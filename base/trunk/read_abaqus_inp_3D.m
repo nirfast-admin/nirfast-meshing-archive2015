@@ -30,6 +30,11 @@ end
 
 % read element list
 data=textscan(fid,pattern);
-elem  = double([data{2} data{3} data{4} data{5}]);
+if ~isempty(strfind(s,'S3R'))
+    elem  = double([data{2} data{3} data{4}]); % surface mesh
+elseif ~isempty(strfind(s,'C3D4'))
+    elem  = double([data{2} data{3} data{4} data{5}]); % solid/tetrahedral mesh
+end
+
 
 fclose(fid);
