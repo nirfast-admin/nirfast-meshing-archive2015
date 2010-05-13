@@ -8,4 +8,4 @@ function [elem, points] = read_abaqus_inp(mesh_fn)
 % For compatibility reason with nirfast suit, we call the identical function whose
 % name has an extra '3D' in it
 
-[elem, points] = read_abaqus_inp_3D(mesh_fn)
+[elem, points] = read_abaqus_inp_3D(mesh_fn);

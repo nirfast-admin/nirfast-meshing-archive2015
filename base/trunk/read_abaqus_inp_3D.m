@@ -20,11 +20,16 @@ for i=1:4, fgetl(fid); end
 data=textscan(fid,' %u64, %.12f, %.12f, %.12f%*[^\n]');
 points = [data{2} data{3} data{4}];
 
-% read head junk
-fgetl(fid);
+% read header
+s = fgetl(fid);
+if ~isempty(strfind(s,'S3R'))
+    pattern = '%u64, %u64, %u64, %u64%*[^\n]'; % surface mesh
+elseif ~isempty(strfind(s,'C3D4'))
+    pattern = ' %u64, %u64, %u64, %u64, %u64%*[^\n]'; % solid/tetrahedral mesh
+end
 
 % read element list
-data=textscan(fid,' %u64, %u64, %u64, %u64, %u64%*[^\n]');
+data=textscan(fid,pattern);
 elem  = double([data{2} data{3} data{4} data{5}]);
 
 fclose(fid);
