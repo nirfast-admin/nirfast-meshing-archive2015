@@ -6,9 +6,19 @@
 extern LogMe MainLogger;
 
 #define FloatTol 1.0e-7
+#define TinyZero 1E-8
+
+#ifndef REAL
+#define REAL double                      /* float or double */
+#endif
 
 #ifndef PI
 #define PI 3.14159265358979323846264338327950288419716939937510
+#endif
+
+#ifndef myrand
+#define myrand(n) ( (long)  ( (double)rand() / ((double)(RAND_MAX)+(double)(1.0)) * (double)n ) )
+//#define myrand(n) (ceil( (double)rand() / ((double)RAND_MAX + 1.0) * (double) (n))); // this produces between 1 and n (including both)
 #endif
 
 //bool IsEqual(double a, double b, double tiny);
