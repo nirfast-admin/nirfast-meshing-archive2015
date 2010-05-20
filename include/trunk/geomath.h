@@ -11,19 +11,8 @@
 #ifndef __dlmathlib_h
 #define __dlmathlib_h
 
-#include <cmath>
-#include <algorithm>
-#include <iostream>
-#include <math.h>
-#include <stdio.h>
+#include "init.h"
 #include "vector.h"
-#include "LogMe.h"
-
-extern LogMe MainLogger;
-
-#ifndef TinyZero
-#define TinyZero 1E-9
-#endif
 
 #ifndef sqrttwo
 #define sqrttwo 1.4142135623730950488016887242097
@@ -161,7 +150,7 @@ int point_inside_segment(double *s, double *e, double *p, double tiny = TinyZero
 // 20,21,22 : if intersection is on one of the triangle vertices
 // 30,31,32 : if ray and one of the triangle edges are colinear (fully or partially)
 // it also returns the intersection point in *p
-int ray_triangle_coplanar(double rp1[3], double rp2[3], double tp1[3], double tp2[3], double tp3[3], std::vector<std::vector<double> > &ipnt, double global_tiny);
+int ray_triangle_coplanar(double rp1[3], double rp2[3], double tp1[3], double tp2[3], double tp3[3], std::vector< std::vector<double> > &ipnt, double global_tiny);
 
 // Routine to check if two line segments in 3D intersect or not!
 int segseg(double p1[3], double p2[3], double p3[3], double p4[3], double tiny, double *I, bool twoD=false);
