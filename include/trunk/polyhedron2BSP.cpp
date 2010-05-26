@@ -307,7 +307,8 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 	/*if (this->polygonmarker[ polygons[0]->id - 1])
 			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
 	// srand( (unsigned)time( NULL ) );
-	idx = (ULONG) ((double)rand() / ((double)RAND_MAX + 1.0) * ((double)polygons.size()));
+	//idx = (ULONG) ((double)rand() / ((double)RAND_MAX + 1.0) * ((double)polygons.size()));
+	idx = myrand((ULONG) polygons.size());
 	bestPlane = *(polygons[idx]->GetPlane());
 	assert(idx<(ULONG)polygons.size() && idx>=0);
 	this->polygonmarker[ polygons[idx]->id - 1] = true;
@@ -355,6 +356,86 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
 	this->polygonmarker[ polygons[idx]->id - 1] = true;
     return bestPlane;
+}
+
+int Polyhedron2BSP::IsInside(Point& p, double PlaneTHK) {
+	
+	BSPNode *node = this->GetBSP_SolidLeaf_no_split();
+	return this->PointInSolidSpace(node, p, PlaneTHK);
+}
+
+int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
+// Using a solid-leaf BSP, determines if point p is inside, outside
+// or on the boundary of polyhedron
+// Returns:
+// 0 : Outside
+// 1 : Inside
+// 2 : On the boundary
+{
+    while (!node->IsLeaf()) {
+        // Compute distance of point to dividing plane
+        //float dist = Dot(node->plane.n, p) - node->plane.d;
+		//double dist = node->myplane.n*p + node->myplane._d;
+		
+		double a[3],b[3],c[3],d[3];
+		a[0] = node->myplane.GetThreePoints(0)->x;
+		a[1] = node->myplane.GetThreePoints(0)->y;
+		a[2] = node->myplane.GetThreePoints(0)->z;
+		b[0] = node->myplane.GetThreePoints(1)->x;
+		b[1] = node->myplane.GetThreePoints(1)->y;
+		b[2] = node->myplane.GetThreePoints(1)->z;
+		c[0] = node->myplane.GetThreePoints(2)->x;
+		c[1] = node->myplane.GetThreePoints(2)->y;
+		c[2] = node->myplane.GetThreePoints(2)->z;
+		d[0] = p.x; d[1] = p.y; d[2] = p.z;
+		double ret = orient3d(a,b,c,d);
+        
+        if (ret < 0.0)
+			node = node->frontnode;
+		else if (ret > 0.0)
+			node = node->backnode;
+		else if (ret == 0.0) {
+			int front = PointInSolidSpace(node->frontnode, p);
+			int back  = PointInSolidSpace(node->backnode,  p);
+            // If results agree, return that, else point is on boundary
+			std::cout << " Query point on plane!" << ((front == back) ? front : 2) << std::endl;
+            return (front == back) ? front : 2;
+		}
+		else {
+			std::cout << std::endl << 
+			"  There seems to be bug!!!" << std::endl << std::endl;
+		}
+        
+		/*if (ret < -node->myplane.plane_thk_epsilon)
+		 node = node->frontnode;
+		 else if (ret > node->myplane.plane_thk_epsilon)
+		 node = node->backnode;
+		 else {
+		 int front = PointInSolidSpace(node->frontnode, p);
+		 int back = PointInSolidSpace(node->backnode, p);
+		 // If results agree, return that, else point is on boundary
+		 return (front == back) ? front : 2;
+		 }*/
+        
+	}
+	return node->IsSolid() ? 1 : 0;
+	
+	/*if (dist > PlaneTHK) {
+	 // Point in front of plane, so traverse front of tree
+	 node = node->frontnode;
+	 } else if (dist < -PlaneTHK) {
+	 // Point behind of plane, so traverse back of tree
+	 node = node->backnode;
+	 } else {
+	 // Point on dividing plane; must traverse both sides
+	 int front = PointInSolidSpace(node->frontnode, p);
+	 int back = PointInSolidSpace(node->backnode, p);
+	 // If results agree, return that, else point is on boundary
+	 return (front == back) ? front : 2;
+	 }
+	 }
+	 // Now at a leaf, inside/outside status determined by solid flag
+	 return node->IsSolid() ? 1 : 0;*/
 }
 
 int Polyhedron2BSP::ReadPolyhedronFromFile(std::string infn) {

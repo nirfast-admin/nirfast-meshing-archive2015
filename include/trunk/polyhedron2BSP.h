@@ -33,6 +33,7 @@ public:
 	void InitFromMatlabMex(double *p, unsigned long *ele, unsigned long np, unsigned long ne, int nnpe);
 
 	BSPNode* GetBSP_SolidLeaf_no_split();
+	int IsInside(Point& p, double PlaneTHK);
 	void SetBBX(double BBX[6]);
 	void SetInputPolyhedron(std::vector<Polygon *> &inputpoly) { this->_inputpoly = inputpoly; }
 	//void SetInputPolyhedron(std::vector<Point *> verts, std::vector<unsigned long>
@@ -45,6 +46,7 @@ public:
 private:
 	BSPNode* _BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, unsigned long depth, int label);
 	Plane3D PickSplittingPlane(std::vector<Polygon *> &polygons, unsigned long depth);
+	int PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK = TinyZero);
 	BSPNode* _delete_node(BSPNode *);
 	BSPNode* _root;
 	std::vector<Polygon *> _inputpoly;

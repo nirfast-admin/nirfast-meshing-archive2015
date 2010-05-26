@@ -73,6 +73,8 @@
 
 #endif
 
+typedef unsigned long ULONG;
+
 #ifndef CPU_TIME
 //extern int getrusage();
 /*#if defined(__APPLE__) || defined(__MACH__) || defined(linux) || defined(__linux)
@@ -86,7 +88,7 @@ ruse.ru_stime.tv_sec + 1e-6 * \
 #endif // CPU_TIME
 
 #ifndef myrand
-#define myrand(n) ( (long)  ( (double)rand() / ((double)(RAND_MAX)+(double)(1.0)) * (double)n ) )
+#define myrand(n) ( (ULONG)  ( (double)rand() / ((double)(RAND_MAX)+(double)(1.0)) * (double)(n) ) )
 //#define myrand(n) (ceil( (double)rand() / ((double)RAND_MAX + 1.0) * (double) (n))); // this produces between 1 and n (including both)
 #endif
 
@@ -96,7 +98,6 @@ ruse.ru_stime.tv_sec + 1e-6 * \
 #define REAL double                      /* float or double */
 #endif
 
-typedef unsigned long ULONG;
 
 #endif
 
