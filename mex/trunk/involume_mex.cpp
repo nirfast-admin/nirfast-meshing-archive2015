@@ -20,7 +20,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (!mxIsDouble(prhs[1]))
         mexErrMsgTxt("involume_mex: input argument 2 should be of 'double' type");
     
-    bool debug=true;
+    bool debug=false;
     
     int dim = mxGetN(prhs[1]);
     if (mxGetN(prhs[1])!=3 || mxGetN(prhs[0]) != 3)

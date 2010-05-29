@@ -131,9 +131,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	if (no_tagged_pixels==0)
 		mexErrMsgTxt("checkerboard3d:EmptyMatrix','Based on input matrix, checkerboard3d can not deploy any nodes!");
 	
-	mexPrintf("  Number of calling rand() function redundantly: %d\n",cc);
+	/*mexPrintf("  Number of calling rand() function redundantly: %d\n",cc);
 	mexPrintf("  nrow*ncol*npln = %d\n", nrow*ncol*npln);
-	mexPrintf("  Time elapsed in tagging : %.6g\n", mytimer.getElapsedTime());
+	mexPrintf("  Time elapsed in tagging : %.6g\n", mytimer.getElapsedTime());*/
 	
 	plhs[0] = mxCreateNumericMatrix(nodes.size(), 3, mxDOUBLE_CLASS, mxREAL);
 	double *foo = (double *) mxGetData(plhs[0]);
