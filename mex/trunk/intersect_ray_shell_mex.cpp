@@ -12,7 +12,7 @@
 //
 // intersected_facets will be meanningful only if all_ok is true
 // intersection_status will then have the following codes:
-// 0 : crossed/pierced the mesh through only one face or edge - toggle worthy 
+// 0 : crossed/pierced the mesh through only one face or edge - toggle worthy
 // 1 : touched only one edge of the mesh, no crossing through mesh - toggle unworthy
 // 2 : point on a parallel facet edge, ray entering the parallel facet through this point - toggle unworthy
 // 3 : point on a parallel facet edge, ray exitting the parallel facet through this point - toggle   worthy
@@ -33,7 +33,7 @@
 				    v[0]=shell_normals[tri-1 + 0*ne]; \
 				    v[1]=shell_normals[tri-1 + 1*ne]; \
 				    v[2]=shell_normals[tri-1 + 2*ne];
-						
+
 
 // [st intpnts all_ok intersection_status intersected_facets] =
 //                         intersect_ray_shell(rp1,rp2,p,t,tiny,facets_bbx,shell_normals,edge2tri_connectivity,indexing,mydir)
@@ -43,9 +43,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     bool debug=false;
     unsigned long cross_counter=0;
     std::vector<std::vector<double> > tmp_ipnt;
-    
+
     int st=0;
-    
+
     if (nrhs==7) // debug flag
         debug=true;
     if (/*rp1 & rp2 */!mxIsDouble(prhs[0]) || !mxIsDouble(prhs[1]) || /*tiny*/!mxIsDouble(prhs[4]))
@@ -65,15 +65,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     else
         mexErrMsgTxt("t needs to be uint32!");*/
-    
+
     double *t;
     if (mxIsDouble(prhs[3]))
         t = (double *) mxGetData(prhs[3]);
     else
         mexErrMsgTxt("intersect_ray_shell: t needs to be 'double'!");
-    
+
 	double tiny=mxGetScalar(prhs[4]);
-    
+
 	float *facets_bbx;
     double *rp1 = mxGetPr(prhs[0]);
     double *rp2 = mxGetPr(prhs[1]);
@@ -81,7 +81,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     unsigned long np=mxGetM(prhs[2]);
 	unsigned long ne=mxGetM(prhs[3]);
 	unsigned long nbbx=mxGetM(prhs[5]);
-	
+
     if (debug) {
         mexPrintf("m=%d n=%d\n",mxGetM(prhs[5]),mxGetN(prhs[5]));
     }
@@ -104,9 +104,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexPrintf("Calculating facets_bbx\n");
         facets_bbx = new float[ne*6];
         for (ulong i=0; i<ne; ++i) {
-            ulong n1=t(i,0);
-            ulong n2=t(i,1);
-            ulong n3=t(i,2);
+            ulong n1= (ulong) t(i,0);
+            ulong n2= (ulong) t(i,1);
+            ulong n3= (ulong) t(i,2);
             double tmp;
             for (ulong j=0; j<3; ++j) {
                 tmp = std::min(p(n1-1,j),p(n2-1,j));
@@ -134,7 +134,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
     else
         mexErrMsgTxt("intersect_ray_shell_mex: 'indexing' should be of the type UINT32!\n");
-    
+
     std::vector<points> intpnts;
     points p1;
     std::vector<int> intersection_status;
@@ -175,7 +175,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         double myipnt[3]={0.,0.,0.}, mydir[3]={1.,0.,0.};
         double tt=0, uu=0, vv=0;
 //         int ret = intersect_RayTriangle(rp1, rp2, tp1, tp2, tp3, ipnt, tiny);
-        
+
         int ret2 = intersect_ray_triangle_moller(rp1,mydir,tp1,tp2,tp3,&tt,&uu,&vv,tiny);
         if (ret2==2) { // parallel ray and plane of triangle, call a different routine
             ret2 = ray_triangle_coplanar(rp1, rp2, tp1, tp2, tp3, tmp_ipnt, tiny);
@@ -190,7 +190,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			tmp_ipnt.push_back(tmp);
 		}
         int ret=ret2;
-        
+
         if (ret!=0 && ret!=2) {
            /* if (debug)
                 mexPrintf("Intersection Exists!\n");*/
@@ -234,7 +234,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             break;
         }
         else if (ret==200 || ret==201 || ret==201) { // Ray parallel to facet and intersecting ONLY one vertex
-            // Two scenarios: 1- onset of ray is one of the facets' vertices. 
+            // Two scenarios: 1- onset of ray is one of the facets' vertices.
             //                2- This ray will intersect other facets on a vertex too, i.e., on a different 'i' (the loop counter for facets)
             // What to do ?!!
             st = -1;
@@ -287,7 +287,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		plhs[3] = mxCreateNumericMatrix(nintpnts, 1, mxINT8_CLASS, mxREAL);
 		char  *footmp1 = (char *) mxGetData(plhs[3]);
 		for (ulong i=0; i<nintpnts; footmp1[i]=intersection_status[i],++i);
-	
+
         if (debug)
             mexPrintf("Setting intersected_facets!\n");
 		if (all_ok) {
@@ -340,14 +340,14 @@ bool CheckArgsIn(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 }
 
 // int_status : contains following codes about the status of intersected points
-// 0 : crossed/pierced the mesh through only one edge - toggle worthy 
+// 0 : crossed/pierced the mesh through only one edge - toggle worthy
 // 1 : touched only one edge of the mesh, no crossing through mesh - toggle unworthy
 // 2 : point on a parallel facet edge, ray entering the parallel facet through this point - toggle unworthy
 // 3 : point on a parallel facet edge, ray exitting the parallel facet through this point - toggle   worthy
 // 4 : point on a parallel facet edge, ray exitting the parallel facet through this point - toggle unworthy
 // 5 : point on two parallel facets' common edge, toggle unworthy
 // int_facets: will be used in calling function to make sure that we don't check them again.
-bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > first_intpnts, 
+bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > first_intpnts,
 					 double *rp1, double *rp2, double *mydir, double tiny,
 					 std::vector<points> &int_pnts, std::vector<int> &int_status, std::vector<bool> &int_facets,
 					 double *shell_normals, const mxArray *list, ulong *indexing,
@@ -368,7 +368,7 @@ bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > 
     points points_tmp;
     ulong tri, next_tri;
     ulong edge1[2], edge2[2];
-	
+
 	int_pnts.clear();
 	int_status.clear();
 	//int_facets.clear();
@@ -458,7 +458,7 @@ bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > 
 			int_pnts.push_back(points_tmp);
 		}
 	}
-	
+
 	// Now we need to sort intersection points based on their distance from rp1.
 	// After the sorting, any point between first and last would be considered
 	// 'toggle unworthy'!
@@ -476,7 +476,7 @@ bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > 
 				tmp_d = d[j];
 				d[j] = d[i];
 				d[i] = tmp_d;
-				
+
 				for (int k=0; k<3; points_tmp.c[k]=int_pnts[j].c[k], ++k);
 				for (int k=0; k<3; int_pnts[j].c[k]=int_pnts[i].c[k], ++k);
 				for (int k=0; k<3; int_pnts[i].c[k]=points_tmp.c[k], ++k);
@@ -494,7 +494,7 @@ bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > 
 	int_pnts = tmpnts;
 	int_status.push_back(2);
 	// int_status.front() = 2; // entering a parallel facet but no toggeling
-	
+
 	if (mysign[0]*mysign[1]>0) // valid crossing over parallel faces
 		ret=true;
 	else
@@ -513,7 +513,7 @@ ulong GetNeighborTriangle(ulong edge[2], ulong tri, const mxArray *list, ulong *
 	int nsubs = 2;
     int nconn_tris = 0;
 	mwIndex index;
-	
+
 	if (edge[0]>edge[1])
 		std::swap(edge[0],edge[1]);
 	ulong starti = indexing(edge[0]-1,0);

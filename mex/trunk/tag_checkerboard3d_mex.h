@@ -28,9 +28,11 @@ typedef unsigned long ULONG;
 #define boundary_node_code 1
 #define on_facet 7
 
-#if defined(WIN32) || defined(WIN64)
-#define _stupidMS_min _cpp_min
-#define _stupidMS_max _cpp_max
+#if defined(WIN32) defined(WIN64)
+/*#define _stupidMS_min _cpp_min
+#define _stupidMS_max _cpp_max*/
+#define _stupidMS_min std::min
+#define _stupidMS_max std::max
 #define round(x) ((int)((x) > 0.0 ? (x) + 0.5 : (x) - 0.5))
 #else
 #define _stupidMS_min std::min
