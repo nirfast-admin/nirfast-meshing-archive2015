@@ -13,13 +13,13 @@
 // To compile this in Matlab use:
 
 // Windows:
-// mex -v -I./header -DCPU86 -DWIN32 PointInPolyhedron_mex.cpp header/polyhedron2BSP.cpp header/CPoint.cpp header/CVector.cpp header/Plane3D.cpp header/BSPNode.cpp header/MeshIO.cpp header/FileOperation.cpp header/CPolygon.cpp header/predicates.cpp header/CStopWatch.cpp
+// mex -v -I./meshlib -DCPU86 -DWIN32 PointInPolyhedron_mex.cpp meshlib/polyhedron2BSP.cpp meshlib/CPoint.cpp meshlib/CVector.cpp meshlib/Plane3D.cpp meshlib/BSPNode.cpp meshlib/MeshIO.cpp meshlib/FileOperation.cpp meshlib/CPolygon.cpp meshlib/predicates.cpp meshlib/CStopWatch.cpp
 
 // Linux:
-// mex -v -I./header -DLINUX PointInPolyhedron_mex.cpp header/polyhedron2BSP.cpp header/CPoint.cpp header/CVector.cpp header/Plane3D.cpp header/BSPNode.cpp header/MeshIO.cpp header/FileOperation.cpp header/CPolygon.cpp header/predicates.cpp header/CStopWatch.cpp
+// mex -v -I./meshlib -DLINUX PointInPolyhedron_mex.cpp meshlib/polyhedron2BSP.cpp meshlib/CPoint.cpp meshlib/CVector.cpp meshlib/Plane3D.cpp meshlib/BSPNode.cpp meshlib/MeshIO.cpp meshlib/FileOperation.cpp meshlib/CPolygon.cpp meshlib/predicates.cpp meshlib/CStopWatch.cpp
 
 // Mac OSX
-// mex -v -I./header         PointInPolyhedron_mex.cpp header/polyhedron2BSP.cpp header/CPoint.cpp header/CVector.cpp header/Plane3D.cpp header/BSPNode.cpp header/MeshIO.cpp header/FileOperation.cpp header/CPolygon.cpp header/predicates.cpp header/CStopWatch.cpp
+// mex -v -I./meshlib         PointInPolyhedron_mex.cpp meshlib/polyhedron2BSP.cpp meshlib/CPoint.cpp meshlib/CVector.cpp meshlib/Plane3D.cpp meshlib/BSPNode.cpp meshlib/MeshIO.cpp meshlib/FileOperation.cpp meshlib/CPolygon.cpp meshlib/predicates.cpp meshlib/CStopWatch.cpp
 
 
 #include "PointInPolyhedron_mex.h"
