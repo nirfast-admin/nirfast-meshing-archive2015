@@ -389,14 +389,19 @@ Point& Point::operator =(const Point &other) {
 //------------------------------------------------------------------
 
 char* Point::errstr() {            // return error string
+	char *ret;
 	switch (err) {
 	case Enot:
-		return "no error";
+			strcpy(ret, "no error");
+            break;
 	case Edim:
-		return "error: invalid dimension for operation";
+			strcpy(ret, "error: invalid dimension for operation");
+            break;
 	case Esum:
-		return "error: Point sum is not affine";
+			strcpy(ret, "error: Point sum is not affine");
+            break;
 	default:
-		return "error: unknown err value";
+			strcpy(ret, "error: unknown err value");
 	}
+	return ret;
 }
