@@ -18,15 +18,14 @@ if nargin==0
                              'MultiSelect','off');
     idx = regexpi(fname,'[0-9]*\.');
     fnprefix = fname(1:idx(end)-1);
-else
-    pname=pwd;
+    fnprefix = [pname filesep fnprefix];
 end
 if nargin~=2
     type='generic';
 end
 
 fprintf('\n\n--> Beginning mesh generation process...\n\n');
-no_regions = length(dir([pname filesep fnprefix '*.inp']));
+no_regions = length(dir([fnprefix '*.inp']));
 if no_regions==0
     errordlg(['Cannot find file .inp files whose prefix is ' fnprefix],'Mesh Error');
     error(['Cannot find file .inp files whose prefix is ' fnprefix]);
@@ -40,7 +39,7 @@ telem = [];
 tnode = [];
 flag= true; fcounter = 1;
 while flag
-    fn = [pname filesep fnprefix num2str(fcounter) '.inp'];
+    fn = [fnprefix num2str(fcounter) '.inp'];
     [fid msg]=fopen(fn,'rt');
     if ~isempty(msg), flag=false; continue; end
     fclose(fid);
@@ -71,7 +70,7 @@ for i=1:size(interior_nodes,1)
     regions{i,2} = i;
 end
 myargs.silentflag=1;
-myargs.bdyfn = [pname filesep fnprefix];
+myargs.bdyfn = [fnprefix];
 myargs.regions = regions;
 % Remove the following line to create a mesh based on average size of the
 % input surfaces
@@ -87,7 +86,7 @@ delete('input4delaunay.*','junk.txt');
 fn = [fnprefix '-nirfast'];
 mesh.dimension = 3;
 mesh.type = type;
-mesh.name = [pname fn];
+mesh.name = fnprefix;
 
 % First figure out the exterior nodes
 faces=[mesh.elements(:,[1,2,3]);
