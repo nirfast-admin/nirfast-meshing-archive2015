@@ -50,9 +50,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexPrintf("Calculating facets_bbx\n");
     facets_bbx = new float[ne][6];
     for (ulong i=0; i<ne; ++i) {
-        ulong n1=ele(i,0);
-        ulong n2=ele(i,1);
-        ulong n3=ele(i,2);
+        ulong n1 = (ulong) ele(i,0);
+        ulong n2 = (ulong) ele(i,1);
+        ulong n3 = (ulong) ele(i,2);
         double tmp;
         for (ulong j=0; j<3; ++j) {
             tmp = std::min(p(n1-1,j),p(n2-1,j));
@@ -62,12 +62,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         }
     }
     
-    plhs[0] = mxCreateNumericMatrix(nqp, 1, mxINT8_CLASS, mxREAL);
-    double *st = mxGetPr(plhs[0]);
-    ulong i;
+    plhs[0] = mxCreateNumericMatrix(nqp, 1, mxUINT8_CLASS, mxREAL);
+    unsigned char *st = (unsigned char *) mxGetData(plhs[0]);
+    
     if (debug)
         mexPrintf("Entering the loop to call isinvolume_ranRay\n");
-    for (i=0; i<nqp; ++i) {
+    for (ulong i=0; i<nqp; ++i) {
         for (int j=0; j<3; tmpqp[j] = qp(i,j), ++j);
         st[i] = isinvolume_randRay(tmpqp,prhs[2],prhs[1],tiny,facets_bbx,ntries,xMin,xMax);
     }

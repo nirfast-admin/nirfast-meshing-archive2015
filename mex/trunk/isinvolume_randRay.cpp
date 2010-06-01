@@ -11,11 +11,11 @@
 
 
 // This routine should be called from a Matlab mex function ONLY!
-unsigned int isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *mxT, double tiny, 
+unsigned char isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *mxT, double tiny, 
 					   float (*facets_bbx)[6], int numPerturb, double minX, double maxX)
 {
    
-    unsigned int st;
+    unsigned char st;
     bool debug=false;
         
     // get p0 and list of shell points
@@ -52,7 +52,7 @@ unsigned int isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *m
     double rp1[3], rp2[3];
     for (int i=0; i<3; rp1[i]=p0[i], rp2[i]=p0[i], ++i);
     // and add 2*AbsMaxX (as infinite point)
-	rp2[0] += fabs(p0[0]-maxX)*10 + fabs(maxX-minX)*10;
+	rp2[0] = fabs(maxX-minX)*10 + maxX;
     
     unsigned long int nintpnts;
 	bool forever = true;
@@ -111,7 +111,7 @@ unsigned int isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *m
                         if (temp > R)
                             R = temp;
                     }
-                    R *= 10;
+                    R *= 100;
                     rayPerturbed=true;
                     if (debug)
                         mexPrintf("Calculated R is : %lf\n",R);

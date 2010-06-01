@@ -20,7 +20,11 @@
 // 5 : point on two parallel facets' common edge, toggle unworthy
 
 // To compile this use:
-// mex -v -I./meshlib intersect_ray_shell_mex.cpp ./meshlib/vector.cpp ./meshlib/geomath.cpp
+// Windows
+// mex -v -DWIN32 -I./meshlib intersect_ray_shell_mex.cpp ./meshlib/vector.cpp ./meshlib/geomath.cpp
+//
+// Mac
+// mex -v         -I./meshlib intersect_ray_shell_mex.cpp ./meshlib/vector.cpp ./meshlib/geomath.cpp
 
 #include "intersect_ray_shell_mex.h"
 
