@@ -35,7 +35,7 @@ public:
 	BSPNode* GetBSP_SolidLeaf_no_split();
 	int IsInside(Point& p, double PlaneTHK);
 	void SetBBX(double BBX[6]);
-	void SetInputPolyhedron(std::vector<Polygon *> &inputpoly) { this->_inputpoly = inputpoly; }
+	void SetInputPolyhedron(std::vector<Polygon *> &inputpoly);
 	//void SetInputPolyhedron(std::vector<Point *> verts, std::vector<unsigned long>
 
 	double GetPlaneThickness();
