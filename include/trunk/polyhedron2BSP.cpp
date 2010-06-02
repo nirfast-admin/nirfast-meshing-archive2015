@@ -314,12 +314,12 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 	///////////////////////////////////////////////////////////////////////////////////
 	/*if (this->polygonmarker[ polygons[0]->id - 1])
 			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
-	srand( (unsigned)time( NULL ) );
+	/*srand( (unsigned)time( NULL ) );
 	idx = myrand((ULONG) polygons.size());
 	assert(idx<(ULONG)polygons.size() && idx>=0);
 	bestPlane = *(polygons[idx]->GetPlane());
 	this->polygonmarker[ polygons[idx]->id - 1] = true;
-	return bestPlane;
+	return bestPlane;*/
 	///////////////////////////////////////////////////////////////////////////////////
 
 	float bestScore = std::numeric_limits<float>::max();
@@ -379,9 +379,11 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
 // 1 : Inside
 // 2 : On the boundary
 {
+	double d[3];
+	d[0] = p.x; d[1] = p.y; d[2] = p.z;
     while (!node->IsLeaf()) {
-		if (true) {
-            double a[3],b[3],c[3],d[3];
+		if (false) {
+            double a[3],b[3],c[3];
             a[0] = node->myplane.GetThreePoints(0)->x;
             a[1] = node->myplane.GetThreePoints(0)->y;
             a[2] = node->myplane.GetThreePoints(0)->z;
@@ -391,7 +393,7 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
             c[0] = node->myplane.GetThreePoints(2)->x;
             c[1] = node->myplane.GetThreePoints(2)->y;
             c[2] = node->myplane.GetThreePoints(2)->z;
-            d[0] = p.x; d[1] = p.y; d[2] = p.z;
+            
             double ret = orient3d(a,b,c,d);
 
             if (ret < 0.0)
