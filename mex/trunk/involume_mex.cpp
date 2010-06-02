@@ -14,7 +14,8 @@ For Linux/Mac:
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     if (nrhs!=7 || nlhs!=1) {
-        mexErrMsgTxt("st = involume_mex(qp, ele, p, facets_bbx, ntries, xMin, xMax, tiny)");
+        mexPrintf("st = involume_mex(qp, ele, p, facets_bbx, ntries, xMin, xMax, tiny)");
+        mexPrintf("It needs 7 inputs and 1 output");
         mexErrMsgTxt("involume_mex: Terminatin...");
     }
     if (!mxIsDouble(prhs[1]))
