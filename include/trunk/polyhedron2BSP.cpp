@@ -440,27 +440,36 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
     return node->IsSolid() ? 1 : 0;    
 }
 
-bool Polyhedron2BSP::PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, double PlaneTHK)
+int Polyhedron2BSP::PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, double PlaneTHK)
 // Using a solid-leaf BSP, determines if point p is inside, outside
 // or on the boundary of polyhedron
 // Returns:
 // 0 : Outside
 // 1 : Inside
+// 2 : On the polyhedron
 
 {
 	if (node->IsLeaf()) {
 		if (node->IsSolid())
-			return true;
+			return 1;
 		else
-			return false;
+			return 0;
 	}
 	else {
 		int st = node->myplane.ClassifyPointToPlane(p);
-		bool hit = false;
-		if (st == Plane3D::POINT_BEHIND_PLANE || st == Plane3D::POINT_ON_PLANE)
+		int hit = 0;
+		if (st == Plane3D::POINT_BEHIND_PLANE)
 			hit = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
-		if (!hit && (st == Plane3D::POINT_IN_FRONT_OF_PLANE || st == Plane3D::POINT_ON_PLANE))
+		if (!hit && st == Plane3D::POINT_IN_FRONT_OF_PLANE)
 			hit = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
+		if (!hit && st == Plane3D::POINT_ON_PLANE) {
+			int f1 = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
+			int f2 = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
+			if (f1 == f2)
+				return f1;
+			else
+				return 2;
+		}
 		return hit;
 	}
 }
@@ -608,7 +617,7 @@ BSPNode* Polyhedron2BSP::_AutoPartition(std::vector<Polygon *> &P, unsigned long
 		}
 		BSPNode *child_negative = _AutoPartition(P_negative, depth+1, BSPNode::IN);
 		BSPNode *child_positive = _AutoPartition(P_positive, depth+1, BSPNode::OUT);
-		return new BSPNode(child_negative, child_positive, H, depth);
+		return new BSPNode(child_positive, child_negative, H, depth);
 	}
 }
 

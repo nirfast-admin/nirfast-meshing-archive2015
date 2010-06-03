@@ -49,7 +49,7 @@ private:
 	BSPNode* _AutoPartition(std::vector<Polygon *> &polygons, unsigned long depth, int label);
 	Plane3D PickSplittingPlane(std::vector<Polygon *> &polygons, unsigned long depth);
 	int PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK = TinyZero);
-	bool PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, double PlaneTHK);
+	int PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, double PlaneTHK = TinyZero);
 	BSPNode* _delete_node(BSPNode *);
 	BSPNode* _root;
 	std::vector<Polygon *> _inputpoly;
