@@ -51,7 +51,8 @@ Polyhedron2BSP::Polyhedron2BSP(double *p, unsigned long *ele, unsigned long np, 
 	    exit(1);
 	}
 	// Two identical points are distinguished by '_mindist'.
-	_mindist = longest * this->macheps;
+	//_mindist = longest * this->macheps;
+	_mindist = this->macheps;
 
 	// Setup initial split planes
 	this->polygonmarker.assign(this->_inputpoly.size(),false);
@@ -104,7 +105,8 @@ void Polyhedron2BSP::InitFromMatlabMex(double *p, unsigned long *ele, unsigned l
 	    exit(1);
 	}
 	// Two identical points are distinguished by '_mindist'.
-	_mindist = longest * this->macheps;
+	//_mindist = longest * this->macheps;
+	_mindist = this->macheps;
 
 	_inputpoly[0]->GetPlane()->plane_thk_epsilon = _mindist;
 	// Setup initial split planes
@@ -132,7 +134,8 @@ void Polyhedron2BSP::SetBBX(double BBX[]) {
 	    exit(1);
 	}
 	// Two identical points are distinguished by '_mindist'.
-	_mindist = longest * this->macheps;
+	//_mindist = longest * this->macheps;
+	_mindist = this->macheps;
 	SetupRequiredSplitPlanes();
 }
 void Polyhedron2BSP::SetupRequiredSplitPlanes() {
@@ -314,7 +317,6 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 	///////////////////////////////////////////////////////////////////////////////////
 	/*if (this->polygonmarker[ polygons[0]->id - 1])
 			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
-	srand( (unsigned)time( NULL ) );
 	idx = myrand((ULONG) polygons.size());
 	assert(idx<(ULONG)polygons.size() && idx>=0);
 	bestPlane = *(polygons[idx]->GetPlane());
@@ -382,7 +384,7 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
 	double d[3];
 	d[0] = p.x; d[1] = p.y; d[2] = p.z;
     while (!node->IsLeaf()) {
-		if (false) {
+		if (true) {
             double a[3],b[3],c[3];
             a[0] = node->myplane.GetThreePoints(0)->x;
             a[1] = node->myplane.GetThreePoints(0)->y;
@@ -510,7 +512,8 @@ int Polyhedron2BSP::ReadPolyhedronFromFile(std::string infn) {
 	    exit(1);
 	}
 	// Two identical points are distinguished by '_mindist'.
-	_mindist = longest * this->macheps;
+	//_mindist = longest * this->macheps;
+	_mindist = this->macheps;
 
 	_inputpoly[0]->GetPlane()->plane_thk_epsilon = this->_mindist;
 	// Setup initial split planes
