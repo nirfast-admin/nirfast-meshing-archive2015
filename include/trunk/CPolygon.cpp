@@ -70,6 +70,8 @@ int Polygon::ClassifyPolygonToPlane(Plane3D& plane)
 				break;
         }
     }
+	/*if (numInFront+numBehind != 3 && !(numInFront==0 && numBehind==0))
+		return POLYGON_STRADDLING_PLANE;*/
     // If vertices on both sides of the plane, the polygon is straddling
     if (numBehind != 0 && numInFront != 0)
         return POLYGON_STRADDLING_PLANE;

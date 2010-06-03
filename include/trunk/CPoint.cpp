@@ -389,7 +389,7 @@ Point& Point::operator =(const Point &other) {
 //------------------------------------------------------------------
 
 char* Point::errstr() {            // return error string
-	char *ret;
+	char *ret = new char[127];
 	switch (err) {
 	case Enot:
 			strcpy(ret, "no error");

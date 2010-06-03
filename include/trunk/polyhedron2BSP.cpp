@@ -233,7 +233,8 @@ BSPNode* Polyhedron2BSP::GetBSP_SolidLeaf_no_split() {
 		if (this->_inputpoly.empty())
 			return (BSPNode *) NULL;
 		srand( (unsigned)time( NULL ) ); // Initialize the seed for random generator.
-		_root = _BuildBSPTree_SL_NS(this->_inputpoly, 0, BSPNode::OUT);
+		//_root = _BuildBSPTree_SL_NS(this->_inputpoly, 0, BSPNode::OUT);
+		_root = _AutoPartition(this->_inputpoly, 0, BSPNode::OUT);
 		_isbuilt = true;
 		return _root;
 	}
@@ -370,7 +371,8 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 int Polyhedron2BSP::IsInside(Point& p, double PlaneTHK) {
 	
 	BSPNode *node = this->GetBSP_SolidLeaf_no_split();
-	return this->PointInSolidSpace(node, p, PlaneTHK);
+	//return this->PointInSolidSpace(node, p, PlaneTHK);
+	return ((int) (this->PointInSolidSpace_AutoPartition(node, p, PlaneTHK)));
 }
 
 int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
@@ -386,59 +388,83 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
     while (!node->IsLeaf()) {
 		if (false) {
             double a[3],b[3],c[3];
-		a[0] = node->myplane.GetThreePoints(0)->x;
-		a[1] = node->myplane.GetThreePoints(0)->y;
-		a[2] = node->myplane.GetThreePoints(0)->z;
-		b[0] = node->myplane.GetThreePoints(1)->x;
-		b[1] = node->myplane.GetThreePoints(1)->y;
-		b[2] = node->myplane.GetThreePoints(1)->z;
-		c[0] = node->myplane.GetThreePoints(2)->x;
-		c[1] = node->myplane.GetThreePoints(2)->y;
-		c[2] = node->myplane.GetThreePoints(2)->z;
+			a[0] = node->myplane.GetThreePoints(0)->x;
+			a[1] = node->myplane.GetThreePoints(0)->y;
+			a[2] = node->myplane.GetThreePoints(0)->z;
+			b[0] = node->myplane.GetThreePoints(1)->x;
+			b[1] = node->myplane.GetThreePoints(1)->y;
+			b[2] = node->myplane.GetThreePoints(1)->z;
+			c[0] = node->myplane.GetThreePoints(2)->x;
+			c[1] = node->myplane.GetThreePoints(2)->y;
+			c[2] = node->myplane.GetThreePoints(2)->z;
             
-		double ret = orient3d(a,b,c,d);
+			double ret = orient3d(a,b,c,d);
         
-        if (ret < 0.0)
-			node = node->frontnode;
-		else if (ret > 0.0)
-			node = node->backnode;
-		else if (ret == 0.0) {
-			int front = PointInSolidSpace(node->frontnode, p);
-			int back  = PointInSolidSpace(node->backnode,  p);
-            // If results agree, return that, else point is on boundary
-                //std::cout << " Query point on node! " << ((front == back) ? front : 2) << std::endl;
-                //std::cout << " P = (" << p.x << ", " << p.y << ", " << p.z << ')' << std::endl;
-            return (front == back) ? front : 2;
+			if (ret < 0.0)
+				node = node->frontnode;
+			else if (ret > 0.0)
+				node = node->backnode;
+			else if (ret == 0.0) {
+				int front = PointInSolidSpace(node->frontnode, p);
+				int back  = PointInSolidSpace(node->backnode,  p);
+				// If results agree, return that, else point is on boundary
+					//std::cout << " Query point on node! " << ((front == back) ? front : 2) << std::endl;
+					//std::cout << " P = (" << p.x << ", " << p.y << ", " << p.z << ')' << std::endl;
+				return (front == back) ? front : 2;
+			}
+			else {
+				std::cout << std::endl << 
+				"  There seems to be bug!!!" << std::endl << std::endl;
+			}
 		}
 		else {
-			std::cout << std::endl << 
-			"  There seems to be bug!!!" << std::endl << std::endl;
-		}
-        }
-		 else {
             // Compute distance of point to dividing plane
             double dist = node->myplane.n*p + node->myplane._d;
             if (dist > PlaneTHK) {
-	 // Point in front of plane, so traverse front of tree
-	 node = node->frontnode;
-	 } else if (dist < -PlaneTHK) {
-	 // Point behind of plane, so traverse back of tree
-	 node = node->backnode;
-	 } else {
-	 // Point on dividing plane; must traverse both sides
-	 int front = PointInSolidSpace(node->frontnode, p);
-	 int back = PointInSolidSpace(node->backnode, p);
-	 // If results agree, return that, else point is on boundary
-	 return (front == back) ? front : 2;
-	 }
-	 }
-             
-             
-    }
+				// Point in front of plane, so traverse front of tree
+				node = node->frontnode;
+			} else if (dist < -PlaneTHK) {
+				// Point behind of plane, so traverse back of tree
+				node = node->backnode;
+			}
+			else {
+				// Point on dividing plane; must traverse both sides
+				int front = PointInSolidSpace(node->frontnode, p);
+				int back = PointInSolidSpace(node->backnode, p);
+				// If results agree, return that, else point is on boundary
+				return (front == back) ? front : 2;
+			}
+		}
+	}
 	 // Now at a leaf, inside/outside status determined by solid flag
     return node->IsSolid() ? 1 : 0;    
 }
 
+bool Polyhedron2BSP::PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, double PlaneTHK)
+// Using a solid-leaf BSP, determines if point p is inside, outside
+// or on the boundary of polyhedron
+// Returns:
+// 0 : Outside
+// 1 : Inside
+
+{
+	if (node->IsLeaf()) {
+		if (node->IsSolid())
+			return true;
+		else
+			return false;
+	}
+	else {
+		int st = node->myplane.ClassifyPointToPlane(p);
+		bool hit = false;
+		if (st == Plane3D::POINT_BEHIND_PLANE || st == Plane3D::POINT_ON_PLANE)
+			hit = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
+		if (!hit && (st == Plane3D::POINT_IN_FRONT_OF_PLANE || st == Plane3D::POINT_ON_PLANE))
+			hit = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
+		return hit;
+	}
+}
+   
 int Polyhedron2BSP::ReadPolyhedronFromFile(std::string infn) {
 	CFileOperation myfile;
 	std::ifstream ifs;
@@ -552,6 +578,38 @@ double Polyhedron2BSP::GetPlaneThickness() {
 
 void Polyhedron2BSP::SetPlaneThickness(double thk) {
     this->_inputpoly[0]->GetPlane()->plane_thk_epsilon = thk;
+}
+
+BSPNode* Polyhedron2BSP::_AutoPartition(std::vector<Polygon *> &P, unsigned long depth, int label) {
+	ULONG numfacets = P.size();
+	if (numfacets==0) {
+		return new BSPNode(label);
+	}
+	else {
+		if (depth > this->maxdepth)
+			this->maxdepth = depth;
+		Plane3D H = this->PickSplittingPlane(P, depth);
+		std::vector<Polygon *> P_positive, P_negative;
+		for (ULONG i=0; i< numfacets; ++i) {
+			Polygon* poly = P[i];
+			int st = poly->ClassifyPolygonToPlane(H);
+			if (st != Polygon::POLYGON_COPLANAR_WITH_PLANE) {
+				if (st == Polygon::POLYGON_STRADDLING_PLANE) {
+					P_negative.push_back(poly);
+					P_positive.push_back(poly);
+				}
+				else if (st == Polygon::POLYGON_BEHIND_PLANE) {
+					P_negative.push_back(poly);
+				}
+				else {
+					P_positive.push_back(poly);
+				}
+			}
+		}
+		BSPNode *child_negative = _AutoPartition(P_negative, depth+1, BSPNode::IN);
+		BSPNode *child_positive = _AutoPartition(P_positive, depth+1, BSPNode::OUT);
+		return new BSPNode(child_negative, child_positive, H, depth);
+	}
 }
 
     
