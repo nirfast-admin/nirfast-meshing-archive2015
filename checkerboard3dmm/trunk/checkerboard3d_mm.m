@@ -18,7 +18,7 @@ if nargin==0
                              'MultiSelect','off');
     idx = regexpi(fname,'[0-9]*\.');
     fnprefix = fname(1:idx(end)-1);
-    fnprefix = [pname filesep fnprefix];
+    fnprefix = [pname fnprefix];
 end
 if nargin~=2
     type='generic';
@@ -63,6 +63,10 @@ while flag
     telem = [telem;elem];
     tnode = [tnode;node];
     fcounter = fcounter + 1;
+end
+if fcounter==1 % couldn't read the first file
+    errordlg({[msg ':'], fn},'Meshing Error');
+    error(msg,'Meshing Error');
 end
 regions=cell(size(interior_nodes,1),2);
 for i=1:size(interior_nodes,1)
