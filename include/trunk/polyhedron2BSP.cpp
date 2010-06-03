@@ -256,7 +256,16 @@ BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, u
 	if (depth > maxdepth) maxdepth = depth;
     // Select best possible partitioning plane based on the input geometry
 	// if (numPolygons != 1)
-	splitPlane = PickSplittingPlane(polygons, depth);
+		splitPlane = PickSplittingPlane(polygons, depth);
+	/*else {
+		splitPlane = Plane3D(polygons[0]->GetVertexPtr(0), polygons[0]->GetVertexPtr(1), polygons[0]->GetVertexPtr(2));
+		// if (this->polygonmarker[ polygons[0]->id - 1])
+		// 	std::cout << "  _BuildBSPTree: polygon's plane has already been used!" << std::endl;
+		this->polygonmarker[ polygons[0]->id - 1] = true;
+		BSPNode *frontTree = _BuildBSPTree_SL_NS(frontList, depth+1, BSPNode::OUT);
+		BSPNode *backTree = _BuildBSPTree_SL_NS(backList, depth+1, BSPNode::IN);
+		return new BSPNode(frontTree, backTree, splitPlane, depth);
+	}*/
 
     // Test each polygon against the dividing plane, adding them
     // to the front list, back list, or both, as appropriate
@@ -377,56 +386,56 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
     while (!node->IsLeaf()) {
 		if (false) {
             double a[3],b[3],c[3];
-            a[0] = node->myplane.GetThreePoints(0)->x;
-            a[1] = node->myplane.GetThreePoints(0)->y;
-            a[2] = node->myplane.GetThreePoints(0)->z;
-            b[0] = node->myplane.GetThreePoints(1)->x;
-            b[1] = node->myplane.GetThreePoints(1)->y;
-            b[2] = node->myplane.GetThreePoints(1)->z;
-            c[0] = node->myplane.GetThreePoints(2)->x;
-            c[1] = node->myplane.GetThreePoints(2)->y;
-            c[2] = node->myplane.GetThreePoints(2)->z;
+		a[0] = node->myplane.GetThreePoints(0)->x;
+		a[1] = node->myplane.GetThreePoints(0)->y;
+		a[2] = node->myplane.GetThreePoints(0)->z;
+		b[0] = node->myplane.GetThreePoints(1)->x;
+		b[1] = node->myplane.GetThreePoints(1)->y;
+		b[2] = node->myplane.GetThreePoints(1)->z;
+		c[0] = node->myplane.GetThreePoints(2)->x;
+		c[1] = node->myplane.GetThreePoints(2)->y;
+		c[2] = node->myplane.GetThreePoints(2)->z;
             
-            double ret = orient3d(a,b,c,d);
-
-            if (ret < 0.0)
-                node = node->frontnode;
-            else if (ret > 0.0)
-                node = node->backnode;
-            else if (ret == 0.0) {
-                int front = PointInSolidSpace(node->frontnode, p);
-                int back  = PointInSolidSpace(node->backnode,  p);
-                // If results agree, return that, else point is on boundary
+		double ret = orient3d(a,b,c,d);
+        
+        if (ret < 0.0)
+			node = node->frontnode;
+		else if (ret > 0.0)
+			node = node->backnode;
+		else if (ret == 0.0) {
+			int front = PointInSolidSpace(node->frontnode, p);
+			int back  = PointInSolidSpace(node->backnode,  p);
+            // If results agree, return that, else point is on boundary
                 //std::cout << " Query point on node! " << ((front == back) ? front : 2) << std::endl;
                 //std::cout << " P = (" << p.x << ", " << p.y << ", " << p.z << ')' << std::endl;
-                return (front == back) ? front : 2;
-            }
-            else {
-                std::cout << std::endl << 
-                "  There seems to be bug!!!" << std::endl << std::endl;
-            }
+            return (front == back) ? front : 2;
+		}
+		else {
+			std::cout << std::endl << 
+			"  There seems to be bug!!!" << std::endl << std::endl;
+		}
         }
-        else {
+		 else {
             // Compute distance of point to dividing plane
             double dist = node->myplane.n*p + node->myplane._d;
             if (dist > PlaneTHK) {
-                // Point in front of plane, so traverse front of tree
-                node = node->frontnode;
-            } else if (dist < -PlaneTHK) {
-                // Point behind of plane, so traverse back of tree
-                node = node->backnode;
-            } else {
-                // Point on dividing plane; must traverse both sides
-                int front = PointInSolidSpace(node->frontnode, p);
-                int back  = PointInSolidSpace(node->backnode,  p);
-                // If results agree, return that, else point is on boundary
-                return (front == back) ? front : 2;
-            }
-        }
+	 // Point in front of plane, so traverse front of tree
+	 node = node->frontnode;
+	 } else if (dist < -PlaneTHK) {
+	 // Point behind of plane, so traverse back of tree
+	 node = node->backnode;
+	 } else {
+	 // Point on dividing plane; must traverse both sides
+	 int front = PointInSolidSpace(node->frontnode, p);
+	 int back = PointInSolidSpace(node->backnode, p);
+	 // If results agree, return that, else point is on boundary
+	 return (front == back) ? front : 2;
+	 }
+	 }
              
              
     }
-    // Now at a leaf, inside/outside status determined by solid flag
+	 // Now at a leaf, inside/outside status determined by solid flag
     return node->IsSolid() ? 1 : 0;    
 }
 
