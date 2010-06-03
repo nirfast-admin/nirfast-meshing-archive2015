@@ -257,15 +257,6 @@ BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, u
     // Select best possible partitioning plane based on the input geometry
 	// if (numPolygons != 1)
 	splitPlane = PickSplittingPlane(polygons, depth);
-	/*else {
-		splitPlane = Plane3D(polygons[0]->GetVertexPtr(0), polygons[0]->GetVertexPtr(1), polygons[0]->GetVertexPtr(2));
-		// if (this->polygonmarker[ polygons[0]->id - 1])
-		// 	std::cout << "  _BuildBSPTree: polygon's plane has already been used!" << std::endl;
-		this->polygonmarker[ polygons[0]->id - 1] = true;
-		BSPNode *frontTree = _BuildBSPTree_SL_NS(frontList, depth+1, BSPNode::OUT);
-		BSPNode *backTree = _BuildBSPTree_SL_NS(backList, depth+1, BSPNode::IN);
-		return new BSPNode(frontTree, backTree, splitPlane, depth);
-	}*/
 
     // Test each polygon against the dividing plane, adding them
     // to the front list, back list, or both, as appropriate
@@ -384,7 +375,7 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
 	double d[3];
 	d[0] = p.x; d[1] = p.y; d[2] = p.z;
     while (!node->IsLeaf()) {
-		if (true) {
+		if (false) {
             double a[3],b[3],c[3];
             a[0] = node->myplane.GetThreePoints(0)->x;
             a[1] = node->myplane.GetThreePoints(0)->y;
@@ -549,3 +540,9 @@ BSPNode* Polyhedron2BSP::_delete_node(BSPNode* node) {
 double Polyhedron2BSP::GetPlaneThickness() {
 	return this->_inputpoly[0]->GetPlane()->plane_thk_epsilon;
 }
+
+void Polyhedron2BSP::SetPlaneThickness(double thk) {
+    this->_inputpoly[0]->GetPlane()->plane_thk_epsilon = thk;
+}
+
+    

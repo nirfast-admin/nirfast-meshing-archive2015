@@ -39,6 +39,7 @@ public:
 	//void SetInputPolyhedron(std::vector<Point *> verts, std::vector<unsigned long>
 
 	double GetPlaneThickness();
+    void SetPlaneThickness(double thk);
 	int DeleteTree();
 
 	std::vector<Point *> _points;
