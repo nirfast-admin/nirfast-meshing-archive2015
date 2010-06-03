@@ -79,12 +79,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     if (debug)
         mexPrintf("Initializing the polyhedron converter\n");
 	myconverter.InitFromMatlabMex(points, ele, np, ne, nnpe);
-	
+	myconverter.SetPlaneThickness(1e-5);
+    
     mexPrintf("\nBuilding the BSP tree...");
     
-	mytimer.startTimer();
+    mytimer.startTimer();
 	double foothk = myconverter.GetPlaneThickness();
-    //mexPrintf("\nfoothk: %10.16g\n",foothk);
+    
+    mexPrintf("\n  foothk: %10.16g\n",foothk);
     if (debug)
         mexPrintf("Runnig the query...\n");
 	for (ULONG i=0; i<nqueryp; ++i) {
@@ -93,7 +95,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		// *(c+i) = PointInSolidSpace(root, qfoo, foothk);
 	}
 	mytimer.stopTimer();
-    mexPrintf(" done! (Time: %.12f sec.)\n",mytimer.getElapsedTime());
+    mexPrintf("  done! ( total time: %.6f sec.)\n",mytimer.getElapsedTime());
 
 	// Testing to see if all polygons of the input polyhedron have been used as a leaf in the BSP tree
 	ULONG not_visited = 0;
