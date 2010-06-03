@@ -17,7 +17,7 @@ if st~=0, error(' '); end
 % read header junk
 for i=1:4, fgetl(fid); end
 % read node coordinates
-data=textscan(fid,' %u64, %.12f, %.12f, %.12f%*[^\n]');
+data=textscan(fid,' %u64, %.54f, %.54f, %.54f%*[^\n]');
 points = [data{2} data{3} data{4}];
 
 % read header

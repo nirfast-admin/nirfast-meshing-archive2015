@@ -122,7 +122,7 @@ if ~quiet
     [mypath myfn myext]=fileparts(fn);
     fprintf('\b%s\n','Done writing mesh to:')
     if ~isempty(mypath)
-        fprintf('\t%s',['Path: ' mypath])
+        fprintf('\t%s\n',['Path: ' mypath])
     end
     fprintf('\t%s\n',['Filename: ' myfn '.node/.ele'])
 end
