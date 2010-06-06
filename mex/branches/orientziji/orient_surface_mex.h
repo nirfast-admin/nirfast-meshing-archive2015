@@ -40,5 +40,5 @@ enum {White=0, Gray, Black=-1};
 void CheckOrientation(ulong v, ulong u);
 unsigned int CalculateOrientation(ulong v, const mxArray *mxT, const mxArray *mxP);
 ulong FindSeedsDirection(ulong elemid, const mxArray *prhs[], int &myst);
-
+int ReOrient();
 #endif
