@@ -1,5 +1,5 @@
 // Matlab usage:
-// st = PointInPolyhedron_mex(P, polygons, points, eps)
+// st = PointInPolyhedron_mex(P, polygons, points, epsi, splitType)
 // st = 0 : Outside
 // st = 1 : Inside
 // st = 2 : On the boundary of polyhedron
@@ -9,7 +9,9 @@
 //            n1 n2 n3 ...
 //            n4 n5 n2 ...
 // points   : coordiantes of polyhedron vertices.
-
+// splitTyep: 1 = random selection of split planes
+//            2 = score-base selection of split planes (slow)
+//
 // To compile this in Matlab use:
 
 // Windows:
@@ -30,7 +32,7 @@
 #define t(i,j) t[(i)+ne*(j)]
 
 
-int PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK = TinyZero);
+//int PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK = TinyZero);
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     CheckArgsIn(nlhs, plhs, nrhs, prhs);
@@ -64,6 +66,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	}
 	else
 		eps = TinyZero;
+
+	double splitType = 1;
+	if (nrhs>=5)
+    		splitType = *mxGetPr(prhs[4]);
+
     
     //mexPrintf("TinyZero is : %.12f\n",TinyZero);
 
@@ -78,7 +85,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	Polyhedron2BSP myconverter;
     if (debug)
         mexPrintf("Initializing the polyhedron converter\n");
-	myconverter.InitFromMatlabMex(points, ele, np, ne, nnpe);
+	myconverter.InitFromMatlabMex(points, ele, np, ne, nnpe, (int) splitType);
 	myconverter.SetPlaneThickness(1e-5);
     
     mexPrintf("\nBuilding the BSP tree...");
@@ -95,7 +102,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		// *(c+i) = PointInSolidSpace(root, qfoo, foothk);
 	}
 	mytimer.stopTimer();
-    mexPrintf("  done! ( total time: %.6f sec.)\n",mytimer.getElapsedTime());
+    mexPrintf("  done! ( total time: %.6f sec. )\n",mytimer.getElapsedTime());
 
 	// Testing to see if all polygons of the input polyhedron have been used as a leaf in the BSP tree
 	ULONG not_visited = 0;
