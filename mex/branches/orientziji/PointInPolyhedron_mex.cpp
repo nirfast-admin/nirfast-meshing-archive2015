@@ -86,20 +86,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     if (debug)
         mexPrintf("Initializing the polyhedron converter\n");
 	myconverter.InitFromMatlabMex(points, ele, np, ne, nnpe, (int) splitType);
-	myconverter.SetPlaneThickness(1e-5);
-    
-    mexPrintf("\nBuilding the BSP tree...");
-    
-    mytimer.startTimer();
-	double foothk = myconverter.GetPlaneThickness();
-    
+    myconverter.SetPlaneThickness(eps);
+    double foothk = myconverter.GetPlaneThickness();
     mexPrintf("\n  foothk: %10.16g\n",foothk);
+    
+    mexPrintf("\n\nPerforming BSP-based containment tests...");
+    
     if (debug)
         mexPrintf("Runnig the query...\n");
+    mytimer.startTimer();
 	for (ULONG i=0; i<nqueryp; ++i) {
 		Point qfoo(p[i], p[i + nqueryp], p[i + nqueryp + nqueryp]);
         *(c+i) = myconverter.IsInside(qfoo, foothk);
-		// *(c+i) = PointInSolidSpace(root, qfoo, foothk);
 	}
 	mytimer.stopTimer();
     mexPrintf("  done! ( total time: %.6f sec. )\n",mytimer.getElapsedTime());
@@ -124,9 +122,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 bool CheckArgsIn(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
-    if (nrhs < 3 || nrhs > 4) {
+    if (nrhs < 3 || nrhs > 5) {
         mexPrintf("nargin = %d\n",nrhs);
-        mexErrMsgTxt("PointInPolyhedron_mex: You need to enter 4 input args!");
+        mexErrMsgTxt("PointInPolyhedron_mex: You need to enter 4 or 5 input args!");
     }
     if (nlhs!=1) {
         mexErrMsgTxt("PointInPolyhedron_mex: Output argument is not specified!");
