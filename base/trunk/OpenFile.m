@@ -4,8 +4,8 @@ function [fid st]=OpenFile(fn,att)
 % It returns 1 if openning was NOT successful
 st=0;
 [fid,message]=fopen(fn,att);
-if ~isempty(message)
-    disp([message ': ' fn]);
-    st=1;
-    return
+if fid == -1 || ~isempty(message)
+    cprintf([1 0.5 0],sprintf('\nFile I/O Error:  %s\n  %s\n\n',message,fn));
+    errordlg(sprintf('File I/O Error:  %s\n%s',message,fn),'File I/O Error');
+    error(' ');
 end
