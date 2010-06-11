@@ -14,6 +14,10 @@ function [tets, points_from_tetgen] = checkerboard3d(e,p,myargs)
 % (material). It also can contain region ID and the volume constraint.
 % regions{:,1} : coordinaets of a point inside the region
 % regions{:,2} : material/attribute ID for the hole and volume constraint.
+% 
+% myargs.extelem : list of elements of the most exterior surface that
+% encloses all other sub surfaces
+% 
 % For more info check:
 % http://tetgen.berlios.de/fformats.poly.html
 % 
@@ -117,7 +121,7 @@ else
 end
 
 % Fix the facets orientation to make sure their normal is poiting outward.
-[e]=FixPatchOrientation(p,e);
+% [e]=FixPatchOrientation(p,e);
 
 clear P Q;
 resolution=2;
@@ -138,7 +142,7 @@ tiny = 1e-12*max(urc-llc);
 P = zeros(nrow,ncol,npln,'int8');
 
 % Tag the 'pixels' inside P and create nodes for each tagged pixel
-[PP] = TagBoundary3d(p,e,ds,dx,dy,dz,llc);
+[PP] = TagBoundary3d(p,e,ds,dx,dy,dz,llc,myargs);
 
 noPLCp = size(p,1);
 int_nodes=(noPLCp+1):(size(PP,1)+noPLCp);
@@ -156,7 +160,7 @@ if isempty(systemcommand)
     error('Could not run Delaunay code! Make sure it is in your default search path');
 end
 
-delaunay_cmd=['! "' systemcommand '" -pqCYYA ' 'input4delaunay' '.poly > junk.txt'];
+delaunay_cmd=['! "' systemcommand '" -pdYYA ' 'input4delaunay' '.poly > junk.txt'];
 eval(delaunay_cmd);
 
 delete('input4delaunay*','junk.txt');
@@ -176,14 +180,13 @@ delete('input4delaunay*','junk.txt');
 % writenodelm_mesh_medit([savefilename '.mesh'],tets(:,1:4),points_from_tetgen(:,1:3),nodemap_fromtetgen);
 
 
-function [PP] = TagBoundary3d(p,t,ds,dx,dy,dz,llc)
+function [PP] = TagBoundary3d(p,t,ds,dx,dy,dz,llc,myargs)
 
 global P
 global tiny
 
 
 xmin = llc(1); ymin = llc(2); zmin = llc(3);
-
 % Get normals of each triangular face
 v1=p(t(:,2),:)-p(t(:,1),:);
 v2=p(t(:,3),:)-p(t(:,2),:);
@@ -196,8 +199,13 @@ shell_normals=shell_normals./repmat(norm_len,1,3);
 [P]=ExpandBoundaryBufferZone(t,p,P,shell_normals,ds,[dx dy dz],llc);
 
 interior_p0 = tag_checkerboard3d_mex(P, [dx dy dz], [xmin ymin zmin], ds);
+
+t=double(myargs.extelem(:,1:3));
+extnoden=unique(t(:));
+[tf t]=ismember(t, extnoden);
+p=p(extnoden,1:3);
 fprintf('-----> Running BSP tree to filter out nodes.\n');
-st1 = PointInPolyhedron_mex(interior_p0, t(:,1:3), p, tiny);
+st1 = PointInPolyhedron_mex(interior_p0, t, p, tiny);
 fprintf('\n-----> done.\n');
 
 % sum(abs(double(st2) - foost))

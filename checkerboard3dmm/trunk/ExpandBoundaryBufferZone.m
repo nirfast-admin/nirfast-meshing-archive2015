@@ -8,7 +8,6 @@ global tiny NA boundary_node_code
 if isempty(tiny), tiny=1e-9; end
 
 fprintf('%s\n','===========================================')
-fprintf('%s\n','Entered ExpandBoundaryBufferZone() function')
 
 % Mesh template properties
 [nrow ncol npln]=size(P);
@@ -25,7 +24,7 @@ list=tmp.list;
 indexing=tmp.indexing;
 clear tmp;
 
-fprintf('\t%s','Calculating desired length at boundary nodes...')
+cprintf([0 0 1],'\tCalculating desired length at boundary nodes...')
 tp1=p(t(:,1),:); tp2=p(t(:,2),:); tp3=p(t(:,3),:);
 [pc]= incircle(tp1,tp2,tp3);
 v=[tp1 tp2 tp3]-repmat(pc,1,3);
@@ -61,7 +60,7 @@ end
 % Get bbx of prisms' facets
 prism_facets_bbx=zeros(nf,8,6,'single');
 prism_normals=zeros(nf,3,8,'double');
-fprintf('\t%s','Calculating prism normals and bounding boxes...')
+cprintf([0 0 1],'\tCalculating prism normals and bounding boxes...')
 for i=1:nf
     tpp=(reshape(pp(i,:,:),3,6))';
     n1=tpp(prism(:,1),:); n2=tpp(prism(:,2),:); n3=tpp(prism(:,3),:);
@@ -121,7 +120,7 @@ edges=[t(:,[1 2]); t(:,[1 3]); t(:,[2 3])];
 edgelength=sqrt(sum((p(edges(:,2),:)-p(edges(:,1),:)).^2,2));
 
 
-fprintf('\t%s','Sealing boundary buffer zone...')
+cprintf([0 0 1],'\tSealing boundary buffer zone...')
 h = waitbar(0,'Sealing boundary buffer zone. Please wait!') ;
 div=200;
 ff=false;
@@ -192,7 +191,7 @@ for i=1:nf
     P(istart:iend,jstart:jend,kstart:kend)=sub_P;
 end
 close(h);
-fprintf('\b%s\n\n',' done.')
+cprintf([0 0 1],'\b%s\n\n',' done.')
 fprintf('  Time spent in intersect_ray_shell_mex: %4.6f\n  Time spent in tag_row_subzone: %4.6f\n',t2,t4); 
 fprintf('  Avg time spent per face for intersect_ray_shell_mex: %4.6f\n',t2/nf);
 fprintf('  Avg time spent per face for tag_row_subzone: %4.6f\n\n',t4/nf);

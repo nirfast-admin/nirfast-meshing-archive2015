@@ -20,13 +20,15 @@ if offset < eps
 end
 
 for i=1:ne
-    v1=p(t(i,2),:)-p(t(i,1),:);
-    v2=p(t(i,3),:)-p(t(i,2),:);
+    v1=p(t(i,2),1:3)-p(t(i,1),1:3);
+    v2=p(t(i,3),1:3)-p(t(i,2),1:3);
     normal = cross(v1,v2);
     normal = -normal / norm(normal);
     
-    offsetp = mean(p(t(i,:),:)) + offset * normal;
-    if PointInPolyhedron_mex(offsetp,double(t),p,tiny*100) == 1
+    if any(isnan(normal)), continue; end
+    offsetp = mean(p(t(i,:),1:3)) + offset * normal;
+    st = PointInPolyhedron_mex(offsetp,double(t),p,tiny*100);
+    if st == 1
         foundflag = true;
         break
     end
