@@ -159,6 +159,8 @@ end
 delaunay_cmd=['! "' systemcommand '" -pqCYYA ' 'input4delaunay' '.poly > junk.txt'];
 eval(delaunay_cmd);
 
+delete('input4delaunay*','junk.txt');
+
 [tets,points_from_tetgen,nodemap_fromtetgen]=read_nod_elm(['input4delaunay' '.1'],1);
 
 
