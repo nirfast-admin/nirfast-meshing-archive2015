@@ -24,11 +24,8 @@ else
 end
 
 % first read the node file
-tempfn=[fn ext1];
-[fid, message]=fopen(tempfn,'rt');
-if ~isempty(message)
-    error([message ': ' tempfn]);
-end
+tempfn=add_extension(fn,ext1);
+fid = OpenFile(tempfn,'rt');
 
 if nargin>1 % tetgen format
 % read the header line:
@@ -88,11 +85,9 @@ end
 fclose(fid);
 
 % Now read the element file
-tempfn=[fn ext2];
-[fid message]=fopen(tempfn,'rt');
-if ~isempty(message)
-    error([message ': ' tempfn])
-end
+tempfn=add_extension(fn,ext2);
+fid = OpenFile(tempfn,'rt');
+
 if nargin>1
     header=textscan(fid,'%u32 %d8 %d8',1);
     ne=header{1}; nnpe=header{2}; natt=header{3};

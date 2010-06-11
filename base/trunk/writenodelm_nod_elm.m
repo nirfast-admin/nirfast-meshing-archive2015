@@ -56,7 +56,7 @@ if nargin>=4
     if nnpe~=2 && nnpe~=3 && nnpe~=4
         error([nnpe ' per element is not supported!']);
     end
-    [mytflag idx]=ismember(e(:,1:nnpe),nodenum);
+    mytflag=ismember(e(:,1:nnpe),nodenum);
     sum1=sum(mytflag,2);
     sumbflag=sum1==nnpe;
     if sum(sumbflag)~=ne % not all vertices of 'faces' are given in nodemap list!
@@ -65,8 +65,6 @@ if nargin>=4
         error('writenodelm_nod_elm: faces/tetrahedrons and nodemap lists are not compatible!')
     end
     newelm=e;
-%     newfaces=nodemap(faces);
-%     newfaces=faces;
 elseif nargin==3
     nodenum=(1:nn)';
     newelm=e;
@@ -81,41 +79,33 @@ end
 
 
 
-f=[fn '.node'];
-fid=fopen(f,'wt');
-if fid<=0
-    disp(['Cant open ' f ' to write output to']);
-    return
-end
+f=add_extension(fn,'.node');
+fid = OpenFile(f,'wt');
 fprintf(fid,'%d %d 0 0\n',nn,dim);
 if dim==2
     fs='%d %.32f %.32f\n';
 else
     fs='%d %.32f %.32f %.32f\n';
 end
-for i=1:nn
-    fprintf(fid,fs,nodenum(i),p(i,:));
-end
+fprintf(fid,fs,[nodenum p]');
 fclose(fid);
-f=[fn '.ele'];
-fid=fopen(f,'wt');
-if fid<=0
-    disp(['Cant open ' f ' to write output to']);
-    return
-end
-% if nnpe==3
-%     fs='%d %d %d %d\n';
-% elseif nnpe==4
-%     fs='%d %d %d %d %d\n';
-% elseif nnpe==2
-%     fs='%d %d %d\n';
-% end
 
-fprintf(fid,'%d %d %d\n',ne,nnpe,natt);
-for i=1:ne
-    fprintf(fid,'%u\t',[i newelm(i,:)]);
-    fprintf(fid,'\n');
+f=add_extension(fn,'.ele');
+fid = OpenFile(f,'wt');
+if nnpe==3
+    fs='%d %d %d %d';
+elseif nnpe==4
+    fs='%d %d %d %d %d';
+elseif nnpe==2
+    fs='%d %d %d';
 end
+
+for i=1:natt
+    fs=[fs ' %d'];
+end
+fs=[fs '\n'];
+fprintf(fid,'%d %d %d\n',ne,nnpe,natt);
+fprintf(fid,fs,[(1:ne)' newelm(:,1:(nnpe+natt))]');
 fclose(fid);
 
 if ~quiet
