@@ -77,8 +77,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// mxArray *cell_pointer; // Returned variable which holds connectivity list of triangles.
 
 	ulong elemid;
-	
-	
+ 
+ 
 	bool endflag = false;
 	elemid = 1;
 	std::queue<ulong> q;
