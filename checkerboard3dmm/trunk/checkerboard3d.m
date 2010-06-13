@@ -39,10 +39,6 @@ NA=3;
 node_code = 2;
 boundary_node_code=1;
 on_facet=7;
-% #################################
-% rand('twister',rand('twister'));
-% global logfilename
-% logfilename='CHECKERBOARD3D.LOG';
 
 if nargin==0
     [orige,p,nodemap,elemap,dim,nnpe,filename,filetype]=ui_read_nod_elm(nargin);
@@ -160,24 +156,13 @@ if isempty(systemcommand)
     error('Could not run Delaunay code! Make sure it is in your default search path');
 end
 
-delaunay_cmd=['! "' systemcommand '" -pdYYA ' 'input4delaunay' '.poly > junk.txt'];
+delaunay_cmd=['! "' systemcommand '" -pqgYYA ' 'input4delaunay' '.poly > junk.txt'];
+cprintf([0 0 1],'\n---------> Running Marching Cube, please wait...');
 eval(delaunay_cmd);
-
-delete('input4delaunay*','junk.txt');
-
-[tets,points_from_tetgen,nodemap_fromtetgen]=read_nod_elm(['input4delaunay' '.1'],1);
+cprintf([0 0 1],' done. <---------\n\n');
 
 
-% save([savefilename '.mat'],'tets','PP','P','ds',...
-%      'points_from_tetgen','nodemap_fromtetgen');
-% 
-% writeelms_tetgen([savefilename '.ele'],tets);
-% writenodes_tetgen([savefilename '.node'],points_from_tetgen);
-
-%  Write the results in differetn formats!
-% writenodelm_miva(savefilename,tets,points_from_tetgen,nodemap_fromtetgen,0);
-% writenodelm_3dm([savefilename '.3dm'],tets,points_from_tetgen,nodemap_fromtetgen);
-% writenodelm_mesh_medit([savefilename '.mesh'],tets(:,1:4),points_from_tetgen(:,1:3),nodemap_fromtetgen);
+[tets,points_from_tetgen,nodemap_fromtetgen]=read_nod_elm(['input4delaunay.1'],1);
 
 
 function [PP] = TagBoundary3d(p,t,ds,dx,dy,dz,llc,myargs)

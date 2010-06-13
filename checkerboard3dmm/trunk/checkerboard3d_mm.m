@@ -104,6 +104,7 @@ elseif strcmpi(myext,'.ele')
     
     interior_nodes=zeros(nregions,3);
     telem=[];
+    % Find a point within each region
     for i=1:nregions
         bf=tele(:,4)==regions(i) | tele(:,5)==regions(i);
         reg_ele=tele(bf,1:3);
@@ -116,7 +117,6 @@ elseif strcmpi(myext,'.ele')
         if i == 1;
             extelem = reg_ele;
         end
-        telem=[telem;reg_ele];
     end
     regions=cell(size(interior_nodes,1),2);
     for i=1:size(interior_nodes,1)
@@ -125,9 +125,9 @@ elseif strcmpi(myext,'.ele')
     end
 end
 
-[foo ix] = unique(sort(telem(:,1:3),2),'rows');
+[foo ix] = unique(sort(tele(:,1:3),2),'rows');
 clear foo
-telem=telem(ix,:);
+tele=tele(ix,:);
 myargs.silentflag=1;
 myargs.bdyfn = [fnprefix];
 myargs.regions = regions;
@@ -139,11 +139,10 @@ myargs.examineinpmesh=0; % Do not run inspection checks on input surface
 myargs.extelem=extelem;
 
 % writenodelm_nod_elm(myargs.bdyfn,extelem,extnode)
-[mesh.elements, mesh.nodes] = checkerboard3d(telem,tnode,myargs);
+[mesh.elements, mesh.nodes] = checkerboard3d(tele(:,1:3),tnode,myargs);
 delete('input4delaunay.*','junk.txt');
 
 %% Write NIRFAST-format mesh files
-fn = [fnprefix '-nirfast'];
 mesh.dimension = 3;
 mesh.type = type;
 mesh.name = fnprefix;

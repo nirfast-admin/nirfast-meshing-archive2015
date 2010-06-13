@@ -192,9 +192,9 @@ for i=1:nf
 end
 close(h);
 cprintf([0 0 1],'\b%s\n\n',' done.')
-fprintf('  Time spent in intersect_ray_shell_mex: %4.6f\n  Time spent in tag_row_subzone: %4.6f\n',t2,t4); 
-fprintf('  Avg time spent per face for intersect_ray_shell_mex: %4.6f\n',t2/nf);
-fprintf('  Avg time spent per face for tag_row_subzone: %4.6f\n\n',t4/nf);
+% fprintf('  Time spent in intersect_ray_shell_mex: %4.6f\n  Time spent in tag_row_subzone: %4.6f\n',t2,t4); 
+% fprintf('  Avg time spent per face for intersect_ray_shell_mex: %4.6f\n',t2/nf);
+% fprintf('  Avg time spent per face for tag_row_subzone: %4.6f\n\n',t4/nf);
 
 fprintf('\n%s\n','Exitting ExpandBoundaryBufferZone() function.')
 fprintf('%s\n','===========================================')

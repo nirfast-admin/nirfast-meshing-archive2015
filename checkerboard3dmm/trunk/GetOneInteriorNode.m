@@ -27,7 +27,8 @@ for i=1:ne
     
     if any(isnan(normal)), continue; end
     offsetp = mean(p(t(i,:),1:3)) + offset * normal;
-    st = PointInPolyhedron_mex(offsetp,double(t),p,tiny*100);
+%     st = PointInPolyhedron_mex(offsetp,double(t),p,tiny*100);
+    st = involume_mex(offsetp, double(t), p, 200, min(p(:,1)), max(p(:,1)), tiny);
     if st == 1
         foundflag = true;
         break
