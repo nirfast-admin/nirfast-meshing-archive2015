@@ -42,15 +42,13 @@ if sum(tf)~=length(nn)
    error(sprintf('\n\nIt seems you have not renumbered your element list based on the nodemap provided!\n'));
 end
 
-if write_node_file_flag % .node file is going to be in a seperate file
+if ~(nargin>=7 && ~isempty(write_node_file_flag) && write_node_file_flag==0)
     write_node_local(fn,p);
 end
+
+fn=add_extension(fn,'.poly');
 fn2=remove_extension(fn);
-fn = [fn2 '.poly'];
-fid=fopen([fn2 '.poly'],'wt');
-if fid==0
-    error('\n\nCant open the output file: %s\n', fn);
-end
+fid = OpenFile(fn,'wt');
 
 % .node file is seperate
 fprintf(fid,'# node file is in %s\n', [fn2 '.node']);
@@ -114,10 +112,7 @@ function write_node_local(fn,p)
 
 fn=remove_extension(fn);
 fn = [fn '.node'];
-fid=fopen(fn,'wt');
-if fid==0
-    error(['Cant open output file: ' fn']);
-end
+fid=OpenFile(fn,'wt');
 
 fprintf(fid,'%u %d 0 0\n',np,dim);
 

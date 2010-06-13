@@ -14,11 +14,23 @@ function systemcommand = GetSystemCommand(command_name)
 os=computer;
 systemcommand=[];
 if ~isempty(strfind(os,'PCWIN')) % Windows
-    systemcommand = which([command_name '.exe']);
+    if strcmpi(os,'PCWIN64')
+        suff='64';
+    else
+        suff='';
+    end
+    systemcommand = which([command_name suff '.exe']);
 elseif ~isempty(strfind(os,'MAC')) % Mac OS
+    % We will use Universal code for mac which contains all the platforms
+    % in one bundle. So no need for '64' suffix
     systemcommand = which([command_name '-mac.exe']);
 elseif ~isempty(strfind(os,'GLNX')) % Linux
-    systemcommand = which([command_name '-linux.exe']);
+    if strcmpi(os,'GLNXA64')
+        suff='64';
+    else
+        suff='';
+    end
+    systemcommand = which([command_name '-linux' suff '.exe']);
 else
     fprintf('\n\tCan not establish your platform!\n');
     error('\t%s will not be executed\n\n', command_name);
