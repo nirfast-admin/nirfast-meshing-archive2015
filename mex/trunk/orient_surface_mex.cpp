@@ -76,85 +76,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	// mxArray *cell_pointer; // Returned variable which holds connectivity list of triangles.
 
-	ulong ndid = 0; /* node id which is the left-most */
-	double xmin;
-	ulong i, ltmp, elemid;
-	// End Hamid Oct 2007
-	// double v1[3], v2[3], v3[3], vec[3], ort, ort_max;
-	double vec[3], ort_max;
-	int ort_flag = 1;
+	ulong elemid;
 	
-	vec[0] = -1; /* point to the left */
-	vec[1] = 0;
-	vec[2] = 0;
-	
-	// mexPrintf("\n The number of triangles is %ld,\n number of nodes is %ld.\n", ne, np);
-	if ((ne==0)||(np==0)) {
-		mexErrMsgTxt("\tInput arguments are empty\n");
-	}
-	xmin =  std::numeric_limits<double>::max();
-	for (i=0; i<np; i++) {
-		if (p(i,0) < xmin) {
-			ndid = i+1;
-			xmin = p(i,0);
-		}		
-	}	
-	/* start checking */
-	//mexPrintf("\n Re-orienting the mesh ...\n");
-	
-	/* find a triangle that connects to the left-most node */
-	elemid = -1;
-	ort_max = -1.;
-	ort_flag = 1; // orientation of the patch is ok
-	// ulong n = 0;
-	// Following method of finding the right orientation for the seed triangle is fast, reliable and
-	// doesn't need intersecting ray/boundary algorithms. This makes it work for shell surface with
-	// small holes in them (non-closed surface like the one we got in boundary recovery).
-	// But it will now work for the case that the left-most point is in involved in patches
-	// that are exactly on the same plane, situation that we can encounter in boundary recovery
-	// when deleting an sliver tetrahedron. 
-/*	for (i=0; i<ne; ++i) {
-		if ((ulong)(ele(i,0))==ndid || (ulong)(ele(i,1))==ndid || (ulong)(ele(i,2))==ndid) {
-			++n;
-			for (int m=0; m<3; ++m) {
-				v1[m] = p((ulong)(ele(i,1))-1,m) - p((ulong)(ele(i,0))-1,m);
-				v2[m] = p((ulong)(ele(i,2))-1,m) - p((ulong)(ele(i,0))-1,m);
-			}
-			CROSS(v3,v1,v2);
-			v_norm(v3,3);
-			ort = DOT(vec,v3);
-			if (fabs(ort) > ort_max || n==1) {
-				elemid = i+1;
-				ort_max = fabs(ort);
-				if (ort > 0)
-					ort_flag = 1; // no need to flip
-				else if (ort < 0)
-					ort_flag = 0; // we need to flip
-			}
-		}
-	}
- 
- 
- if (n<1) {
- //the number of associate elem is too low 
- //the triangle is probably a tangling elem or on the edge
- //of a not closed loop 
-	mexErrMsgTxt("\n\nThere is no triangle associated with the leftmost node!\n");
-}
-else {
-	if (ort_flag==0) {
-		// wrong orientation, flip it
-		ltmp = ele(elemid-1,0);
-		ele(elemid-1,0) = ele(elemid-1,1);
-		ele(elemid-1,1) = ltmp;
-	}
-	q.push(elemid);
-	color[elemid-1] = Gray;
-}
-
- */
-	// So we switch to ray intersection method in which we first to try to identify a point's
-	// status (interior/exterior) and use it to figure out the seed triangle's orientation
 	
 	bool endflag = false;
 	elemid = 1;
@@ -162,11 +85,11 @@ else {
 	std::vector<short> color(ne, White);
 	bool firstTimeFlag = true;
 	while (!endflag) {
-		elemid = FindSeedsDirection(elemid,prhs,st);
+		/*elemid = FindSeedsDirection(elemid,prhs,st);
 		if (st!=0) { // could not determine the orientation of any facets to use as seed orientation
 			//st=2;
 			break;
-		}
+		}*/
 		int myst=0;
 		if (color[elemid-1]!=White) { // we have tried this element before to no success
 			break;
@@ -178,7 +101,7 @@ else {
 		
 		mxArray *tmpArray;
 		double *tris;
-		bool fooflag=false;
+		//bool fooflag=false;
 		
 		while (!q.empty()) {
 			ulong u = q.front();
@@ -216,10 +139,10 @@ else {
 			q.pop();
 			color[u-1] = Black;
 		}
-		if (fooflag) {
+		/*if (fooflag) {
 			st=myst;
 			break;
-		}
+		}*/
 
 		// Check to see if all the elements are tagged as visited
 		endflag = true;
@@ -231,13 +154,6 @@ else {
 			}
 		}
 	}
-	if (st!=0)
-		goto EXIT;
-	if (!endflag) { // the loop didn't end naturally
-		st=3;
-		goto EXIT;
-	}
-
 	/* Check if we have visited all triangles */
 	for (ulong i=0; i<ne; ++i) {
 		if (color[i]!=Black) {
@@ -245,6 +161,18 @@ else {
 			mexErrMsgTxt("Aborting...");
 		}
 	}
+	/*if (st!=0)
+		goto EXIT;*/
+	if (!endflag) { // the loop didn't end naturally
+		st=3;
+		goto EXIT;
+	}
+	 if (ReOrient()!=0) {
+		 st=4;
+		 goto EXIT;
+	 }
+
+	
 
 EXIT:
 	plhs[0] = mxCreateDoubleScalar((double) st);
@@ -424,4 +352,65 @@ unsigned int CalculateOrientation(ulong v, const mxArray *mxT, const mxArray *mx
 		ele(v-1,1) = tmp;
 	}
 	return st; // successful inclustion test and/or re-orientation
+}
+
+int ReOrient() {
+	double v1[3], v2[3], v3[3], vec[3];	
+	double ltmp, ort;
+	int n = 0;
+	ulong i, ndid;
+
+	vec[0] = 1; /* point to the right */
+	vec[1] = 0;
+	vec[2] = 0;
+	
+	double xmax =  -std::numeric_limits<double>::max();
+	for (i=0; i<np; i++) {
+		if (p(i,0) > xmax) {
+			ndid = i+1;
+			xmax = p(i,0);
+		}		
+	}	
+
+	int dotsign = 0;
+	for (i=0; i<ne; ++i) {
+		if ((ulong)(ele(i,0))==ndid || (ulong)(ele(i,1))==ndid || (ulong)(ele(i,2))==ndid) {
+			++n;
+			for (int m=0; m<3; ++m) {
+				v1[m] = p((ulong)(ele(i,1))-1,m) - p((ulong)(ele(i,0))-1,m);
+				v2[m] = p((ulong)(ele(i,2))-1,m) - p((ulong)(ele(i,0))-1,m);
+			}
+			CROSS(v3,v1,v2);
+			v_norm(v3,3);
+			ort = DOT(vec,v3);
+			if (ort != 0.0) {
+				if (ort > 0.0 && dotsign == 0)
+					dotsign = 1;
+				else if (ort < 0.0 && dotsign ==0)
+					dotsign = -1;
+				else if (dotsign!=0) {
+					if (dotsign * ort < 0.0) // triangles are not following the same orientation
+						return 1; // error
+				}
+			}
+		}
+	}
+ 
+	if (n<1) {
+	 //the number of associate elem is too low 
+	 //the triangle is probably a tangling elem or on the edge
+	 //of a not closed loop 
+		mexErrMsgTxt("\n\nThere is no triangle associated with the leftmost node!\n");
+	}
+	else {
+		if (dotsign == -1) {
+			// wrong orientation, flip it
+			for (i=0; i<ne; ++i) {
+				ltmp = ele(i,0);
+				ele(i,0) = ele(i,1);
+				ele(i,1) = ltmp;
+			}
+		}
+	}
+	return 0;
 }
