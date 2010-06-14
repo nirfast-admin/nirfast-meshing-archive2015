@@ -34,17 +34,23 @@ end
 
 
 
+function mask = GetBMPStack(filename)
 
-
-function mask = GetBMPStack(maskloc)
-
-foo = dir([maskloc '*.bmp']);
-if isempty(foo)
-    errordlg('Can not find BMP files','Meshing Error');
-    error('Can not find BMP files');
+[path fnprefix num_flag myext] = GetFilenameNumbering(filename);
+if num_flag==0
+    errordlg('You need more than one 2D mask to create a surface','Meshing Error');
+    error('You need more than one 2D mask to create a surface');
 end
 
-a = imread([maskloc '1.bmp']);
+maskloc = fullfile(path,fnprefix);
+
+foo = dir([maskloc '*' myext]);
+if isempty(foo)
+    errordlg({'Can not find BMP files:';[fnprefix '*' myext]},'Meshing Error');
+    error(['Can not find BMP files: ' fnprefix '*' myext]);
+end
+
+a = imread([maskloc num2str(num_flag) myext]);
 if ndims(a)==3
     a=rgb2gray(a);
 end
@@ -52,7 +58,7 @@ end
 mask = zeros(nrow,ncol,length(foo),'int16');
 
 for i=1:length(foo)
-    a = imread([maskloc num2str(i) '.bmp']);
+    a = imread([maskloc num2str(i) myext]);
     if ndims(a)==3
         a=rgb2gray(a);
     end
