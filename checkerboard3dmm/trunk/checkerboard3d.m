@@ -144,6 +144,7 @@ noPLCp = size(p,1);
 int_nodes=(noPLCp+1):(size(PP,1)+noPLCp);
 
 % Write input files for delaunaygen
+delete('input4delaunay.*','junk.txt');
 if isfield(myargs,'regions') && ~isempty(myargs.regions)
     writenodelm_poly3d('input4delaunay',e,[p;PP],int_nodes,[],myargs.regions,1,[]);
 else
@@ -152,13 +153,16 @@ end
 
 delaunaycommand = 'delaunaygen';
 systemcommand = GetSystemCommand(delaunaycommand);
-if isempty(systemcommand)
-    error('Could not run Delaunay code! Make sure it is in your default search path');
-end
+
+cprintf([0 0 1],'\n---------> Running Marching Cube, please wait...');
 
 delaunay_cmd=['! "' systemcommand '" -pqgYYA ' 'input4delaunay' '.poly > junk.txt'];
-cprintf([0 0 1],'\n---------> Running Marching Cube, please wait...');
 eval(delaunay_cmd);
+if ~exist('input4delaunay.1.ele','file')
+    errordlg(' Delaunay Generator failed. Check your input surface mesh.','Meshing Error');
+    error(' Delaunay Generator failed. Check your input surface mesh.')
+end
+
 cprintf([0 0 1],' done. <---------\n\n');
 
 

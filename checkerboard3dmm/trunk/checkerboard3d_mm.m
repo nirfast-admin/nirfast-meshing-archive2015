@@ -1,4 +1,4 @@
-function mesh = checkerboard3d_mm(fnprefix, type)
+function mesh = checkerboard3d_mm(filename, type)
 % checkerbaord3d_mm(fnprefix, type)
 % Reads input surfaces which are either in .inp format (Mimics exported in Abaqus
 % file format) or .ele format (tetgen format) and then generates a 3D 
@@ -12,14 +12,14 @@ function mesh = checkerboard3d_mm(fnprefix, type)
 
 %% Check the proper input filename
 if nargin==0
-    [fname, pname, filterindex] = uigetfile({'*.inp','Select one of exported files from Mimics (*.inp)'},...
+    [fname, pname, filterindex] = uigetfile({'*.inp;*.ele','Select one of exported files from Mimics (*.inp)'},...
                              'Please select a 3D surface mesh file',...
                              'MultiSelect','off');
-    [fnprefix myext] = remove_extension(fname);
-    fnprefix = [pname fnprefix];
-else
-    [fnprefix myext] = remove_extension(fnprefix);
+    filename =[pname fname];
 end
+[path fnprefix num_flag myext] = GetFilenameNumbering(filename);
+fnprefix=fullfile(path,fnprefix);
+
 if isempty(myext) || (~strcmpi(myext,'.inp') && ~strcmpi(myext,'.ele'))
     errordlg('Surface filenaem should have either .inp or .ele as its extension','Meshing Error');
     error('Surface filenaem should have either .inp or .ele as its extension');
@@ -43,9 +43,13 @@ if strcmpi(myext,'.inp') % Each INP file represents a surface in mesh with disjo
     tnn = 0;
     telem = [];
     tnode = [];
-    flag= true; fcounter = 1;
-    while flag
+    flag= true; fcounter = num_flag;
+    if num_flag==0
+        fn = [fnprefix '.inp'];
+    else
         fn = [fnprefix num2str(fcounter) '.inp'];
+    end
+    while flag
         [fid msg]=fopen(fn,'rt');
         if ~isempty(msg), flag=false; continue; end
         fclose(fid);
@@ -60,7 +64,7 @@ if strcmpi(myext,'.inp') % Each INP file represents a surface in mesh with disjo
         end
         interior_nodes(fcounter,:) = tmp;
         % Save the exteriro surface
-        if fcounter == 1;
+        if fcounter == num_flag;
             extelem = elem; extnode = node;
         end
         cnn = size(node,1);
@@ -69,8 +73,9 @@ if strcmpi(myext,'.inp') % Each INP file represents a surface in mesh with disjo
         telem = [telem;elem];
         tnode = [tnode;node];
         fcounter = fcounter + 1;
+        fn = [fnprefix num2str(fcounter) '.inp'];
     end
-    if fcounter==1 % couldn't read the first file
+    if fcounter==num_flag % couldn't read the first file
         errordlg({[msg ':'], fn},'Meshing Error');
         error(msg,'Meshing Error');
     end
@@ -86,16 +91,19 @@ elseif strcmpi(myext,'.ele')
 %     This routine assumes that the smallest region id (excluding 0) is the
 %     id for the most exterior region which encloses all other sub regions
 
-    [tele tnode] = read_nod_elm(fnprefix,1);
-    if size(tele,2)~=3 && size(tele,2)<5
+    if num_flag~=0
+        fnprefix = [fnprefix num2str(num_flag)];
+    end
+    [telem tnode] = read_nod_elm(fnprefix,1);
+    if size(telem,2)~=3 && size(telem,2)<5
         error(['Input surface mesh does not seem to be a triangular mesh: ' fnprefix]);
     end
-    if size(tele,2)==3
+    if size(telem,2)==3
         nregions=1;
         regions=1;
-        tele = [tele repmat([1 0], size(tele,1), 1)];
+        telem = [telem repmat([1 0], size(telem,1), 1)];
     else
-        regions = tele(:,4:5);
+        regions = telem(:,4:5);
         regions = unique(regions(:));
         nregions = length(regions);
     end
@@ -103,15 +111,15 @@ elseif strcmpi(myext,'.ele')
     if tf, regions(idx)=[]; nregions=nregions-1; end % Remove 0 (which represents outside space)
     
     interior_nodes=zeros(nregions,3);
-    telem=[];
+
     % Find a point within each region
     for i=1:nregions
-        bf=tele(:,4)==regions(i) | tele(:,5)==regions(i);
-        reg_ele=tele(bf,1:3);
+        bf=telem(:,4)==regions(i) | telem(:,5)==regions(i);
+        reg_ele=telem(bf,1:3);
         tmp = GetOneInteriorNode(reg_ele,tnode);
         if isempty(tmp)
-            errordlg(['Could not find an interior point in surface: ' fn],'Mesh Error');
-            error(['Could not find an interior point in surface: ' fn]);
+            errordlg(['Could not find an interior point in surface: ' fnprefix myext],'Mesh Error');
+            error(['Could not find an interior point in surface: ' fnprefix myext]);
         end
         interior_nodes(i,:) = tmp;
         if i == 1;
@@ -125,11 +133,11 @@ elseif strcmpi(myext,'.ele')
     end
 end
 
-[foo ix] = unique(sort(tele(:,1:3),2),'rows');
+[foo ix] = unique(sort(telem(:,1:3),2),'rows');
 clear foo
-tele=tele(ix,:);
+telem=telem(ix,:);
 myargs.silentflag=1;
-myargs.bdyfn = [fnprefix];
+myargs.bdyfn = fnprefix;
 myargs.regions = regions;
 % Remove the following line to create a mesh based on average size of the
 % input surfaces
@@ -139,7 +147,7 @@ myargs.examineinpmesh=0; % Do not run inspection checks on input surface
 myargs.extelem=extelem;
 
 % writenodelm_nod_elm(myargs.bdyfn,extelem,extnode)
-[mesh.elements, mesh.nodes] = checkerboard3d(tele(:,1:3),tnode,myargs);
+[mesh.elements, mesh.nodes] = checkerboard3d(telem(:,1:3),tnode,myargs);
 delete('input4delaunay.*','junk.txt');
 
 %% Write NIRFAST-format mesh files
