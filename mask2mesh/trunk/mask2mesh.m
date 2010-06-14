@@ -1,4 +1,4 @@
-function [mesh_e mesh_p ext_bdy_nodes mesh_edges] = ...
+function [mesh_p mesh_e ext_bdy_nodes regions] = ...
                          mask2mesh(I,pixel_dim,edge_size,tri_area)
 % [mesh_ele mesh_nodes bdy_nodes] = mask2mesh(I)
 % Creates a 2D triangular mesh using the mask info defined in I
@@ -40,7 +40,7 @@ if nargin==1 || nargin==0
     pixel_dim = 0.1923;
     edge_size = 3;
     tri_area = 60;
-else
+elseif nargin~=4
     cprintf([0.1 0.1 1],['\n  Usage: [mesh_e mesh_p ext_bdy_nodes mesh_edges] = ...' ...
                          'mask2mesh(I,pixel_dim,edge_size,tri_area)\n\n']);
     errordlg(' mask2mesh needs 4 input arguments','Meshing Error');
@@ -106,10 +106,10 @@ mesh.elements = mesh_e(:,1:3);
 mesh.regions = GetNodeRegions(mesh,mask);
 mesh.nodes = mesh.nodes * pixel_dim;
 
-% Plot the mesh
-figure;
-trisurf(mesh.elements,mesh.nodes(:,1),mesh.nodes(:,2),double(mesh.regions))
-colormap(cool); view(2); shading interp;
+mesh_p = mesh.nodes;
+mesh_e = mesh_e(:,1:3);
+regions = mesh.regions;
+
 
 
 
