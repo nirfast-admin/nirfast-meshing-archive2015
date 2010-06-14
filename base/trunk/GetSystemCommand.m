@@ -13,12 +13,16 @@ function systemcommand = GetSystemCommand(command_name)
 
 os=computer;
 systemcommand=[];
+command_name=add_extension(command_name,'.exe');
+[command_name ext]=remove_extension(command_name);
+
 if ~isempty(strfind(os,'PCWIN')) % Windows
     if strcmpi(os,'PCWIN64')
         suff='64';
     else
         suff='';
     end
+    
     systemcommand = which([command_name suff '.exe']);
 elseif ~isempty(strfind(os,'MAC')) % Mac OS
     % We will use Universal code for mac which contains all the platforms
