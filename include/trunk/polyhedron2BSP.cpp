@@ -414,7 +414,7 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
 			}
 			else {
 				std::cout << std::endl << 
-				"  There seems to be bug!!!" << std::endl << std::endl;
+				"  There seems to be a bug!!!" << std::endl << std::endl;
 			}
 		}
 		else {
