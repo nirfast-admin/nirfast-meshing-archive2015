@@ -154,7 +154,7 @@ end
 delaunaycommand = 'delaunaygen';
 systemcommand = GetSystemCommand(delaunaycommand);
 
-cprintf([0 0 1],'\n---------> Running Marching Cube, please wait...');
+cprintf([0 0 1],'\n---------> Running Delaunay, please wait...');
 
 delaunay_cmd=['! "' systemcommand '" -pqgYYA ' 'input4delaunay' '.poly > junk.txt'];
 eval(delaunay_cmd);
