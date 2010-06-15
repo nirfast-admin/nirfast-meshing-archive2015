@@ -70,6 +70,7 @@ if ndims(a)==3
     a=rgb2gray(a);
 end
 
+edge_size = edge_size/pixel_dim;
 mask=flipdim(a,1);
 
 % Create a 2D boundary for the exterior of the mask
@@ -103,13 +104,16 @@ ext_bdy_nodes = unique([mesh_edges(:,1); mesh_edges(:,2)]);
 
 mesh.nodes = mesh_p;
 mesh.elements = mesh_e(:,1:3);
-mesh.regions = GetNodeRegions(mesh,mask);
+mesh.region = GetNodeRegions(mesh,mask);
 mesh.nodes = mesh.nodes * pixel_dim;
 
 mesh_p = mesh.nodes;
 mesh_e = mesh_e(:,1:3);
-regions = mesh.regions;
-
+regions = mesh.region;
+% Plot the mesh
+figure;
+trisurf(mesh.elements,mesh.nodes(:,1),mesh.nodes(:,2),double(mesh.region))
+colormap(cool); view(2); shading interp;
 
 
 
@@ -164,9 +168,9 @@ end
 function regions = GetNodeRegions(mesh,mask)
 %%
 nodes = mesh.nodes;
-regs = unique(mask);
+regs = int32(unique(mask));
 foo = mask;
-tmp1 = zeros(size(nodes,1),1,'int8');
+tmp1 = zeros(size(nodes,1),1,'int32');
 tmp2 = tmp1;
 regions = tmp1;
 for i=2:length(regs) % ignore region whose ID is 0
@@ -176,7 +180,7 @@ for i=2:length(regs) % ignore region whose ID is 0
     for j = 1:length(B)
         bb = B{j};
         IN = pnpoly_mex(bb(:,1),bb(:,2),nodes(:,1),nodes(:,2));
-        tmp1 = tmp1 + IN;
+        tmp1 = tmp1 + int32(IN);
     end
     bf = (mod(tmp1,2)==1);
     regions(bf) = regs(i);
