@@ -1,5 +1,5 @@
 function mesh = ExtractSurfaceRelations(fnprefix, no_regions)
-% Reads disjoint surface meshes from eavh file (total of 'no_region' files)
+% Reads disjoint surface meshes from each file (total of 'no_region' files)
 % and establishes their relational hierarchy.
 % The output is a structure compatible with nirfast format. The relation
 % ship information is stored in .region field, which provides the
