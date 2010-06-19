@@ -14,8 +14,6 @@ All platforms:
 
 */
 
-#define debugme
-
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     if (nrhs!=2 || nlhs!=1)
@@ -90,7 +88,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 				v = (ulong) tris[i];
 				if (v<1 || v>ne) {
 					mexPrintf(" extract_ind_regions_mex: Given connectivity 'list' refers \
-						to elements not available in the input 'ele' lsit!\n");
+						to elements not available in the input 'ele' list!\n");
 						mexErrMsgTxt("  Exitting...\n\n");
 				}
 				if (color[v-1] == White) {  // First time visit
