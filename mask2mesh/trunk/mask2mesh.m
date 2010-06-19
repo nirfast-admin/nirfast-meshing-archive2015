@@ -179,6 +179,7 @@ for i=2:length(regs) % ignore region whose ID is 0
     B = getBDYfromContour(mask,regs(i));
     for j = 1:length(B)
         bb = B{j};
+        clear mex
         IN = pnpoly_mex(bb(:,1),bb(:,2),nodes(:,1),nodes(:,2));
         tmp1 = tmp1 + int32(IN);
     end
