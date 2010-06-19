@@ -57,10 +57,15 @@ end
 [nrow ncol]=size(a);
 mask = zeros(nrow,ncol,length(foo),'int16');
 
+fprintf('Creating a mask stack from input images...');
 for i=1:length(foo)
-    a = imread([maskloc num2str(i) myext]);
+    c = num_flag + i - 1;
+    a = imread([maskloc num2str(c) myext]);
     if ndims(a)==3
         a=rgb2gray(a);
     end
-    mask(:,:,i) = a;
+%    a(458:end,:)=0;
+    mask(:,:,i) = flipdim(a,1);
 end
+fprintf(' done.\n');
+

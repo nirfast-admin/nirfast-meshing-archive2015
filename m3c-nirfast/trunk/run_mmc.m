@@ -15,15 +15,14 @@ props.endian = 'ieee-le';
 mmcfn = 'mmc_imgstack';
 WriteSPRHeaderInfo(mmcfn,props);
 
-fid = fopen([mmcfn '.sdt'],'wb');
+fid = OpenFile([mmcfn '.sdt'],'wb');
 for i=1:nslice
     count = fwrite(fid,(img(:,:,i))','int16');
     assert(count==nrow*ncol);
 end
-
-
-
 fclose(fid);
+
+
 %% Run M3C
 % set up the input file to M3C
 fid = fopen('m3cinput.txt','wt');
@@ -51,8 +50,8 @@ fprintf(' done. <---------\n\n');
 
 %% Read in the generated surface file and call checkerboard3d
 [e p] = read_nod_elm([outputfn '_tetgen'],1);
-movefile([outputfn '_tetgen.node'],[outputdir filesep outputfn '.node']);
-movefile([outputfn '_tetgen.ele'],[outputdir filesep outputfn '.ele']);
+movefile([outputfn '_tetgen.node'], [fullfile(outputdir,outputfn) '.node']);
+movefile([outputfn '_tetgen.ele'],  [fullfile(outputdir,outputfn)  '.ele']);
 
 %% Delete extra files
 delfiles = {'tmp.elm','tmp.nod','mc_layer.elm','mc_layer.nod','layer.nod',...
