@@ -21,7 +21,9 @@ pp=p(ren_nodes,:);
 [tf ee]=ismember(sfaces,nodes);
 
 ee=double(ee);
+clear mex
 list=GetListOfConnTri2Tri_mex(ee,pp); 
+clear mex
 [status tc1]=orient_surface_mex(ee,pp,list);
 if status~=0
     warning('nirfast:MeshingWarning','Could not orient the given surface. Error Code: %d\n', status);

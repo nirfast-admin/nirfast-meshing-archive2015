@@ -1,4 +1,4 @@
-function ind_regions = GetIndRegions(ele,nodes)
+function ind_regions = GetIndRegions(ele,p)
 % Assuming all the elements in ele are sharing one material ID (i.e. they
 % all belong to a certain region/material) and 'ele' defines only manifold
 % surfaces, this routine returns individual
@@ -20,12 +20,18 @@ function ind_regions = GetIndRegions(ele,nodes)
 %                   surface
 % and so on...
 
-foo=double(ele(:,1:3));
+% Make sure nodes in 't' are numbered from 1 to N
+nodes=unique(ele(:));
+pp=p(nodes,:);
+[tf ee]=ismember(ele,nodes);
 
+foo=double(ee(:,1:3));
 % Get tri2tri graph
-list = GetListOfConnTri2Tri_mex(foo, nodes);
+clear mex
+list = GetListOfConnTri2Tri_mex(foo, pp);
 
 % Extract the regions
+clear mex
 ind_regions = extract_ind_regions_mex(foo, list);
 
 % Check to see if each region has at least 4 surfaces (a tetrahedron)
@@ -34,5 +40,9 @@ for i=1:size(ind_regions,1)
         cprintf([1 0.4 0.4],' Found a surface with less than 4 triangles!\n');
         error('Aborting');
     end
+    % Renumber the nodes in 'ind_regions' back to the way they were before
+    % in 'ele'
 end
+
+
 

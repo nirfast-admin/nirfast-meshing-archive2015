@@ -12,6 +12,7 @@ function mesh = ExtractSurfaceRelations(fnprefix, no_regions)
 % fnprefixno_regions.node fnprefixno_regions.ele
 
 fprintf('\tSurface detection.\n\t\t');
+clear mex
 surface_relations_mex(fnprefix,no_regions);
 relations = textread('surface_relations.txt');
 
