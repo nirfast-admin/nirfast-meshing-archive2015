@@ -19,16 +19,33 @@ if offset < eps
     return
 end
 
+% Make sure nodes in 't' are numbered from 1 to N
+nodes=unique(t(:));
+pp=p(nodes,:);
+[tf ee]=ismember(t,nodes);
+
+% Check the subvolume's integrity
+input_args.verbose=1;
+input_args.type=1;
+[~,~,~,myst] = CheckMesh3D(ee,pp,[],input_args);
+
+if isfield(myst,'b') && myst.b~=0
+    writenodelm_surface_medit('foo.mesh',ee,pp)
+    system('/usr/local/bin/medit foo.mesh')
+    disp(' ')
+end
+
 for i=1:ne
-    v1=p(t(i,2),1:3)-p(t(i,1),1:3);
-    v2=p(t(i,3),1:3)-p(t(i,2),1:3);
+    v1=pp(ee(i,2),1:3)-pp(ee(i,1),1:3);
+    v2=pp(ee(i,3),1:3)-pp(ee(i,2),1:3);
     normal = cross(v1,v2);
     normal = -normal / norm(normal);
     
     if any(isnan(normal)), continue; end
-    offsetp = mean(p(t(i,:),1:3)) + offset * normal;
-%     st = PointInPolyhedron_mex(offsetp,double(t),p,tiny*100);
-    st = involume_mex(offsetp, double(t), p, 200, min(p(:,1)), max(p(:,1)), tiny);
+    offsetp = mean(pp(ee(i,:),1:3)) + offset * normal;
+%     st = PointInPolyhedron_mex(offsetp,double(ee),pp,tiny*100);
+    clear mex
+    st = involume_mex(offsetp, double(ee), pp, 200, min(pp(:,1)), max(pp(:,1)), tiny);
     if st == 1
         foundflag = true;
         break

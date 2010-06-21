@@ -95,42 +95,8 @@ elseif strcmpi(myext,'.ele')
         fnprefix = [fnprefix num2str(num_flag)];
     end
     [telem tnode] = read_nod_elm(fnprefix,1);
-    if size(telem,2)~=3 && size(telem,2)<5
-        error(['Input surface mesh does not seem to be a triangular mesh: ' fnprefix]);
-    end
-    if size(telem,2)==3
-        nregions=1;
-        regions=1;
-        telem = [telem repmat([1 0], size(telem,1), 1)];
-    else
-        regions = telem(:,4:5);
-        regions = unique(regions(:));
-        nregions = length(regions);
-    end
-    [tf idx]=ismember(0,regions);
-    if tf, regions(idx)=[]; nregions=nregions-1; end % Remove 0 (which represents outside space)
-    
-    interior_nodes=zeros(nregions,3);
-
-    % Find a point within each region
-    for i=1:nregions
-        bf=telem(:,4)==regions(i) | telem(:,5)==regions(i);
-        reg_ele=telem(bf,1:3);
-        tmp = GetOneInteriorNode(reg_ele,tnode);
-        if isempty(tmp)
-            errordlg(['Could not find an interior point in surface: ' fnprefix myext],'Mesh Error');
-            error(['Could not find an interior point in surface: ' fnprefix myext]);
-        end
-        interior_nodes(i,:) = tmp;
-        if i == 1;
-            extelem = reg_ele;
-        end
-    end
-    regions=cell(size(interior_nodes,1),2);
-    for i=1:size(interior_nodes,1)
-        regions{i,1} = interior_nodes(i,:);
-        regions{i,2} = i;
-    end
+    [tags extelem] = SeparateSubVolumes(telem, tnode);
+    extelem = FixPatchOrientation(tnode,extelem,[],1);
 end
 
 [foo ix] = unique(sort(telem(:,1:3),2),'rows');
@@ -138,7 +104,7 @@ clear foo
 telem=telem(ix,:);
 myargs.silentflag=1;
 myargs.bdyfn = fnprefix;
-myargs.regions = regions;
+myargs.regions = tags;
 % Remove the following line to create a mesh based on average size of the
 % input surfaces
 % myargs.edgesize = 4.1;

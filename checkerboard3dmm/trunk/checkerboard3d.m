@@ -186,7 +186,7 @@ shell_normals=shell_normals./repmat(norm_len,1,3);
 % Create a zone around each triangular face to avoid placing nodes too
 % close to them
 [P]=ExpandBoundaryBufferZone(t,p,P,shell_normals,ds,[dx dy dz],llc);
-
+clear mex
 interior_p0 = tag_checkerboard3d_mex(P, [dx dy dz], [xmin ymin zmin], ds);
 
 t=double(myargs.extelem(:,1:3));
@@ -194,6 +194,7 @@ extnoden=unique(t(:));
 [tf t]=ismember(t, extnoden);
 p=p(extnoden,1:3);
 fprintf('-----> Running BSP tree to filter out nodes.\n');
+clear mex
 st1 = PointInPolyhedron_mex(interior_p0, t, p, tiny);
 fprintf('\n-----> done.\n');
 
