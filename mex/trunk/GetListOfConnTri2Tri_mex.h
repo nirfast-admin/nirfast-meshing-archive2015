@@ -35,3 +35,4 @@ bool ShareEdge(ulong u, ulong v);
 void SetCell(mxArray* cell_pointer, std::set<ulong> conn_elems, ulong i);
 
 #endif
+

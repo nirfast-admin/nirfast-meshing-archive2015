@@ -85,23 +85,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	std::vector<short> color(ne, White);
 	bool firstTimeFlag = true;
 	while (!endflag) {
-		/*elemid = FindSeedsDirection(elemid,prhs,st);
-		if (st!=0) { // could not determine the orientation of any facets to use as seed orientation
-			//st=2;
-			break;
-		}*/
 		int myst=0;
 		if (color[elemid-1]!=White) { // we have tried this element before to no success
 			break;
 		}
 		assert(q.empty());
-		//q.erase();
 		q.push(elemid);
 		color[elemid-1] = Gray;
 		
 		mxArray *tmpArray;
 		double *tris;
-		//bool fooflag=false;
 		
 		while (!q.empty()) {
 			ulong u = q.front();
@@ -129,7 +122,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 						CheckOrientation(v,u);
 					else {
 						myst = CalculateOrientation(v,prhs[0],prhs[1]);
-						if (myst!=0)
+						if (myst>1)
 							continue;
 					}
 					color[v-1] = Gray;
@@ -139,11 +132,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			q.pop();
 			color[u-1] = Black;
 		}
-		/*if (fooflag) {
-			st=myst;
-			break;
-		}*/
-
 		// Check to see if all the elements are tagged as visited
 		endflag = true;
 		for (ulong i=0; i<ne; ++i) {
@@ -161,13 +149,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			mexErrMsgTxt("Aborting...");
 		}
 	}
-	/*if (st!=0)
-		goto EXIT;*/
 	if (!endflag) { // the loop didn't end naturally
 		st=3;
 		goto EXIT;
 	}
-	 if (ReOrient()!=0) {
+	 if (ReOrient(prhs[0],prhs[1])!=0) {
 		 st=4;
 		 goto EXIT;
 	 }
@@ -278,11 +264,12 @@ void CheckOrientation(ulong v, ulong u) {
 
 // Randomly, chooses one side of triangle 'v' and creates a point very close to it and determines
 // if that point is within the boundary or not. Then calculates the normal of triangle and
-// checks if the point created is on the same side of the normal and accordingly decided if
+// checks if the point created is on the same side of the normal and accordingly decides if
 // the orientation of the triangle is correct.
 // This routine will return following codes:
-// 0 : everything is OK and triangle v is properly oriented
-// 1 : couldn't orient v because random points created on both sides of v have the same inclusion test results. (i.e. v is very close to another triangle)
+// 0 : everything is OK and triangle v's orientation was not changed
+// 1 : everything is OK and triangle v's orientation was     changed
+// 2 : couldn't orient v because random points created on both sides of v have the same inclusion test results. (i.e. v is very close to another triangle)
 // 255 : could not decide if the random point created was inside or outside of the boundary
 unsigned int CalculateOrientation(ulong v, const mxArray *mxT, const mxArray *mxP) {
 	unsigned int st=0;
@@ -326,8 +313,6 @@ unsigned int CalculateOrientation(ulong v, const mxArray *mxT, const mxArray *mx
 	CROSS(vec,v1,v2);
 	v_norm(vec,3);
 	double p0[3]={0.,0.,0.};
-	double tiny = 1e-11;
-	double tiny_offset = 1e-4;
 
 	// Find the centroid of triangle
 	double cent[3]={0.,0.,0.};
@@ -343,74 +328,45 @@ unsigned int CalculateOrientation(ulong v, const mxArray *mxT, const mxArray *mx
 	unsigned int st2 = isinvolume_randRay(p0,mxP,mxT,tiny,facets_bbx,200,xMin,xMax);
 	
 	if (st1==st2 && st1!=255)
-		st = 1;
+		st = 2;
 	else if (st1==255 || st2==255) // couldn't determine the location of point, ran out of numPertub!
 		st = 255;
 	else if (st1==1) { // need to change the orientation
 		double tmp = ele(v-1,0);
 		ele(v-1,0) = ele(v-1,1);
 		ele(v-1,1) = tmp;
+		st = 1;
 	}
-	return st; // successful inclustion test and/or re-orientation
+	return st;
 }
 
-int ReOrient() {
-	double v1[3], v2[3], v3[3], vec[3];	
-	double ltmp, ort;
-	int n = 0;
-	ulong i, ndid;
-
-	vec[0] = 1; /* point to the right */
-	vec[1] = 0;
-	vec[2] = 0;
-	
-	double xmax =  -std::numeric_limits<double>::max();
-	for (i=0; i<np; i++) {
-		if (p(i,0) > xmax) {
-			ndid = i+1;
-			xmax = p(i,0);
-		}		
-	}	
-
-	int dotsign = 0;
+int ReOrient(const mxArray *mxT, const mxArray *mxP) {
+	unsigned char st;
+	ulong i, eleid=0;
+	bool s=false;
 	for (i=0; i<ne; ++i) {
-		if ((ulong)(ele(i,0))==ndid || (ulong)(ele(i,1))==ndid || (ulong)(ele(i,2))==ndid) {
-			++n;
-			for (int m=0; m<3; ++m) {
-				v1[m] = p((ulong)(ele(i,1))-1,m) - p((ulong)(ele(i,0))-1,m);
-				v2[m] = p((ulong)(ele(i,2))-1,m) - p((ulong)(ele(i,0))-1,m);
-			}
-			CROSS(v3,v1,v2);
-			v_norm(v3,3);
-			ort = DOT(vec,v3);
-			if (ort != 0.0) {
-				if (ort > 0.0 && dotsign == 0)
-					dotsign = 1;
-				else if (ort < 0.0 && dotsign ==0)
-					dotsign = -1;
-				else if (dotsign!=0) {
-					if (dotsign * ort < 0.0) // triangles are not following the same orientation
-						return 1; // error
-				}
-			}
+		st = CalculateOrientation(i+1, mxT, mxP);
+		if (st <= 1) {
+			eleid = i;
+			s=true;
+			break;
 		}
 	}
- 
-	if (n<1) {
-	 //the number of associate elem is too low 
-	 //the triangle is probably a tangling elem or on the edge
-	 //of a not closed loop 
-		mexErrMsgTxt("\n\nThere is no triangle associated with the leftmost node!\n");
-	}
-	else {
-		if (dotsign == -1) {
-			// wrong orientation, flip it
+	if (s) {
+		if (st==1) { 
+			double ltmp;
+			// Could determine orientation of one element and that element was in wrong direction
+			// therefore since we assume all the elements in 'ele' are in the same directin,
+			//  we need to change all of them.
 			for (i=0; i<ne; ++i) {
+				if (i==eleid) continue;
 				ltmp = ele(i,0);
 				ele(i,0) = ele(i,1);
 				ele(i,1) = ltmp;
 			}
 		}
+		return 0; // everything went well
 	}
-	return 0;
+	else
+		return 1; // could not orient
 }

@@ -57,6 +57,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	while (!endflag) {
 		
 		q.push(starte);
+		current_region.push_back(starte);
 		while (!q.empty()) {
 			#ifdef debugme
 				mexPrintf("Entered queue loop\n");

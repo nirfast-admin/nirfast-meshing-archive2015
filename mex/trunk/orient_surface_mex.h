@@ -22,6 +22,9 @@
 #define ulong unsigned long
 #endif
 
+double tiny = 1e-11;
+double tiny_offset = 1e-5;
+
 double *ele;
 const double *p;
 const mxArray *list;
@@ -40,5 +43,5 @@ enum {White=0, Gray, Black=-1};
 void CheckOrientation(ulong v, ulong u);
 unsigned int CalculateOrientation(ulong v, const mxArray *mxT, const mxArray *mxP);
 ulong FindSeedsDirection(ulong elemid, const mxArray *prhs[], int &myst);
-int ReOrient();
+int ReOrient(const mxArray *mxT, const mxArray *mxP);
 #endif
