@@ -107,12 +107,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         if (debug)
             mexPrintf("Calculating facets_bbx\n");
         facets_bbx = new float[ne*6];
-        for (ulong i=0; i<ne; ++i) {
-            ulong n1= (ulong) t(i,0);
-            ulong n2= (ulong) t(i,1);
-            ulong n3= (ulong) t(i,2);
+        for (ULONG i=0; i<ne; ++i) {
+            ULONG n1= (ULONG) t(i,0);
+            ULONG n2= (ULONG) t(i,1);
+            ULONG n3= (ULONG) t(i,2);
             double tmp;
-            for (ulong j=0; j<3; ++j) {
+            for (ULONG j=0; j<3; ++j) {
                 tmp = std::min(p(n1-1,j),p(n2-1,j));
                 facets_bbx[i+j*ne]=std::min(tmp,p(n3-1,j));
                 tmp = std::max(p(n1-1,j),p(n2-1,j));
@@ -142,7 +142,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     std::vector<points> intpnts;
     points p1;
     std::vector<int> intersection_status;
-    std::vector<ulong> intersected_facets;
+    std::vector<ULONG> intersected_facets;
     bool all_ok=true;
     if (debug)
         mexPrintf("Calculating ray's bbx\n");
@@ -156,7 +156,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (debug)
         mexPrintf("Entering the main loop\n");
 	std::vector<bool> examined_facets(ne,false);
-    for (ulong i=0; i<ne; ++i) {
+    for (ULONG i=0; i<ne; ++i) {
 		if (examined_facets[i]==true) // we have already checked this face in IsValidCrossing() function
 			continue;
         double MaxX = facets_bbx(i,3); double MinX = facets_bbx(i,0);
@@ -170,9 +170,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         for (int k=0; k<3; ++k) {
            if (debug)
                mexPrintf("getting the triangle coordinates to check intersection with");
-            tp1[k] = p( (ulong)(t(i,0)-1), k);
-            tp2[k] = p( (ulong)(t(i,1)-1), k);
-            tp3[k] = p( (ulong)(t(i,2)-1), k);
+            tp1[k] = p( (ULONG)(t(i,0)-1), k);
+            tp2[k] = p( (ULONG)(t(i,1)-1), k);
+            tp3[k] = p( (ULONG)(t(i,2)-1), k);
         }
         if (debug)
             mexPrintf("Calling intersect_RayTriangle\n");
@@ -277,7 +277,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexPrintf("Setting intpnts!\n");
         plhs[1] = mxCreateDoubleMatrix(nintpnts,3,mxREAL);
 		double *ipnts = mxGetPr(plhs[1]);
-		for (ulong i=0; i<nintpnts; ++i) {
+		for (ULONG i=0; i<nintpnts; ++i) {
 			for (int j=0; j<3; ++j) {
 				ipnts[j*nintpnts+i]=intpnts[i].c[j];
 			}
@@ -290,14 +290,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexPrintf("Setting intersection_status!\n");
 		plhs[3] = mxCreateNumericMatrix(nintpnts, 1, mxINT8_CLASS, mxREAL);
 		char  *footmp1 = (char *) mxGetData(plhs[3]);
-		for (ulong i=0; i<nintpnts; footmp1[i]=intersection_status[i],++i);
+		for (ULONG i=0; i<nintpnts; footmp1[i]=intersection_status[i],++i);
 
         if (debug)
             mexPrintf("Setting intersected_facets!\n");
 		if (all_ok) {
 			plhs[4] = mxCreateNumericMatrix(nintpnts, 1, mxUINT32_CLASS, mxREAL);
 			unsigned long int *footmp2 = (unsigned long int *) mxGetData(plhs[4]);
-			for (ulong i=0; i<nintpnts; footmp2[i]=intersected_facets[i],++i);
+			for (ULONG i=0; i<nintpnts; footmp2[i]=intersected_facets[i],++i);
 		}
 		else
 			plhs[4] = mxCreateNumericMatrix(0, 1, mxUINT32_CLASS, mxREAL); // empty
@@ -354,11 +354,11 @@ bool CheckArgsIn(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 // 4 : point on a parallel facet edge, ray exitting the parallel facet through this point - toggle unworthy
 // 5 : point on two parallel facets' common edge, toggle unworthy
 // int_facets: will be used in calling function to make sure that we don't check them again.
-bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > first_intpnts,
+bool IsValidCrossing(ULONG idx, int first_st, std::vector<std::vector<double> > first_intpnts,
 					 double *rp1, double *rp2, double *mydir, double tiny,
 					 std::vector<points> &int_pnts, std::vector<int> &int_status, std::vector<bool> &int_facets,
-					 double *shell_normals, const mxArray *list, ulong *indexing,
-					 double *t, double *p, ulong ne, ulong np) {
+					 double *shell_normals, const mxArray *list, ULONG *indexing,
+					 double *t, double *p, ULONG ne, ULONG np) {
 	double tp1[3], tp2[3], tp3[3];
 	double tt=0, uu=0, vv=0;
 	double norm[2][3];
@@ -366,15 +366,15 @@ bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > 
 	double mysign[2]={0,0};
 	bool ret;
 	int tmp_i;
-	ulong starting_triangle;
-	ulong edge[2][2]={{0,0}, {0,0}};
-	ulong comm_edge[2]={0,0};
-	ulong N[3];
-	ulong tri1;
+	ULONG starting_triangle;
+	ULONG edge[2][2]={{0,0}, {0,0}};
+	ULONG comm_edge[2]={0,0};
+	ULONG N[3];
+	ULONG tri1;
 	std::vector<std::vector<double> > myipnt, myipnt2;
     points points_tmp;
-    ulong tri, next_tri;
-    ulong edge1[2], edge2[2];
+    ULONG tri, next_tri;
+    ULONG edge1[2], edge2[2];
 
 	int_pnts.clear();
 	int_status.clear();
@@ -386,16 +386,16 @@ bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > 
 	mysign[0] = DOT(norm[0],mydir);
 	if (!IsEqual(mysign[0],0,tiny)) {
 		mysign[0] = sign(mysign[0]);
-		for (int i=0; i<3; N[i]=(ulong)t(tri1-1,i), ++i);
+		for (int i=0; i<3; N[i]=(ULONG)t(tri1-1,i), ++i);
 		int foo1 = first_st % 10;
 		int foo2 = (foo1+1) % 3;
 		edge[0][0] = std::min(N[foo1],N[foo2]); edge[0][1] = std::max(N[foo1],N[foo2]);
 	}
 	else {
 		assert(first_st!=-1 && first_st<=302 && first_st>=300);
-		for (int i=0; i<3; N[i]=(ulong)t(tri1-1,i), ++i);
-		ulong foo1 = first_st % 10;
-		ulong foo2 = (foo1 + 1) % 3;
+		for (int i=0; i<3; N[i]=(ULONG)t(tri1-1,i), ++i);
+		ULONG foo1 = first_st % 10;
+		ULONG foo2 = (foo1 + 1) % 3;
 		edge[0][0] = std::min(N[foo1],N[foo2]); edge[0][1] = std::max(N[foo1],N[foo2]);
 		foo1 = (foo1+1) % 3;
 		foo2 = (foo1+1) % 3;
@@ -436,15 +436,15 @@ bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > 
 		}
 		else {
 			for (int k=0; k<3; ++k) { // Copy coordinates of next triangle to tp1, tp2, tp3
-				tp1[k] = p( (ulong)(t(tri-1,0)-1), k);
-				tp2[k] = p( (ulong)(t(tri-1,1)-1), k);
-				tp3[k] = p( (ulong)(t(tri-1,2)-1), k);
+				tp1[k] = p( (ULONG)(t(tri-1,0)-1), k);
+				tp2[k] = p( (ULONG)(t(tri-1,1)-1), k);
+				tp3[k] = p( (ULONG)(t(tri-1,2)-1), k);
 			}
-			for (int iii=0; iii<3; N[iii]=(ulong)t(tri-1,iii), ++iii);
+			for (int iii=0; iii<3; N[iii]=(ULONG)t(tri-1,iii), ++iii);
 			int ret2 = ray_triangle_coplanar(rp1, rp2, tp1, tp2, tp3, myipnt2, tiny);
 			assert(ret2!=-1 && ret2<=302 && ret2>=300);
-			ulong foo1 = ret2 % 10;
-			ulong foo2 = (foo1 + 1) % 3;
+			ULONG foo1 = ret2 % 10;
+			ULONG foo2 = (foo1 + 1) % 3;
 			edge1[0] = std::min(N[foo1],N[foo2]); edge1[1] = std::max(N[foo1],N[foo2]);
 			foo1 = (foo1+1) % 3;
 			foo2 = (foo2+1) % 3;
@@ -511,7 +511,7 @@ bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > 
 }
 
 // Returns the triangle neighbor to 'tri' that is sharing the edge 'edge'
-ulong GetNeighborTriangle(ulong edge[2], ulong tri, const mxArray *list, ulong *indexing) {
+ULONG GetNeighborTriangle(ULONG edge[2], ULONG tri, const mxArray *list, ULONG *indexing) {
 	unsigned long int m = mxGetM(list);
     mxArray *tmp;
     unsigned long int *temp_edge;
@@ -523,10 +523,10 @@ ulong GetNeighborTriangle(ulong edge[2], ulong tri, const mxArray *list, ulong *
 
 	if (edge[0]>edge[1])
 		std::swap(edge[0],edge[1]);
-	ulong starti = indexing(edge[0]-1,0);
-	ulong endi   = indexing(edge[0]-1,1);
+	ULONG starti = indexing(edge[0]-1,0);
+	ULONG endi   = indexing(edge[0]-1,1);
 	--starti; --endi;
-	for (ulong i=starti; i<=endi; ++i) {
+	for (ULONG i=starti; i<=endi; ++i) {
 		index = i + 0*m;
 		tmp = mxGetCell(list,index);
 		temp_edge = (unsigned long int *) mxGetData(tmp);

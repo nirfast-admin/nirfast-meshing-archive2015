@@ -9,10 +9,12 @@
 #ifndef __intersect_ray_shell_mex_h
 #define __intersect_ray_shell_mex_h
 
-#ifndef sign(x)
+#ifndef sign
 #define sign(x) (fabs(x)/(x))
 #endif
-#define ulong unsigned long int
+#ifndef ULONG
+#define ULONG unsigned long int
+#endif
 
 #include "mex.h"
 #include <vector>
@@ -37,12 +39,11 @@ unsigned long m_indexing;
 
 bool CheckArgsIn(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
 //unsigned long int *GetEdgeTriConnList(mxArray *list);
-ulong GetNeighborTriangle(ulong edge[2], ulong tri, const mxArray *list, ulong *indexing);
-bool IsValidCrossing(ulong idx, int first_st, std::vector<std::vector<double> > first_intpnts, 
+ULONG GetNeighborTriangle(ULONG edge[2], ULONG tri, const mxArray *list, ULONG *indexing);
+bool IsValidCrossing(ULONG idx, int first_st, std::vector<std::vector<double> > first_intpnts, 
 					 double *rp1, double *rp2, double *mydir, double tiny,
 					 std::vector<points> &int_pnts, std::vector<int> &int_status, std::vector<bool> &int_facets,
-					 double *shell_normals, const mxArray *list, ulong *indexing,
-					 double *t, double *p, ulong ne, ulong np);
+					 double *shell_normals, const mxArray *list, ULONG *indexing,
+					 double *t, double *p, ULONG ne, ULONG np);
 
 #endif
-
