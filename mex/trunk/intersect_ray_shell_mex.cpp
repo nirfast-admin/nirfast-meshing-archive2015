@@ -302,6 +302,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		else
 			plhs[4] = mxCreateNumericMatrix(0, 1, mxUINT32_CLASS, mxREAL); // empty
 	}
+    if (nrhs<6 || mxIsEmpty(prhs[5])) {
+        delete [] facets_bbx;
+    }
     // Exit
 
 }

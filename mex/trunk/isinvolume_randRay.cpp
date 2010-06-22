@@ -3,6 +3,7 @@
 #ifndef p
 #define p(i,j) p[(i)+np*(j)]
 #define t(i,j) t[(i)+ne*(j)]
+#define facets_bbx(i,j) facets_bbx[(i)*6+(j)]
 #endif
 
 #ifndef _SIGN
@@ -12,7 +13,7 @@
 
 // This routine should be called from a Matlab mex function ONLY!
 unsigned char isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *mxT, double tiny, 
-					   float (*facets_bbx)[6], int numPerturb, double minX, double maxX)
+					   float *facets_bbx, int numPerturb, double minX, double maxX)
 {
    
     unsigned char st;
@@ -58,16 +59,16 @@ unsigned char isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *
 	bool forever = true;
     bool brokenloop = false;
     bool rayPerturbed=false;
-    double R;
+    double R = -std::numeric_limits<double>::max();
     
     if (debug)
         mexPrintf("Entering the main loop\n");
 	while (forever) {
         for (ulong i=0; i<ne; ++i) {
             if (!rayPerturbed) {
-                double MaxX = facets_bbx[i][3]; 
-                double MaxY = facets_bbx[i][4]; double MinY = facets_bbx[i][1];
-                double MaxZ = facets_bbx[i][5]; double MinZ = facets_bbx[i][2];
+                double MaxX = facets_bbx(i,3); 
+                double MaxY = facets_bbx(i,4); double MinY = facets_bbx(i,1);
+                double MaxZ = facets_bbx(i,5); double MinZ = facets_bbx(i,2);
                 if (debug) {
 //                     mexPrintf("Ray Is Perturbed! i = %d\n",i);
                 }
@@ -77,15 +78,15 @@ unsigned char isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *
             // get coordinates of tp1, tp2 and tp3 into mxArrays of *rhs1[]
             double tp1[3], tp2[3], tp3[3];
             for (int k=0; k<3; ++k) {
-		ulong idx = (ulong) t(i,0) - 1;
-		assert(idx>=0 && idx<=np);
-                tp1[k] = p(idx, k);
-		idx = (ulong) t(i,1) - 1;
-		assert(idx>=0 && idx<=np);
-                tp2[k] = p(idx, k);
-		idx = (ulong) t(i,2) - 1;
-		assert(idx>=0 && idx<=np);
-                tp3[k] = p(idx, k);
+				ulong idx = (ulong) t(i,0) - 1;
+				assert(idx>=0 && idx<=np);
+		                tp1[k] = p(idx, k);
+				idx = (ulong) t(i,1) - 1;
+				assert(idx>=0 && idx<=np);
+		                tp2[k] = p(idx, k);
+				idx = (ulong) t(i,2) - 1;
+				assert(idx>=0 && idx<=np);
+		                tp3[k] = p(idx, k);
             }
 
             if (debug) {

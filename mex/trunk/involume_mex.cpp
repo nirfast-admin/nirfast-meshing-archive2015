@@ -3,6 +3,7 @@
 #define p(i,j) p[(i)+np*(j)]
 #define ele(i,j) ele[(i)+ne*(j)]
 #define qp(i,j) qp[(i)+nqp*(j)]
+#define facets_bbx(i,j) facets_bbx[(i)*6+(j)]
 /* To compile this file use:
 * For Windows:
 * mex -v -DWIN32 -I./meshlib involume_mex.cpp isinvolume_randRay.cpp meshlib/geomath.cpp meshlib/vector.cpp
@@ -45,11 +46,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double tiny = mxGetScalar(prhs[6]);
     
     //     check to see if we need to create facets_bbx
-    float (*facets_bbx)[6];
+	float *facets_bbx;
    
     if (debug)
         mexPrintf("Calculating facets_bbx\n");
-    facets_bbx = new float[ne][6];
+    facets_bbx = new float[ne*6];
     for (ulong i=0; i<ne; ++i) {
         ulong n1 = (ulong) ele(i,0);
         ulong n2 = (ulong) ele(i,1);
@@ -57,9 +58,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         double tmp;
         for (ulong j=0; j<3; ++j) {
             tmp = std::min(p(n1-1,j),p(n2-1,j));
-            facets_bbx[i][j]=std::min(tmp,p(n3-1,j));
+            //facets_bbx[i][j]=std::min(tmp,p(n3-1,j));
+			facets_bbx(i,j) = std::min(tmp,p(n3-1,j));
             tmp = std::max(p(n1-1,j),p(n2-1,j));
-            facets_bbx[i][j+3]=std::max(tmp,p(n3-1,j));
+            //facets_bbx[i][j+3]=std::max(tmp,p(n3-1,j));
+			facets_bbx(i,j+3) = std::max(tmp,p(n3-1,j));
         }
     }
     
@@ -72,5 +75,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         for (int j=0; j<3; tmpqp[j] = qp(i,j), ++j);
         st[i] = isinvolume_randRay(tmpqp,prhs[2],prhs[1],tiny,facets_bbx,ntries,xMin,xMax);
     }
+    // Free the facets_bbx memory
+    delete [] facets_bbx;
 }
 

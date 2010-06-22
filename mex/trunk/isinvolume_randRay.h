@@ -19,4 +19,4 @@ struct points {
 };
 
 unsigned char isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *mxT, double tiny, 
-					   float (*facets_bbx)[6], int numPerturb, double minX, double maxX);
+					   float *facets_bbx, int numPerturb, double minX, double maxX);
