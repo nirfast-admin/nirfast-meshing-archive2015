@@ -1,4 +1,4 @@
-function [tags extelem regionvols] = SeparateSubVolumes(telem,tnode)
+function [tags extelem] = SeparateSubVolumes(telem,tnode)
 % Assuming multiple material regions are delineated in 'telem', this routines
 % returns:
 % tags : list of nodes inside _every_ subvolume (one node per subvolume)
@@ -7,11 +7,6 @@ function [tags extelem regionvols] = SeparateSubVolumes(telem,tnode)
 % 
 % extelem : indices to the elements that compose the largest volume
 % 
-% regionvols: a cell containing subvolumes that share a material ID
-%             regionvols{:,1} = material ID
-%             regionvols{:,2} = ind_regions
-%                               ind_regions{i} = indices of elements for
-%                               every subvolume belonging to region ID
 % 
 % telem(:,1:3) defines the triagnels in the surface
 % telem(:,4:5) defines the two materials on each side of a triangle
@@ -34,41 +29,46 @@ if tf, regions(idx)=[]; nregions=nregions-1; end % Remove 0 (which represents ou
 
 % Find a point within each region (note that regions might consist of
 % multiple sub-surfaces)
-regionvols = cell(nregions,2);
 tag_counter = 1;
 maxvol = -realmax;
-invc=0;
 for i=1:nregions
-    interior_nodes = [];
+    maxvol_local = -realmax;
     bf=telem(:,4)==regions(i) | telem(:,5)==regions(i);
+    idx = find(bf);
     subvol=telem(bf,1:3);
     % Get all the sub-surfaces of current region
     ind_regions = GetIndRegions(subvol,tnode);
-    regionvols{i,1} = regions(i); % Storing the material ID of each region
-    regionvols{i,2} = ind_regions;
-    % Calculate an interior node for each sub-surface
-    for j=1:size(ind_regions,1)
-        % Orient each subvolume and get a point within its boundary
-        fooelem = FixPatchOrientation(tnode,subvol(ind_regions{j},:),[],1);
-        tmp = GetOneInteriorNode(fooelem,tnode);
-        if isempty(tmp)
-            invc=invc+1;
-            fprintf('No of invalid subvolumes so far: %d\n',invc);
-%             errordlg('Could not find an interior point in surface.','Mesh Error');
-%             error('Could not find an interior point in surface.' );
+    % Figure out which sub-surface should be used for point coordinate
+    % calculations.
+    if size(ind_regions,1)>1
+        for j=1:size(ind_regions,1)
+            vol = shell_volume(subvol(ind_regions{j},1:3),tnode);
+            if vol > maxvol_local
+                maxvol_local = vol;
+                myidx = j;
+            end
         end
-        interior_nodes = [interior_nodes; tmp];
-        % Check if this surface is the exterior one, we need it for
-        % actual checkerboard3d to work. We do this by calculating the
-        % volume of each sub-volume.
-        vol = shell_volume(subvol,tnode);
-        if vol > maxvol
-            maxvol = vol;
-            extelem = subvol;
-        end
+    else
+        myidx = 1;
+    end
+    % Orient the surface
+    fooelem = FixPatchOrientation(tnode,subvol(ind_regions{myidx},1:3),[],1);
+    % Calculate a node within the surface
+    interior_nodes = GetOneInteriorNode(fooelem,tnode);
+    if isempty(interior_nodes)
+            errordlg('Could not find an interior point in surface.','Mesh Error');
+            error('Could not find an interior point in surface.' );
+    end
+    % Check if this surface is the exterior one, we need it for
+    % actual checkerboard3d to work. We do this by calculating the
+    % volume of each sub-volume.
+    vol = shell_volume(fooelem,tnode);
+    if vol > maxvol
+        maxvol = vol;
+        extelem = telem(idx(ind_regions{myidx}),1:3);
     end
     for j=1:size(interior_nodes,1);
-        tags{tag_counter,1} = interior_nodes(i,:);
+        tags{tag_counter,1} = interior_nodes(j,:);
         tags{tag_counter,2} = regions(i);
         tag_counter = tag_counter + 1;
     end

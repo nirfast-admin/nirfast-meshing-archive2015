@@ -29,4 +29,4 @@ for i=1:3
 end
 tets(4,:,:)=reshape(repmat(p0,ne,1)',[1 3 ne]);
 tet_vol = signed_tetrahedron_vol(tets);
-totvol = sum(tet_vol);
+totvol = abs(sum(tet_vol));
