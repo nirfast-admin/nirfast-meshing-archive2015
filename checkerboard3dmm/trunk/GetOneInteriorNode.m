@@ -25,14 +25,15 @@ pp=p(nodes,:);
 [tf ee]=ismember(t,nodes);
 
 % Check the subvolume's integrity
-input_args.verbose=1;
+input_args.verbose=0;
 input_args.type=1;
 [~,~,~,myst] = CheckMesh3D(ee,pp,[],input_args);
 
-if isfield(myst,'b') && myst.b~=0
-    writenodelm_surface_medit('foo.mesh',ee,pp)
-    system('/usr/local/bin/medit foo.mesh')
-    disp(' ')
+if isfield(myst,'b') && myst.b~=0 && myst.b~=4
+%     writenodelm_surface_medit('foo.mesh',ee,pp)
+%     system('/usr/local/bin/medit foo.mesh')
+%     disp(' ')
+    cprintf([1 0.5 0.5],'Warning (GetOneInteriorNode.m):\n   The given surface is not closed or single material!\n');
 end
 
 for i=1:ne
