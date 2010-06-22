@@ -22,7 +22,7 @@
 #define p(i,j) p[(i)+np*(j)]
 #define ele(i,j) ele[(i)+ne*(j)]
 #define list(i,j) list[(i)+ne*(j)];
-#define facets_bbx(i,j) facets_bbx[(i)+ne*(j)];
+#define facets_bbx(i,j) facets_bbx[(i)*6+(j)]
 /* To compile this file use:
 * For Windows:
 * mex -v -DWIN32 -I./meshlib orient_surface_mex.cpp meshlib/vector.cpp meshlib/geomath.cpp isinvolume_randRay.cpp
@@ -286,7 +286,7 @@ unsigned int CalculateOrientation(ulong v, const mxArray *mxT, const mxArray *mx
 		ExtremeFlag = true;
 	}
 	if (!BBXFlag) {
-		facets_bbx = new float[ne][6];
+		facets_bbx = new float[ne*6];
 		for (ulong i=0; i<ne; ++i) {
 			ulong n1=(ulong)(ele(i,0));
             ulong n2=(ulong)(ele(i,1));
@@ -294,9 +294,11 @@ unsigned int CalculateOrientation(ulong v, const mxArray *mxT, const mxArray *mx
             double tmp;
             for (ulong j=0; j<3; ++j) {
 				tmp = std::min(p(n1-1,j),p(n2-1,j));
-				facets_bbx[i][j] = std::min(tmp,p(n3-1,j));
+				//facets_bbx[i][j] = std::min(tmp,p(n3-1,j));
+				facets_bbx(i,j) = std::min(tmp,p(n3-1,j));
 				tmp = std::max(p(n1-1,j),p(n2-1,j));
-				facets_bbx[i][j+3] = std::max(tmp,p(n3-1,j));
+				//facets_bbx[i][j+3] = std::max(tmp,p(n3-1,j));
+				facets_bbx(i,j+3) = std::max(tmp,p(n3-1,j));
 			}
 		}
 		BBXFlag = true;

@@ -36,7 +36,7 @@ ulong ne, np;
 
 bool ExtremeFlag=false, BBXFlag=false;
 int numPerturb = 50;
-float (*facets_bbx)[6];
+float *facets_bbx;
 double xMax, xMin;
 enum {White=0, Gray, Black=-1};
 
