@@ -73,7 +73,9 @@
 
 #endif
 
-typedef unsigned long ULONG;
+#ifndef ULONG
+#define ULONG unsigned long
+#endif
 
 #ifndef CPU_TIME
 //extern int getrusage();
