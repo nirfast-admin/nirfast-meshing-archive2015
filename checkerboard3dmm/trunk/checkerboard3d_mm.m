@@ -17,7 +17,6 @@ if nargin==0
                              'MultiSelect','off');
     filename =[pname fname];
 end
-
 [path fnprefix num_flag myext] = GetFilenameNumbering(filename);
 fnprefix=fullfile(path,fnprefix);
 
@@ -132,7 +131,6 @@ faces=sort(faces,2);
 vec=histc(jx,1:max(jx));
 qx = vec==1;
 bdy_faces=faces(ix(qx),:);
-
 exterior_nodes_id = unique(bdy_faces(:));
 mesh.bndvtx = zeros(size(mesh.nodes,1),1);
 mesh.bndvtx(exterior_nodes_id) = 1;

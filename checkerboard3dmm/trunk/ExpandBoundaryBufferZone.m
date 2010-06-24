@@ -41,7 +41,6 @@ tp1=v(:,1:3).*repmat(betha(:,1),1,3)+pc;
 tp2=v(:,4:6).*repmat(betha(:,2),1,3)+pc;
 tp3=v(:,7:9).*repmat(betha(:,3),1,3)+pc;
 clear v pc;
-
 fprintf('\b%s\n',' done.')
 
 % Calculate each face's prism coordinates
@@ -60,7 +59,6 @@ end
 % Get bbx of prisms' facets
 prism_facets_bbx=zeros(nf,8,6,'single');
 prism_normals=zeros(nf,3,8,'double');
-
 cprintf([0 0 1],'\tCalculating prism normals and bounding boxes...')
 for i=1:nf
     tpp=(reshape(pp(i,:,:),3,6))';
@@ -77,7 +75,6 @@ for i=1:nf
     norm_len=v_magn(tmp);
     prism_normals(i,:,:)=(tmp./repmat(norm_len,1,3))';
 end
-
 fprintf('\b%s\n',' done.')
 % Get bbx of prisms
 prisms_bbx=zeros(nf,6);
