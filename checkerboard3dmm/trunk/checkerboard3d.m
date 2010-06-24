@@ -18,7 +18,6 @@ function [tets, points_from_tetgen] = checkerboard3d(e,p,myargs)
 % myargs.extelem : list of elements of the most exterior surface that
 % encloses all other sub surfaces
 % 
-
 % For more info check:
 % http://tetgen.berlios.de/fformats.poly.html
 % 

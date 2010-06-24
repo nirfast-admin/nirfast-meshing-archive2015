@@ -23,8 +23,6 @@ prism=tmp.prism;
 list=tmp.list;
 indexing=tmp.indexing;
 clear tmp;
-
-
 cprintf([0 0 1],'\tCalculating desired length at boundary nodes...')
 tp1=p(t(:,1),:); tp2=p(t(:,2),:); tp3=p(t(:,3),:);
 [pc]= incircle(tp1,tp2,tp3);
@@ -64,7 +62,6 @@ prism_facets_bbx=zeros(nf,8,6,'single');
 prism_normals=zeros(nf,3,8,'double');
 
 cprintf([0 0 1],'\tCalculating prism normals and bounding boxes...')
-
 for i=1:nf
     tpp=(reshape(pp(i,:,:),3,6))';
     n1=tpp(prism(:,1),:); n2=tpp(prism(:,2),:); n3=tpp(prism(:,3),:);

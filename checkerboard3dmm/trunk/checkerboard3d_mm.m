@@ -20,7 +20,6 @@ end
 
 [path fnprefix num_flag myext] = GetFilenameNumbering(filename);
 fnprefix=fullfile(path,fnprefix);
-
 if isempty(myext) || (~strcmpi(myext,'.inp') && ~strcmpi(myext,'.ele'))
     errordlg('Surface filenaem should have either .inp or .ele as its extension','Meshing Error');
     error('Surface filenaem should have either .inp or .ele as its extension');
