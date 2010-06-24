@@ -18,6 +18,7 @@ function [tets, points_from_tetgen] = checkerboard3d(e,p,myargs)
 % myargs.extelem : list of elements of the most exterior surface that
 % encloses all other sub surfaces
 % 
+
 % For more info check:
 % http://tetgen.berlios.de/fformats.poly.html
 % 
@@ -116,9 +117,6 @@ else
     end
 end
 
-% Fix the facets orientation to make sure their normal is poiting outward.
-% [e]=FixPatchOrientation(p,e);
-
 clear P Q;
 resolution=2;
 
@@ -145,6 +143,7 @@ int_nodes=(noPLCp+1):(size(PP,1)+noPLCp);
 
 % Write input files for delaunaygen
 delete('input4delaunay.*','junk.txt');
+
 if isfield(myargs,'regions') && ~isempty(myargs.regions)
     writenodelm_poly3d('input4delaunay',e,[p;PP],int_nodes,[],myargs.regions,1,[]);
 else
@@ -170,7 +169,6 @@ cprintf([0 0 1],' done. <---------\n\n');
 
 
 function [PP] = TagBoundary3d(p,t,ds,dx,dy,dz,llc,myargs)
-
 global P
 global tiny
 
@@ -186,6 +184,7 @@ shell_normals=shell_normals./repmat(norm_len,1,3);
 % Create a zone around each triangular face to avoid placing nodes too
 % close to them
 [P]=ExpandBoundaryBufferZone(t,p,P,shell_normals,ds,[dx dy dz],llc);
+
 clear mex
 interior_p0 = tag_checkerboard3d_mex(P, [dx dy dz], [xmin ymin zmin], ds);
 

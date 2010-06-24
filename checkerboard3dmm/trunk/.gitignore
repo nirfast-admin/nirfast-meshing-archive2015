@@ -1,0 +1,5 @@
+# Exclude these files (some are externals/submodules)
+mex
+*.m~
+# Do NOT exclude these files
+!.gitignore

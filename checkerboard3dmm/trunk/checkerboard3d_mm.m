@@ -131,6 +131,7 @@ faces=sort(faces,2);
 vec=histc(jx,1:max(jx));
 qx = vec==1;
 bdy_faces=faces(ix(qx),:);
+
 exterior_nodes_id = unique(bdy_faces(:));
 mesh.bndvtx = zeros(size(mesh.nodes,1),1);
 mesh.bndvtx(exterior_nodes_id) = 1;
@@ -150,15 +151,3 @@ end
 mesh.elements=mesh.elements(:,1:4);
 
 fprintf('\n\n--> Finished mesh generation.\n');
-
-
-
-
-
-
-
-
-
-
-
-
