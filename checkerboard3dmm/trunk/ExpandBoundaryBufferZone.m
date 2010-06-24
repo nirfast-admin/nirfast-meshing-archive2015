@@ -172,6 +172,7 @@ for i=1:nf
                     rp1 = [(jj-2)*dx+xmin (nrow-ii-1)*dy+ymin (npln-kk-1)*dz+zmin];
                     rp2 = [infX rp1(2) rp1(3)];
                     t1=tic;
+                    clear mex
                     [st intpnts all_ok intersection_status]=...
                         intersect_ray_shell_mex(rp1,rp2,prism_p,double(prism),tiny,bbx,prism_n,list,indexing,mydir);    
                         t2=t2+toc(t1);

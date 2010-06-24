@@ -142,7 +142,6 @@ int_nodes=(noPLCp+1):(size(PP,1)+noPLCp);
 
 % Write input files for delaunaygen
 delete('input4delaunay.*','junk.txt');
-
 if isfield(myargs,'regions') && ~isempty(myargs.regions)
     writenodelm_poly3d('input4delaunay',e,[p;PP],int_nodes,[],myargs.regions,1,[]);
 else

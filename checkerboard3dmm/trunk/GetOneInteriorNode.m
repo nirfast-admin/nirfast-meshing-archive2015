@@ -25,6 +25,7 @@ pp=p(nodes,:);
 [tf ee]=ismember(t,nodes);
 
 % Check the subvolume's integrity
+
 input_args.verbose=0;
 input_args.type=1;
 [~,~,~,myst] = CheckMesh3D(ee,pp,[],input_args);
@@ -37,7 +38,6 @@ if isfield(myst,'b') && myst.b~=0 && myst.b~=4
 end
 
 for i=1:ne
-
     v1=pp(ee(i,2),1:3)-pp(ee(i,1),1:3);
     v2=pp(ee(i,3),1:3)-pp(ee(i,2),1:3);
     normal = cross(v1,v2);
