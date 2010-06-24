@@ -17,6 +17,7 @@ if nargin==0
                              'MultiSelect','off');
     filename =[pname fname];
 end
+
 [path fnprefix num_flag myext] = GetFilenameNumbering(filename);
 fnprefix=fullfile(path,fnprefix);
 
@@ -75,6 +76,7 @@ if strcmpi(myext,'.inp') % Each INP file represents a surface in mesh with disjo
         fcounter = fcounter + 1;
         fn = [fnprefix num2str(fcounter) '.inp'];
     end
+<<<<<<< HEAD
     if fcounter==num_flag % couldn't read the first file
         errordlg({[msg ':'], fn},'Meshing Error');
         error(msg,'Meshing Error');
@@ -97,6 +99,19 @@ elseif strcmpi(myext,'.ele')
     [telem tnode] = read_nod_elm(fnprefix,1);
     [tags extelem] = SeparateSubVolumes(telem, tnode);
     extelem = FixPatchOrientation(tnode,extelem,[],1);
+=======
+    cnn = size(node,1);
+    elem = elem + tnn;
+    tnn = tnn + cnn;
+    telem = [telem;elem];
+    tnode = [tnode;node];
+    fcounter = fcounter + 1;
+end
+regions=cell(size(interior_nodes,1),2);
+for i=1:size(interior_nodes,1)
+    regions{i,1} = interior_nodes(i,:);
+    regions{i,2} = i;
+>>>>>>> First working version
 end
 
 [foo ix] = unique(sort(telem(:,1:3),2),'rows');
@@ -148,6 +163,6 @@ for i=1:length(region_ids)
     rnodes = unique([relem(:,1);relem(:,2);relem(:,3);relem(:,4)]);
     mesh.region(rnodes) = region_ids(i);
 end
-mesh.elements=mesh.elements(:,1:4);
 
+mesh.elements=mesh.elements(:,1:4);
 fprintf('\n\n--> Finished mesh generation.\n');

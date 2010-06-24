@@ -184,7 +184,6 @@ shell_normals=shell_normals./repmat(norm_len,1,3);
 % Create a zone around each triangular face to avoid placing nodes too
 % close to them
 [P]=ExpandBoundaryBufferZone(t,p,P,shell_normals,ds,[dx dy dz],llc);
-
 clear mex
 interior_p0 = tag_checkerboard3d_mex(P, [dx dy dz], [xmin ymin zmin], ds);
 

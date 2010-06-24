@@ -7,7 +7,6 @@ function [P]=ExpandBoundaryBufferZone(t,p,P,shell_normals,density,DELTA,llc)
 global tiny NA boundary_node_code 
 if isempty(tiny), tiny=1e-9; end
 
-
 fprintf('%s\n','===========================================')
 
 % Mesh template properties
@@ -197,7 +196,6 @@ for i=1:nf
     P(istart:iend,jstart:jend,kstart:kend)=sub_P;
 end
 close(h);
-
 cprintf([0 0 1],'\b%s\n\n',' done.')
 % fprintf('  Time spent in intersect_ray_shell_mex: %4.6f\n  Time spent in tag_row_subzone: %4.6f\n',t2,t4); 
 % fprintf('  Avg time spent per face for intersect_ray_shell_mex: %4.6f\n',t2/nf);
