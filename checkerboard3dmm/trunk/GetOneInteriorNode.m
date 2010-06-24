@@ -12,7 +12,6 @@ bbx2=min(p);
 ld=min(bbx1-bbx2);
 
 tiny = eps;
-
 offset = tiny*100 * ld;
 
 if offset < eps
