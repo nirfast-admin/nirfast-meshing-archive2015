@@ -45,7 +45,7 @@ fclose(fid);
 systemcommand=GetSystemCommand('m3c');
 m3c_cmd=['! "' systemcommand '" < m3cinput.txt > junk.txt'];
 
-fprintf('\n---------> Running Marching Cube, please wait...);
+fprintf('\n---------> Running Marching Cube, please wait...');
 eval(m3c_cmd);
 fprintf(' done. <---------\n\n');
 
