@@ -25,7 +25,8 @@ if ~strcmpi(ext,'.inp')
     outputfn = [outputfn '.inp'];
 end
 
-writenodelm_abaqus_inp(outputfn,t(:,1:3),p(:,1:3));
+writenodelm_nod_elm(outputfn,t,p,[],2);
+
 
 
 
