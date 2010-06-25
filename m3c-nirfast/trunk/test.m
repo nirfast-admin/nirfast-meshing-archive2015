@@ -1,11 +1,22 @@
-for i=1:5
-    a=ones(255,255,'uint8')*200;
+for i=1:128
+    if i==1 || i==128
+        a=zeros(256,256,'uint8');
+        imwrite(a,['foo' num2str(i) '.bmp'],'bmp');
+        continue
+    end
+    a=ones(256,256,'uint8')*50;
     a(1:2,:)=0;
     a(:,1:2)=0;
     a(end-2:end,:)=0;
     a(:,end-2:end)=0;
-    a(50:80,50:80)=10;
+    if (i>20 && i<80)
+        a(50:100,50:100)=100;
+        a(80:150,80:150)=200;
+    end 
     imwrite(a,['foo' num2str(i) '.bmp'],'bmp');
 end
+MMC('foo', 2, 4, 16, 'myoutput')
 
-MMC('foo', 2, 4, 4, 'myoutput')
+for i=1:128
+    delete(['foo' num2str(i) '.bmp'])
+end

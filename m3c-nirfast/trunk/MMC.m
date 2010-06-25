@@ -21,11 +21,7 @@ end
 [nrow ncol nslice]=size(mask);
 [t p]=run_mmc(mask,nrow,ncol,nslice,xypixelsize,zpixelsize,edgesize,outputdir,outputfn);
 
-if ~strcmpi(ext,'.inp')
-    outputfn = [outputfn '.inp'];
-end
-
-writenodelm_nod_elm(outputfn,t,p,[],2);
+writenodelm_nod_elm([outputdir filesep outputfn],t,p,[],2);
 
 
 
@@ -40,6 +36,9 @@ if isempty(foo)
 end
 
 a = imread([maskloc '1.bmp']);
+if ndims(a)==3
+    a=rgb2gray(a);
+end
 [nrow ncol]=size(a);
 mask = zeros(nrow,ncol,length(foo),'int16');
 
