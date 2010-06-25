@@ -1,10 +1,12 @@
+nrow=356;
+ncol=160;
 for i=1:128
     if i==1 || i==128
-        a=zeros(256,256,'uint8');
+        a=zeros(nrow,ncol,'uint8');
         imwrite(a,['foo' num2str(i) '.bmp'],'bmp');
         continue
     end
-    a=ones(256,256,'uint8')*50;
+    a=ones(nrow,ncol,'uint8')*50;
     a(1:2,:)=0;
     a(:,1:2)=0;
     a(end-2:end,:)=0;
@@ -15,7 +17,7 @@ for i=1:128
     end 
     imwrite(a,['foo' num2str(i) '.bmp'],'bmp');
 end
-MMC('foo', 2, 4, 16, 'myoutput')
+MMC('foo', 2, 4, 14, 'myoutput')
 
 for i=1:128
     delete(['foo' num2str(i) '.bmp'])
