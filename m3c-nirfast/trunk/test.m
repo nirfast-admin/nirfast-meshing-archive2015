@@ -17,7 +17,7 @@ for i=1:128
     end 
     imwrite(a,['foo' num2str(i) '.bmp'],'bmp');
 end
-MMC('foo', 2, 4, 14, 'myoutput')
+MMC('foo2.bmp', 2, 4, 16, 'myoutput')
 
 for i=1:128
     delete(['foo' num2str(i) '.bmp'])
