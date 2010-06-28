@@ -94,6 +94,7 @@ std::vector< std::vector<int> > core(std::vector<std::string>&surface_fnames) {
 //			delete [] tree;
 			return relations;
 		}
+		tree[i].SetSplitType(2); // Full scoring system
 	}
 
 
@@ -126,7 +127,8 @@ std::vector< std::vector<int> > core(std::vector<std::string>&surface_fnames) {
 			if (i==j) continue;
 			for (ULONG ii=0; ii<tree[j]._points.size(); ++ii) {
 				Point P = *(tree[j]._points[ii]);
-				int ret = PointInSolidSpace(root[i], P, foothk);
+				//int ret = PointInSolidSpace(root[i], P, foothk);
+				int ret = tree[i].IsInside(P, foothk);
 				if (ret == 0) {
 					allin_flag = false;
 					// break;
@@ -136,9 +138,9 @@ std::vector< std::vector<int> > core(std::vector<std::string>&surface_fnames) {
 				}
 			}
 			if (allin_flag == false && inflag == true) { // intersection surfaces, not suitable for BEM
-				std::cout << std::endl << "  Warning!" << std::endl;
-				std::cout << "  Surface " << i+1 << " and " << j+1 << " are intersecting!" << std::endl;
-				std::cout << "  This set of surfaces can not be used in BEM formulation!" << std::endl << std::endl;
+				mexPrintf("  Warning!\n");
+				mexPrintf("   This set of surfaces can not be used in BEM formulation!\n");
+				mexPrintf("   Reason: they are NOT mutually exclusive sub-surfaces!\n\n");
 				allin_flag = true; inflag = false;
 				goto exit;
 			}
