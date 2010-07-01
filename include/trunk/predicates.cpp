@@ -659,12 +659,11 @@ float uniformfloatrand()
 /*****************************************************************************/
 
 #if defined(__GNUG__) && (!defined(LINUX))
-void set_ctrlword(int v)
+void set_ctrlword(unsigned int mode)
 {
-  asm("fldcw %0" :: "m" (v));
+  asm ("fldcw %0" : : "m" (*&mode));
 }
 #endif
-
 
 /*****************************************************************************/
 /*                                                                           */
@@ -718,9 +717,11 @@ REAL exactinit()
 #if defined(__GNUG__) && (!defined(LINUX)) /*being compiled by gcc 
                                             on a non-linux paltform*/
 #ifdef SINGLE
-  set_ctrlword(4210);           /* set FPU control word for single precision */
+  //set_ctrlword(4210);           /* set FPU control word for single precision */
+  set_ctrlword(0x27F);
 #else /* not SINGLE */
-  set_ctrlword(4722);           /* set FPU control word for double precision */
+  //set_ctrlword(4722);           /* set FPU control word for double precision */
+  set_ctrlword(0x27F);
 #endif /* not SINGLE */
   
 #endif //__GNUG__

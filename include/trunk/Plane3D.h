@@ -13,7 +13,8 @@
 
 extern REAL orient3d(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
 extern REAL orient3dexact(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
-
+extern double signed_tetrahedron_vol(double (*tetra)[3]);
+extern double signed_tetrahedron_vol(double a[3], double b[3], double c[3],  double d[3]);
 class Plane3D :	public Vector
 {
 public:

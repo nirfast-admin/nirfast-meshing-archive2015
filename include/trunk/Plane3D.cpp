@@ -58,13 +58,15 @@ Plane3D& Plane3D::operator =(const Plane3D& other) {
 }
 
 int Plane3D::ClassifyPointToPlane(Point& p) {
-	if (true) {
+	if (false) {
 		double a[3],b[3],c[3],d[3];
 		a[0] = _points[0]->x; a[1] = _points[0]->y; a[2] = _points[0]->z;
 		b[0] = _points[1]->x; b[1] = _points[1]->y; b[2] = _points[1]->z;
 		c[0] = _points[2]->x; c[1] = _points[2]->y; c[2] = _points[2]->z;
 		d[0] = p.x; d[1] = p.y; d[2] = p.z;
-		double ret = orient3dexact(a,b,c,d);
+        
+		double ret = orient3d(a,b,c,d);
+        //double ret = signed_tetrahedron_vol(a,b,c,d);
 		
 		
 		if (ret == 0.0)
