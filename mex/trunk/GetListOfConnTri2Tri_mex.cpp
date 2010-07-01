@@ -72,9 +72,8 @@ void PopulateGraph(std::vector< std::set<ulong> > &Graph, std::vector< std::set<
 	std::set<ulong> myneighbors;
 	// Populate the hash table which tells us which triangles are sharing a specific node.
 	for (ulong i=0; i<nele; ++i) {
-		for (int j=0; j<3; ++j) {
+		for (int j=0; j<3; ++j)
 			vertex_tri_hash[(ulong) (ele(i,j)-1)].insert(i+1);
-		}
 	}
 	std::set<ulong> tmpSet;
 	std::queue<ulong> q;
@@ -90,7 +89,7 @@ void PopulateGraph(std::vector< std::set<ulong> > &Graph, std::vector< std::set<
 			for (std::set<ulong>::iterator it=myneighbors.begin(); it!=myneighbors.end(); ++it) {
 				if (edge_check[(*it)-1]==Black) continue;
 				if (u != *it) {
-					//ulong tempak = *it;
+					ulong tempak = *it;
 					tmpSet.clear();
 					tmpSet = Graph[u-1];
 					tmpSet.insert(*it);
@@ -170,8 +169,7 @@ void SetCell(mxArray* cell_pointer, std::set<ulong> conn_elems, ulong i) {
 
 	ulong counter=0;
 	for (std::set<ulong>::iterator j=conn_elems.begin(); j!=conn_elems.end(); 
-		 temp2[counter]=(double)*j, ++counter, ++j);
-
+		 temp2[counter]=*j, ++counter, ++j);
 	mxSetCell(cell_pointer, i, mxDuplicateArray(tmpArray2));
 
 	mxDestroyArray(tmpArray2);

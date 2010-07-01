@@ -22,7 +22,7 @@
 #define p(i,j) p[(i)+np*(j)]
 #define ele(i,j) ele[(i)+ne*(j)]
 #define list(i,j) list[(i)+ne*(j)];
-#define facets_bbx(i,j) facets_bbx[(i)*6+(j)]
+#define facets_bbx(i,j) facets_bbx[(i)+(j)*ne]
 /* To compile this file use:
 * For Windows:
 * mex -v -DWIN32 -I./meshlib orient_surface_mex.cpp meshlib/vector.cpp meshlib/geomath.cpp isinvolume_randRay.cpp
@@ -176,7 +176,7 @@ EXIT:
 	else {
 		plhs[1] = mxCreateDoubleScalar(0);
 	}
-
+	delete [] facets_bbx;
 }
 
 ulong FindSeedsDirection(ulong elemid, const mxArray *prhs[], int &myst) {
@@ -286,7 +286,7 @@ unsigned int CalculateOrientation(ulong v, const mxArray *mxT, const mxArray *mx
 		ExtremeFlag = true;
 	}
 	if (!BBXFlag) {
-		facets_bbx = new float[ne*6];
+		facets_bbx = new double[ne*6];
 		for (ulong i=0; i<ne; ++i) {
 			ulong n1=(ulong)(ele(i,0));
             ulong n2=(ulong)(ele(i,1));
@@ -323,11 +323,13 @@ unsigned int CalculateOrientation(ulong v, const mxArray *mxT, const mxArray *mx
 	}
 	for (int i=0; i<3; cent[i] /= 3., ++i);
 
+	std::vector<ULONG> int_facets;
+    std::vector<points> int_points;
 	for (int i=0; i<3; p0[i] = cent[i] + tiny_offset*vec[i], ++i);
-	unsigned int st1 = isinvolume_randRay(p0,mxP,mxT,tiny,facets_bbx,200,xMin,xMax);
+	unsigned int st1 = isinvolume_randRay(p0,mxP,mxT,tiny,facets_bbx,200,xMin,xMax,int_facets,int_points);
 
 	for (int i=0; i<3; p0[i] = cent[i] - tiny_offset*vec[i], ++i);
-	unsigned int st2 = isinvolume_randRay(p0,mxP,mxT,tiny,facets_bbx,200,xMin,xMax);
+	unsigned int st2 = isinvolume_randRay(p0,mxP,mxT,tiny,facets_bbx,200,xMin,xMax,int_facets,int_points);
 	
 	if (st1==st2 && st1!=255)
 		st = 2;

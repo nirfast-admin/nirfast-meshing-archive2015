@@ -1,44 +1,46 @@
 #include "isinvolume_randRay.h"
 
-#ifndef p
-#define p(i,j) p[(i)+np*(j)]
-#define t(i,j) t[(i)+ne*(j)]
-#define facets_bbx(i,j) facets_bbx[(i)*6+(j)]
+#ifndef pp
+#define pp(i,j) pp[(i)+npp*(j)]
+#define tt(i,j) tt[(i)+nee*(j)]
+#endif
+
+#ifndef myfacets_bbx
+#define myfacets_bbx(i,j) myfacets_bbx[(i) + nee*(j)]
 #endif
 
 #ifndef _SIGN
 #define _SIGN(x) (fabs(x)/(x))
 #endif
 
-
 // This routine should be called from a Matlab mex function ONLY!
 unsigned char isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *mxT, double tiny, 
-					   float *facets_bbx, int numPerturb, double minX, double maxX)
+					   double *myfacets_bbx, int numPerturb, double minX, double maxX,
+					   std::vector<ULONG>& int_facets, std::vector<points>& int_points)
 {
    
     unsigned char st;
     bool debug=false;
-        
+    int_facets.clear();
+	int_points.clear();
+	
     // get p0 and list of shell points
     if (/*rp1 & rp2 */!mxIsDouble(mxP))
         mexErrMsgTxt("isinvolume_randRay: p0, p and numPerturb need to be of type 'double'!");
-	double *p = mxGetPr(mxP);
+	double *pp = mxGetPr(mxP);
     if (debug)
         mexPrintf("p0 = %lf %lf %lf\n",p0[0],p0[1],p0[2]);
     // get list of shell elements
-    double *t;
+    double *tt;
     if (mxIsDouble(mxT))
-        t = (double *) mxGetData(mxT);
+        tt = mxGetPr(mxT);
     else
         mexErrMsgTxt("isinvolume_randRay: t needs to be 'double'!");
     
     // extract number of points and elements
-    unsigned long np=mxGetM(mxP);
-	unsigned long ne=mxGetM(mxT);
+    unsigned long npp=mxGetM(mxP);
+	unsigned long nee=mxGetM(mxT);
 
-
-    // c++ vector to hold growing list of intersection points
-	std::vector<points> intpnts;
     points p1;
     
     if (debug)
@@ -64,11 +66,11 @@ unsigned char isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *
     if (debug)
         mexPrintf("Entering the main loop\n");
 	while (forever) {
-        for (ulong i=0; i<ne; ++i) {
+        for (ULONG i=0; i<nee; ++i) {
             if (!rayPerturbed) {
-                double MaxX = facets_bbx(i,3); 
-                double MaxY = facets_bbx(i,4); double MinY = facets_bbx(i,1);
-                double MaxZ = facets_bbx(i,5); double MinZ = facets_bbx(i,2);
+                double MaxX = myfacets_bbx(i,3); 
+                double MaxY = myfacets_bbx(i,4); double MinY = myfacets_bbx(i,1);
+                double MaxZ = myfacets_bbx(i,5); double MinZ = myfacets_bbx(i,2);
                 if (debug) {
 //                     mexPrintf("Ray Is Perturbed! i = %d\n",i);
                 }
@@ -78,15 +80,15 @@ unsigned char isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *
             // get coordinates of tp1, tp2 and tp3 into mxArrays of *rhs1[]
             double tp1[3], tp2[3], tp3[3];
             for (int k=0; k<3; ++k) {
-				ulong idx = (ulong) t(i,0) - 1;
-				assert(idx>=0 && idx<=np);
-		                tp1[k] = p(idx, k);
-				idx = (ulong) t(i,1) - 1;
-				assert(idx>=0 && idx<=np);
-		                tp2[k] = p(idx, k);
-				idx = (ulong) t(i,2) - 1;
-				assert(idx>=0 && idx<=np);
-		                tp3[k] = p(idx, k);
+				ULONG idx = (ULONG) tt(i,0) - 1;
+				assert(idx>=0 && idx<=npp);
+		                tp1[k] = pp(idx, k);
+				idx = (ULONG) tt(i,1) - 1;
+				assert(idx>=0 && idx<=npp);
+		                tp2[k] = pp(idx, k);
+				idx = (ULONG) tt(i,2) - 1;
+				assert(idx>=0 && idx<=npp);
+		                tp3[k] = pp(idx, k);
             }
 
             if (debug) {
@@ -98,7 +100,8 @@ unsigned char isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *
             intersect_RayTriangle(rp1, rp2, tp1, tp2, tp3, ipnt, tiny);
             if (ret==1) {
                 for (int j=0;j<3;p1.c[j]=ipnt[j],++j);
-				intpnts.push_back(p1);
+				int_points.push_back(p1);
+				int_facets.push_back(i+1);
                 if (debug)
                     mexPrintf("i=%d \t intp = %lf %lf %lf\n",i,p1.c[0], p1.c[1], p1.c[2]);
                 continue;
@@ -107,8 +110,8 @@ unsigned char isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *
                      || ret>100) {
                 if (!rayPerturbed) {
                     R = -std::numeric_limits<double>::max();
-                    for (ulong j=0;j<np;++j) {
-                        double temp = length(p0[0]-p(j,0), p0[1]-p(j,1), p0[2]-p(j,2));
+                    for (ULONG j=0;j<npp;++j) {
+                        double temp = length(p0[0]-pp(j,0), p0[1]-pp(j,1), p0[2]-pp(j,2));
                         if (temp > R)
                             R = temp;
                     }
@@ -118,11 +121,12 @@ unsigned char isinvolume_randRay(double *p0, const mxArray *mxP, const mxArray *
                         mexPrintf("Calculated R is : %lf\n",R);
                 }
                 brokenloop=true;
-				intpnts.clear();
+				int_points.clear();
+				int_facets.clear();
                 break;
             }
         }
-        nintpnts = intpnts.size();
+        nintpnts = int_points.size();
         if (!brokenloop) {
             (nintpnts%2==1) ? st=1 : st=0;
             if (debug) {
