@@ -598,14 +598,8 @@ double signed_tetrahedron_vol(double a[3], b[3], c[3], d[3]) {
     double (*tet)[3] = new double[4][3];
     for (int i=0; i<3; ++i) {
         tet[0][i] = a[i];
-    }
-    for (int i=0; i<3; ++i) {
         tet[1][i] = b[i];
-    }
-    for (int i=0; i<3; ++i) {
         tet[2][i] = c[i];
-    }
-    for (int i=0; i<3; ++i) {
         tet[3][i] = d[i];
     }
     return signed_tetrahedron_vol(tet);
