@@ -217,7 +217,7 @@ std::string CFileOperation::GetExtension(std::string s) {
 	int loc = (int) s.rfind('.');
 	return s.substr(loc);
 }
-
+	
 // Read delimeted text file 'fn' and return the list of (x,y,z) coordinates it contains
 std::vector<Point *> CFileOperation::ReadXYZ(std::string fn, std::string delimeter) {
 	char *pend;
