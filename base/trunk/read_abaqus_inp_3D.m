@@ -14,49 +14,27 @@ end
 [fid st]=OpenFile([pname fname],'r');
 if st~=0, error(' '); end
 
-flag=false;
 % read header junk
-while true
-    junk = fgetl(fid);
-    if ~isempty(regexp(junk,'\<NODE\>', 'once')) % found the node section
-        flag=true;
-        break;
-    end
-end
-if ~flag
-    errordlg('Could not find the node section in inp file!')
-    erro('Could not find the node section in inp file!')
-end
+for i=1:4, fgetl(fid); end
 % read node coordinates
 data=textscan(fid,' %u64, %.54f, %.54f, %.54f%*[^\n]');
 points = [data{2} data{3} data{4}];
 
-flag=false;
-% read header junk
-while true
-    s = fgetl(fid);
-    if ~isempty(regexp(s,'\<ELEMENT\>', 'once')) % found the node section
-        flag=true;
-        break;
-    end
-end
-if ~flag
-    errordlg('Could not find the element section in inp file!')
-    erro('Could not find the element section in inp file!')
-end
-
-if ~isempty(strfind(s,'TYPE=S3'))
+% read header
+s = fgetl(fid);
+if ~isempty(strfind(s,'S3R'))
     pattern = '%u64, %u64, %u64, %u64%*[^\n]'; % surface mesh
-elseif ~isempty(strfind(s,'TYPE=C3D4'))
+elseif ~isempty(strfind(s,'C3D4'))
     pattern = ' %u64, %u64, %u64, %u64, %u64%*[^\n]'; % solid/tetrahedral mesh
 end
 
 % read element list
 data=textscan(fid,pattern);
-if ~isempty(strfind(s,'TYPE=S3'))
+if ~isempty(strfind(s,'S3R'))
     elem  = double([data{2} data{3} data{4}]); % surface mesh
-elseif ~isempty(strfind(s,'TYPE=C3D4'))
+elseif ~isempty(strfind(s,'C3D4'))
     elem  = double([data{2} data{3} data{4} data{5}]); % solid/tetrahedral mesh
 end
+
 
 fclose(fid);

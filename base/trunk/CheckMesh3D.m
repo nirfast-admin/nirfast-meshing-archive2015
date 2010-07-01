@@ -33,6 +33,10 @@ if nargin>3 && ~isempty(input_flags)
     else
         verbose=0;
     end
+elseif nargin<3
+    type = 1;
+    verbose = 1;
+    input_flags=[];
 end
 vol=0;
 q=0;
@@ -56,6 +60,7 @@ if type==0
 else
     np=size(p,1);
     ne=size(e,1);
+    nnpe = size(e,2);
 end
 if type==0
     if nnpe==3
