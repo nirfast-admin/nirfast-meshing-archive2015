@@ -233,58 +233,39 @@ BSPNode* Polyhedron2BSP::GetBSP_SolidLeaf_no_split() {
 		if (this->_inputpoly.empty())
 			return (BSPNode *) NULL;
 		srand( (unsigned)time( NULL ) ); // Initialize the seed for random generator.
-		//_root = _BuildBSPTree_SL_NS(this->_inputpoly, 0, BSPNode::OUT);
-		_root = _AutoPartition(this->_inputpoly, 0, BSPNode::OUT);
+		Plane3D foo;
+		_root = _BuildBSPTree_SL_NS(this->_inputpoly, 0, BSPNode::OUT, foo);
+		//_root = _AutoPartition(this->_inputpoly, 0, BSPNode::OUT, foo);
 		_isbuilt = true;
 		return _root;
 	}
 }
 
-BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, unsigned long depth, int label) {
+BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, unsigned long depth, int label, Plane3D& ParentH) {
 
     // Get number of polygons in the input vector
     ULONG numPolygons = polygons.size();
-	Plane3D splitPlane;
-
-	if (polygons.empty()) {
+	if (numPolygons==0) {
 		return new BSPNode(label);
 	}
-
+	
+	Plane3D splitPlane;
 	std::vector<Polygon *> frontList, backList;
-
-	// Using following section, splitting planes are chosen based on a scoring system.
-	///////////////////////////////////////////////////////////////
 	if (depth > maxdepth) maxdepth = depth;
-    // Select best possible partitioning plane based on the input geometry
-	// if (numPolygons != 1)
-		splitPlane = PickSplittingPlane(polygons, depth);
-	/*else {
-		splitPlane = Plane3D(polygons[0]->GetVertexPtr(0), polygons[0]->GetVertexPtr(1), polygons[0]->GetVertexPtr(2));
-		// if (this->polygonmarker[ polygons[0]->id - 1])
-		// 	std::cout << "  _BuildBSPTree: polygon's plane has already been used!" << std::endl;
-		this->polygonmarker[ polygons[0]->id - 1] = true;
-		BSPNode *frontTree = _BuildBSPTree_SL_NS(frontList, depth+1, BSPNode::OUT);
-		BSPNode *backTree = _BuildBSPTree_SL_NS(backList, depth+1, BSPNode::IN);
-		return new BSPNode(frontTree, backTree, splitPlane, depth);
-	}*/
+   
+	splitPlane = this->PickSplittingPlane(polygons, depth);
 
     // Test each polygon against the dividing plane, adding them
     // to the front list, back list, or both, as appropriate
     for (unsigned long i = 0; i < numPolygons; i++) {
-        Polygon *poly = polygons[i]; //*frontPart, *backPart;
-		//int st;
+        Polygon *poly = polygons[i]; 
 		switch (poly->ClassifyPolygonToPlane(splitPlane)) {
 			case Polygon::POLYGON_COPLANAR_WITH_PLANE:
-				// What's done in this case depends on what type of tree is being
-				// built. For a node-storing tree, the polygon is stored inside
-				// the node at this level (along with all other polygons coplanar
-				// with the plane). Here, for a leaf-storing tree, coplanar polygons
-				// are sent to either side of the plane. In this case, to the front
-				// side, by falling through to the next case
-				// frontList.push_back(poly);
-				//if (numPolygons==1)
-				this->polygonmarker[poly->id - 1] = true;
-				break;
+				if (poly->id == splitPlane.id && this->polygonmarker[poly->id - 1])
+					break;
+				else if (poly->id == splitPlane.id) {
+					this->polygonmarker[poly->id - 1] = true;
+				}
 			case Polygon::POLYGON_IN_FRONT_OF_PLANE:
 				frontList.push_back(poly);
 				break;
@@ -292,17 +273,14 @@ BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, u
 				backList.push_back(poly);
 				break;
 			case Polygon::POLYGON_STRADDLING_PLANE:
-				// Split polygon to plane and send a part to each side of the plane
-				//SplitPolygon(*poly, splitPlane, &frontPart, &backPart);
 				frontList.push_back(poly);
 				backList.push_back(poly);
 				break;
 		}
 	}
-
     // Recursively build child subtrees and return new tree root combining them
-	BSPNode *frontTree = _BuildBSPTree_SL_NS(frontList, depth+1, BSPNode::OUT);
-	BSPNode *backTree = _BuildBSPTree_SL_NS(backList, depth+1, BSPNode::IN);
+	BSPNode *frontTree = _BuildBSPTree_SL_NS(frontList, depth+1, BSPNode::OUT, splitPlane);
+	BSPNode *backTree = _BuildBSPTree_SL_NS(backList, depth+1, BSPNode::IN, splitPlane);
     return new BSPNode(frontTree, backTree, splitPlane, depth);
 }
 
@@ -321,7 +299,7 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 		idx = myrand((ULONG) polygons.size());
 		assert(idx<(ULONG)polygons.size() && idx>=0);
 		bestPlane = *(polygons[idx]->GetPlane());
-		this->polygonmarker[ polygons[idx]->id - 1] = true;
+		//this->polygonmarker[ polygons[idx]->id - 1] = true;
 		bestPlane.id = polygons[idx]->id;
 		return bestPlane;
 	}
@@ -366,7 +344,7 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 		/*if (this->polygonmarker[ polygons[0]->id - 1])
 				std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
 		bestPlane.id = polygons[idx]->id;
-		this->polygonmarker[ polygons[idx]->id - 1] = true;
+		//this->polygonmarker[ polygons[idx]->id - 1] = true;
 		return bestPlane;
     }
 }
@@ -376,7 +354,7 @@ int Polyhedron2BSP::IsInside(Point& p, double PlaneTHK) {
 	BSPNode *node = this->GetBSP_SolidLeaf_no_split();
 	//return this->PointInSolidSpace(node, p, PlaneTHK);
 	this->SetPlaneThickness(PlaneTHK);
-	return ((int) (this->PointInSolidSpace_AutoPartition(node, p, PlaneTHK)));
+	return ((int) (this->PointInSolidSpace(node, p, PlaneTHK)));
 }
 
 int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
@@ -552,7 +530,7 @@ void Polyhedron2BSP::SetPlaneThickness(double thk) {
     this->_inputpoly[0]->GetPlane()->plane_thk_epsilon = thk;
 }
 
-BSPNode* Polyhedron2BSP::_AutoPartition(std::vector<Polygon *> &P, unsigned long depth, int label) {
+BSPNode* Polyhedron2BSP::_AutoPartition(std::vector<Polygon *> &P, unsigned long depth, int label, Plane3D& ParentH) {
 	ULONG numfacets = P.size();
 	if (numfacets==0) {
 		return new BSPNode(label);
@@ -578,8 +556,8 @@ BSPNode* Polyhedron2BSP::_AutoPartition(std::vector<Polygon *> &P, unsigned long
 				}
 			}
 		}
-		BSPNode *child_negative = _AutoPartition(P_negative, depth+1, BSPNode::IN);
-		BSPNode *child_positive = _AutoPartition(P_positive, depth+1, BSPNode::OUT);
+		BSPNode *child_negative = _AutoPartition(P_negative, depth+1, BSPNode::IN, H);
+		BSPNode *child_positive = _AutoPartition(P_positive, depth+1, BSPNode::OUT, H);
 		return new BSPNode(child_positive, child_negative, H, depth);
 	}
 }
