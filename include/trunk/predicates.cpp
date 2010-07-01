@@ -658,7 +658,7 @@ float uniformfloatrand()
 /*  Added: Hamid Ghadyani (hamid@hamid.cc) June 2010                         */
 /*****************************************************************************/
 
-#if defined(__GNUG__) && (!defined(LINUX))
+#if defined(__GNUG__) && (!defined(LINUX)) && !defined(__APPLE__) && !defined(__MACH__)
 void set_ctrlword(unsigned int mode)
 {
   asm ("fldcw %0" : : "m" (*&mode));
@@ -714,8 +714,7 @@ REAL exactinit()
 
  
 /*****************************************************************************/
-#if defined(__GNUG__) && (!defined(LINUX)) /*being compiled by gcc 
-                                            on a non-linux paltform*/
+#if defined(__GNUG__) && (!defined(LINUX))  && !defined(__APPLE__) && !defined(__MACH__)
 #ifdef SINGLE
   //set_ctrlword(4210);           /* set FPU control word for single precision */
   set_ctrlword(0x27F);
