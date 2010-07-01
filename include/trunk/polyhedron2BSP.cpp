@@ -318,55 +318,56 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 	/*if (this->polygonmarker[ polygons[0]->id - 1])
 			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
 	if (this->_splitType == 1) {
-	idx = myrand((ULONG) polygons.size());
-	assert(idx<(ULONG)polygons.size() && idx>=0);
-	bestPlane = *(polygons[idx]->GetPlane());
-	this->polygonmarker[ polygons[idx]->id - 1] = true;
-	return bestPlane;
+		idx = myrand((ULONG) polygons.size());
+		assert(idx<(ULONG)polygons.size() && idx>=0);
+		bestPlane = *(polygons[idx]->GetPlane());
+		this->polygonmarker[ polygons[idx]->id - 1] = true;
+		bestPlane.id = polygons[idx]->id;
+		return bestPlane;
 	}
-	else if (this->_splitType == 2) {
+	else {
 
-	float bestScore = std::numeric_limits<float>::max();
+		float bestScore = std::numeric_limits<float>::max();
 
-	/*if (depth < this->RequiredSplitPlanes.size()) { // We should first split using required splitting planes
-		return this->RequiredSplitPlanes[depth];
-	}*/
-    // Try the plane of each polygon as a dividing plane
-    for (unsigned long i = 0; i < polygons.size(); i++) {
-        unsigned long numInFront = 0, numBehind = 0, numStraddling = 0;
-        Plane3D* plane = polygons[i]->GetPlane();
-        // Test against all other polygons
-        for (unsigned long j = 0; j < polygons.size(); j++) {
-            // Ignore testing against self
-            if (i == j) continue;
-            // Keep standing count of the various poly-plane relationships
-			switch (polygons[j]->ClassifyPolygonToPlane(plane)) {
-			case Polygon::POLYGON_COPLANAR_WITH_PLANE:
-                /* Coplanar polygons treated as being in front of plane */
-            case Polygon::POLYGON_IN_FRONT_OF_PLANE:
-                numInFront++;
-                break;
-            case Polygon::POLYGON_BEHIND_PLANE:
-                numBehind++;
-                break;
-            case Polygon::POLYGON_STRADDLING_PLANE:
-                numStraddling++;
-                break;
-            }
-        }
-        // Compute score as a weighted combination (based on K, with K in range
-        // 0..1) between balance and splits (lower score is better)
-		float score = K * numStraddling + (1.0f - K) * std::fabs((float)((float)numInFront - (float)numBehind));
-        if (score < bestScore) {
-            bestScore = score;
-            bestPlane = *plane;
-			idx = i;
-        }
-    }
-	/*if (this->polygonmarker[ polygons[0]->id - 1])
-			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
-	this->polygonmarker[ polygons[idx]->id - 1] = true;
-    return bestPlane;
+		/*if (depth < this->RequiredSplitPlanes.size()) { // We should first split using required splitting planes
+			return this->RequiredSplitPlanes[depth]; }*/
+		// Try the plane of each polygon as a dividing plane
+		for (unsigned long i = 0; i < polygons.size(); i++) {
+			unsigned long numInFront = 0, numBehind = 0, numStraddling = 0;
+			Plane3D* plane = polygons[i]->GetPlane();
+			// Test against all other polygons
+			for (unsigned long j = 0; j < polygons.size(); j++) {
+				// Ignore testing against self
+				if (i == j) continue;
+				// Keep standing count of the various poly-plane relationships
+				switch (polygons[j]->ClassifyPolygonToPlane(plane)) {
+				case Polygon::POLYGON_COPLANAR_WITH_PLANE:
+					/* Coplanar polygons treated as being in front of plane */
+				case Polygon::POLYGON_IN_FRONT_OF_PLANE:
+					numInFront++;
+					break;
+				case Polygon::POLYGON_BEHIND_PLANE:
+					numBehind++;
+					break;
+				case Polygon::POLYGON_STRADDLING_PLANE:
+					numStraddling++;
+					break;
+				}
+			}
+			// Compute score as a weighted combination (based on K, with K in range
+			// 0..1) between balance and splits (lower score is better)
+			float score = K * numStraddling + (1.0f - K) * std::fabs((float)((float)numInFront - (float)numBehind));
+			if (score < bestScore) {
+				bestScore = score;
+				bestPlane = *plane;
+				idx = i;
+			}
+		}
+		/*if (this->polygonmarker[ polygons[0]->id - 1])
+				std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
+		bestPlane.id = polygons[idx]->id;
+		this->polygonmarker[ polygons[idx]->id - 1] = true;
+		return bestPlane;
     }
 }
 

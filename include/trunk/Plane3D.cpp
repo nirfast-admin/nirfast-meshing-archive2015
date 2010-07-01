@@ -2,7 +2,7 @@
 
 double Plane3D::plane_thk_epsilon = PLANE_THICKNESS_EPSILON;
 
-Plane3D::Plane3D() : n(0.,0.,0.), _d(0.), _has3points(false), _release_verts(false) {
+Plane3D::Plane3D() : n(0.,0.,0.), _d(0.), _has3points(false), _release_verts(false), id(0) {
 
 }
 Plane3D::Plane3D(Point& A, Point& B, Point& C)
@@ -35,6 +35,7 @@ Plane3D::Plane3D(const Plane3D& other) {
 void Plane3D::CopyFrom(const Plane3D& other) {
 	n = other.n;
 	_d = other._d;
+	id = other.id;
 	if (other._has3points == true) {
 		if (other._release_verts == true)
 			for (int i=0; i<3; _points[i] = new Point(other._points[i]), ++i);

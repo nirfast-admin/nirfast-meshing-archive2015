@@ -40,6 +40,7 @@ public:
 	double _d;
 
 	static double plane_thk_epsilon;
+	unsigned long id;
 private:
 	void CopyFrom(const Plane3D& other);
 	Point *_points[3];
