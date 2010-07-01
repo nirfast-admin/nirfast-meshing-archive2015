@@ -36,6 +36,7 @@ public:
 	int IsInside(Point& p, double PlaneTHK);
 	void SetBBX(double BBX[6]);
 	void SetInputPolyhedron(std::vector<Polygon *> &inputpoly);
+	void SetSplitType(int t) { this->_splitType = t; }
 	//void SetInputPolyhedron(std::vector<Point *> verts, std::vector<unsigned long>
 
 	double GetPlaneThickness();

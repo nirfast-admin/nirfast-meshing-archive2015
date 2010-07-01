@@ -352,7 +352,7 @@ int Polyhedron2BSP::IsInside(Point& p, double PlaneTHK) {
 	BSPNode *node = this->GetBSP_SolidLeaf_no_split();
 	//return this->PointInSolidSpace(node, p, PlaneTHK);
 	this->SetPlaneThickness(PlaneTHK);
-	return this->PointInSolidSpace(node, p, PlaneTHK);
+	return this->PointInSolidSpace_AutoPartition(node, p, PlaneTHK);
 }
 
 int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
@@ -404,11 +404,36 @@ int Polyhedron2BSP::PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, dou
 	}
 	else {
 		int st = node->myplane.ClassifyPointToPlane(p,true);
-		int hit = 0;
+		int hit;
+		if (st == Plane3D::POINT_BEHIND_PLANE)
+			hit = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
+		else if (st == Plane3D::POINT_IN_FRONT_OF_PLANE)
+			hit = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
+		else if (st = Plane3D::POINT_ON_PLANE) {
+			int front = 0, back = 0;
+			if (node->frontnode->IsLeaf())
+				front = -1;
+			else {
+				front = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
+			}
+			if (node->backnode->IsLeaf())
+				back = -1;
+			else {
+				front = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
+			}
+
+			if (front == back && front == -1)
+				return 2;
+			else {
+				return front == back ? front : 2;
+			}
+
+		}
+		/*int hit = 0;
 		if (st == Plane3D::POINT_BEHIND_PLANE || st == Plane3D::POINT_ON_PLANE)
 			hit = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
 		if (!hit && st == Plane3D::POINT_IN_FRONT_OF_PLANE)
-			hit = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
+			hit = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);*/
 		/*if (!hit && st == Plane3D::POINT_ON_PLANE) {
 			int f1 = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
 			int f2 = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);

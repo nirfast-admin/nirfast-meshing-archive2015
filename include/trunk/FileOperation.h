@@ -1,12 +1,16 @@
 #ifndef __FileOperation
 #define __FileOperation
 
-#include <stdio.h>
+//#include <stdio.h>
 #include <fstream>
-#include <iostream>
+//#include <iostream>
 #include <iomanip>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <string>
+#include <vector>
+//#include <cstdlib>
+
+#include "CPoint.h"
 
 #define adjustf std::fixed << std::setprecision(10) << std::setw(16) << std::setfill(' ') << std::right
 
@@ -26,6 +30,7 @@ public:
 	static void CleanString(std::string &s);
 	static std::string GetArg(std::string& s, char ch=',');
 	static std::string GetExtension(std::string s);
+	std::vector<Point *> ReadXYZ(std::string fn, std::string delimeter=" ");
 
 
 protected:
