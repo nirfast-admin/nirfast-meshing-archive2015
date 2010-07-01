@@ -318,11 +318,11 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 	///////////////////////////////////////////////////////////////////////////////////
 	/*if (this->polygonmarker[ polygons[0]->id - 1])
 			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
-	idx = myrand((ULONG) polygons.size());
+	/*idx = myrand((ULONG) polygons.size());
 	assert(idx<(ULONG)polygons.size() && idx>=0);
 	bestPlane = *(polygons[idx]->GetPlane());
 	this->polygonmarker[ polygons[idx]->id - 1] = true;
-	return bestPlane;
+	return bestPlane;*/
 	///////////////////////////////////////////////////////////////////////////////////
 
 	float bestScore = std::numeric_limits<float>::max();
@@ -372,6 +372,7 @@ int Polyhedron2BSP::IsInside(Point& p, double PlaneTHK) {
 	
 	BSPNode *node = this->GetBSP_SolidLeaf_no_split();
 	//return this->PointInSolidSpace(node, p, PlaneTHK);
+	this->SetPlaneThickness(PlaneTHK);
 	return ((int) (this->PointInSolidSpace_AutoPartition(node, p, PlaneTHK)));
 }
 
