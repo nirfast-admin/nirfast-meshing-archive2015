@@ -59,7 +59,7 @@ Plane3D& Plane3D::operator =(const Plane3D& other) {
 }
 
 int Plane3D::ClassifyPointToPlane(Point& p) {
-	if (false) {
+	if (true) {
 		double a[3],b[3],c[3],d[3];
 		a[0] = _points[0]->x; a[1] = _points[0]->y; a[2] = _points[0]->z;
 		b[0] = _points[1]->x; b[1] = _points[1]->y; b[2] = _points[1]->z;
