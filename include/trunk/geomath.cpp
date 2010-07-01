@@ -594,6 +594,23 @@ void plane_exp2imp_3d ( double x1, double y1, double z1, double x2, double y2,
 
 }
 
+double signed_tetrahedron_vol(double a[3], b[3], c[3], d[3]) {
+    double (*tet)[3] = new double[4][3];
+    for (int i=0; i<3; ++i) {
+        tet[0][i] = a[i];
+    }
+    for (int i=0; i<3; ++i) {
+        tet[1][i] = b[i];
+    }
+    for (int i=0; i<3; ++i) {
+        tet[2][i] = c[i];
+    }
+    for (int i=0; i<3; ++i) {
+        tet[3][i] = d[i];
+    }
+    return signed_tetrahedron_vol(tet);
+}
+            t
 double signed_tetrahedron_vol(double (*tetra)[3]) {
 /* computes the signed volume of a tetrahedron whose points are given in tetra.
  * tetra is a 4x3 matrix containing coordinates of the vertices of the tetrahedron

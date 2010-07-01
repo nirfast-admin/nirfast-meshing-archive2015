@@ -121,6 +121,7 @@ double tetra_volume_3d ( double x1, double y1, double z1, double x2,
 
 // Calculates signed volume of a tetrahedon
 double signed_tetrahedron_vol(double (*tetra)[3]);
+double signed_tetrahedron_vol(double a[3], b[3], c[3], d[3]);
 
 // Calculates determinant of a 4x4 matrix
 double rmat4_det ( double a[4][4] );
