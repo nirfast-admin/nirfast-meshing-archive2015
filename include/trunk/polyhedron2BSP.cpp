@@ -355,7 +355,8 @@ int Polyhedron2BSP::IsInside(Point& p, double PlaneTHK) {
 	BSPNode *node = this->GetBSP_SolidLeaf_no_split();
 	//return this->PointInSolidSpace(node, p, PlaneTHK);
 	this->SetPlaneThickness(PlaneTHK);
-	return this->PointInSolidSpace_AutoPartition(node, p, PlaneTHK);
+	//return this->PointInSolidSpace_AutoPartition(node, p, PlaneTHK);
+	return this->PointInSolidSpace(node, p, PlaneTHK);
 }
 
 int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
@@ -367,7 +368,7 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
 // 2 : On the boundary
 {
     while (!node->IsLeaf()) {
-		int st = node->myplane.ClassifyPointToPlane(p);
+		int st = node->myplane.ClassifyPointToPlane(p,true);
 		if (st == Plane3D::POINT_IN_FRONT_OF_PLANE)
 			node = node->frontnode;
 		else if (st == Plane3D::POINT_BEHIND_PLANE)
