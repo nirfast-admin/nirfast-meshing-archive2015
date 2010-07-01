@@ -30,7 +30,7 @@ public:
 	~Polyhedron2BSP();
 
 	int ReadPolyhedronFromFile(std::string infilename);
-	void InitFromMatlabMex(double *p, unsigned long *ele, unsigned long np, unsigned long ne, int nnpe);
+	void InitFromMatlabMex(double *p, unsigned long *ele, unsigned long np, unsigned long ne, int nnpe, int splitType=1);
 
 	BSPNode* GetBSP_SolidLeaf_no_split();
 	int IsInside(Point& p, double PlaneTHK);
@@ -59,10 +59,10 @@ private:
 	double _mindist;
 	bool _isbuilt;
 	REAL macheps;
+	int _splitType;
 	
 };
 
 extern REAL orient3d(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
-extern REAL orient3dexact(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
 extern REAL exactinit();
 #endif

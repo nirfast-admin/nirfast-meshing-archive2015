@@ -60,10 +60,10 @@ Polyhedron2BSP::Polyhedron2BSP(double *p, unsigned long *ele, unsigned long np, 
 }
 
 // This is called from a Matlab mex file. Since Matlab stores variables in a column based format we need this function.
-void Polyhedron2BSP::InitFromMatlabMex(double *p, unsigned long *ele, unsigned long np, unsigned long ne, int nnpe) {
+void Polyhedron2BSP::InitFromMatlabMex(double *p, unsigned long *ele, unsigned long np, unsigned long ne, int nnpe, int splitType) {
 	this->macheps = exactinit();
 	this->_inputpoly.clear();
-
+	this->_splitType = splitType;
 	for (unsigned long i=0; i<ne; ++i) {
 		std::vector<Point *> fooverts;
 		for (int j=0; j<nnpe; ++j) {
@@ -315,15 +315,16 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 	// Variable for tracking index of the best plane
 	ULONG idx = 0;
 
-	///////////////////////////////////////////////////////////////////////////////////
 	/*if (this->polygonmarker[ polygons[0]->id - 1])
 			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
+	if (this->_splitType == 1) {
 	idx = myrand((ULONG) polygons.size());
 	assert(idx<(ULONG)polygons.size() && idx>=0);
 	bestPlane = *(polygons[idx]->GetPlane());
 	this->polygonmarker[ polygons[idx]->id - 1] = true;
 	return bestPlane;
-	///////////////////////////////////////////////////////////////////////////////////
+	}
+	else if (this->_splitType == 2) {
 
 	float bestScore = std::numeric_limits<float>::max();
 
@@ -366,6 +367,7 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
 	this->polygonmarker[ polygons[idx]->id - 1] = true;
     return bestPlane;
+    }
 }
 
 int Polyhedron2BSP::IsInside(Point& p, double PlaneTHK) {
