@@ -52,7 +52,7 @@ Polyhedron2BSP::Polyhedron2BSP(double *p, unsigned long *ele, unsigned long np, 
 	}
 	// Two identical points are distinguished by '_mindist'.
 	//_mindist = longest * this->macheps;
-	_mindist = this->macheps;
+	_mindist = longest * this->macheps;
 
 	// Setup initial split planes
 	this->polygonmarker.assign(this->_inputpoly.size(),false);
@@ -106,7 +106,7 @@ void Polyhedron2BSP::InitFromMatlabMex(double *p, unsigned long *ele, unsigned l
 	}
 	// Two identical points are distinguished by '_mindist'.
 	//_mindist = longest * this->macheps;
-	_mindist = this->macheps;
+	_mindist = longest * this->macheps;
 
 	_inputpoly[0]->GetPlane()->plane_thk_epsilon = _mindist;
 	// Setup initial split planes
@@ -135,7 +135,7 @@ void Polyhedron2BSP::SetBBX(double BBX[]) {
 	}
 	// Two identical points are distinguished by '_mindist'.
 	//_mindist = longest * this->macheps;
-	_mindist = this->macheps;
+	_mindist = longest * this->macheps;
 	SetupRequiredSplitPlanes();
 }
 void Polyhedron2BSP::SetupRequiredSplitPlanes() {
@@ -548,7 +548,7 @@ int Polyhedron2BSP::ReadPolyhedronFromFile(std::string infn) {
 	}
 	// Two identical points are distinguished by '_mindist'.
 	//_mindist = longest * this->macheps;
-	_mindist = this->macheps;
+	_mindist = longest * this->macheps;
 
 	_inputpoly[0]->GetPlane()->plane_thk_epsilon = this->_mindist;
 	// Setup initial split planes
@@ -621,4 +621,3 @@ BSPNode* Polyhedron2BSP::_AutoPartition(std::vector<Polygon *> &P, unsigned long
 	}
 }
 
-    
