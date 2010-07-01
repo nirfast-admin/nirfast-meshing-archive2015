@@ -245,11 +245,12 @@ BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, u
         Polygon *poly = polygons[i]; 
 		switch (poly->ClassifyPolygonToPlane(splitPlane)) {
 			case Polygon::POLYGON_COPLANAR_WITH_PLANE:
-				if (poly->id == splitPlane.id && this->polygonmarker[poly->id - 1])
+				/*if (poly->id == splitPlane.id && this->polygonmarker[poly->id - 1])
 					break;
 				else if (poly->id == splitPlane.id) {
 					this->polygonmarker[poly->id - 1] = true;
-				}
+				}*/
+					break;
 			case Polygon::POLYGON_IN_FRONT_OF_PLANE:
 				frontList.push_back(poly);
 				break;
@@ -281,6 +282,7 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
 	if (this->_splitType == 1) {
 		idx = myrand((ULONG) polygons.size());
+		idx = (ULONG)polygons.size()-1;
 		assert(idx<(ULONG)polygons.size() && idx>=0);
 		bestPlane = *(polygons[idx]->GetPlane());
 		//this->polygonmarker[ polygons[idx]->id - 1] = true;
@@ -419,15 +421,21 @@ int Polyhedron2BSP::PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, dou
 			if (node->backnode->IsLeaf())
 				back = -1;
 			else {
-				front = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
+				back = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
 			}
 
-			if (front == back && front == -1)
-				return 2;
+			if (front == back && front == -1) {
+				front = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
+				back = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
+				return front == back ? front : 2;
+			}
+			if (front == -1)
+				return back;
+			else if (back == -1)
+				return front;
 			else {
 				return front == back ? front : 2;
 			}
-
 		}
 		/*int hit = 0;
 		if (st == Plane3D::POINT_BEHIND_PLANE || st == Plane3D::POINT_ON_PLANE)
