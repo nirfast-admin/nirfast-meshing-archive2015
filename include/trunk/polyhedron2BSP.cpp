@@ -281,8 +281,9 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 	/*if (this->polygonmarker[ polygons[0]->id - 1])
 			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
 	if (this->_splitType == 1) {
-		idx = myrand((ULONG) polygons.size());
+		//idx = myrand((ULONG) polygons.size());
 		idx = (ULONG)polygons.size()-1;
+		//idx=0;
 		assert(idx<(ULONG)polygons.size() && idx>=0);
 		bestPlane = *(polygons[idx]->GetPlane());
 		//this->polygonmarker[ polygons[idx]->id - 1] = true;
