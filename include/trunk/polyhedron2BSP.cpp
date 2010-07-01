@@ -245,12 +245,11 @@ BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, u
         Polygon *poly = polygons[i]; 
 		switch (poly->ClassifyPolygonToPlane(splitPlane)) {
 			case Polygon::POLYGON_COPLANAR_WITH_PLANE:
-				/*if (poly->id == splitPlane.id && this->polygonmarker[poly->id - 1])
+				if (poly->id == splitPlane.id && this->polygonmarker[poly->id - 1])
 					break;
 				else if (poly->id == splitPlane.id) {
 					this->polygonmarker[poly->id - 1] = true;
-				}*/
-				break;
+				}
 			case Polygon::POLYGON_IN_FRONT_OF_PLANE:
 				frontList.push_back(poly);
 				break;
@@ -353,7 +352,7 @@ int Polyhedron2BSP::IsInside(Point& p, double PlaneTHK) {
 	BSPNode *node = this->GetBSP_SolidLeaf_no_split();
 	//return this->PointInSolidSpace(node, p, PlaneTHK);
 	this->SetPlaneThickness(PlaneTHK);
-	return this->PointInSolidSpace_AutoPartition(node, p, PlaneTHK);
+	return this->PointInSolidSpace(node, p, PlaneTHK);
 }
 
 int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
@@ -371,8 +370,16 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
 		else if (st == Plane3D::POINT_BEHIND_PLANE)
 			node = node->backnode;
 		else if (st == Plane3D::POINT_ON_PLANE) {
-			int front = PointInSolidSpace(node->frontnode, p);
-			int back  = PointInSolidSpace(node->backnode,  p);
+			int front = -1, back = -1;
+			if (!(node->frontnode->IsLeaf()))
+				front = PointInSolidSpace(node->frontnode, p);
+			if (!(node->backnode->IsLeaf()))
+				back  = PointInSolidSpace(node->backnode,  p);
+			assert(!(front==-1 && back==-1)); // Can both be a leaf ?
+			if (front==-1)
+				return back;
+			else if (back==-1)
+				return front;
 			return (front == back) ? front : 2;
 		}
 	}
