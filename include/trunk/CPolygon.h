@@ -29,8 +29,8 @@ public:
 	Point* GetVertexPtr(unsigned short id) { return _verts[id]; }
 	Point GetVertex(unsigned short id) { return *_verts[id]; }
 	Plane3D* GetPlane() const { return this->myplane; }
-	int ClassifyPolygonToPlane(Plane3D& plane);
-	int ClassifyPolygonToPlane(Plane3D* plane);
+	int ClassifyPolygonToPlane(Plane3D& plane, bool predicate_flag);
+	int ClassifyPolygonToPlane(Plane3D* plane, bool predicate_flag);
 
 	unsigned long id;
 private:

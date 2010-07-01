@@ -49,8 +49,8 @@ private:
 	BSPNode* _BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, unsigned long depth, int label, Plane3D& ParentH);
 	BSPNode* _AutoPartition(std::vector<Polygon *> &polygons, unsigned long depth, int label, Plane3D& ParentH);
 	Plane3D PickSplittingPlane(std::vector<Polygon *> &polygons, unsigned long depth);
-	int PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK = TinyZero);
-	int PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, double PlaneTHK = TinyZero);
+	int PointInSolidSpace(BSPNode *node, Point& p);
+	int PointInSolidSpace_AutoPartition(BSPNode *node, Point& p);
 	BSPNode* _delete_node(BSPNode *);
 	BSPNode* _root;
 	std::vector<Polygon *> _inputpoly;

@@ -53,14 +53,14 @@ Polygon::Polygon(Point *V[], unsigned short n) {
 	}
 }
 
-int Polygon::ClassifyPolygonToPlane(Plane3D& plane)
+int Polygon::ClassifyPolygonToPlane(Plane3D& plane, bool predicate_flag)
 {
     // Loop over all polygon vertices and count how many vertices
     // lie in front of and how many lie behind of the thickened plane
     unsigned long numInFront = 0, numBehind = 0;
     for (unsigned long i = 0; i < this->_nv; i++) {
         // Point *p = _verts[i];
-		switch (plane.ClassifyPointToPlane(*_verts[i])) {
+		switch (plane.ClassifyPointToPlane(*_verts[i], predicate_flag)) {
         //switch (ClassifyPointToPlane(p, plane)) {
 			case Plane3D::POINT_IN_FRONT_OF_PLANE:
 				numInFront++;
@@ -87,14 +87,14 @@ int Polygon::ClassifyPolygonToPlane(Plane3D& plane)
     return POLYGON_COPLANAR_WITH_PLANE;
 }
 
-int Polygon::ClassifyPolygonToPlane(Plane3D* plane)
+int Polygon::ClassifyPolygonToPlane(Plane3D* plane, bool predicate_flag)
 {
     // Loop over all polygon vertices and count how many vertices
     // lie in front of and how many lie behind of the thickened plane
     unsigned long numInFront = 0, numBehind = 0;
     for (unsigned long i = 0; i < this->_nv; i++) {
         // Point *p = _verts[i];
-		switch (plane->ClassifyPointToPlane(*_verts[i])) {
+		switch (plane->ClassifyPointToPlane(*_verts[i], predicate_flag)) {
         //switch (ClassifyPointToPlane(p, plane)) {
 			case Plane3D::POINT_IN_FRONT_OF_PLANE:
 				numInFront++;

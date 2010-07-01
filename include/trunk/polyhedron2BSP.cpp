@@ -243,7 +243,7 @@ BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, u
     // to the front list, back list, or both, as appropriate
     for (unsigned long i = 0; i < numPolygons; i++) {
         Polygon *poly = polygons[i]; 
-		switch (poly->ClassifyPolygonToPlane(splitPlane)) {
+		switch (poly->ClassifyPolygonToPlane(splitPlane, false)) {
 			case Polygon::POLYGON_COPLANAR_WITH_PLANE:
 				/*if (poly->id == splitPlane.id && this->polygonmarker[poly->id - 1])
 					break;
@@ -281,8 +281,8 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 	/*if (this->polygonmarker[ polygons[0]->id - 1])
 			std::cout << "  PickSplittingPlane: polygon's plane has already been used!" << std::endl;*/
 	if (this->_splitType == 1) {
-		//idx = myrand((ULONG) polygons.size());
-		idx = (ULONG)polygons.size()-1;
+		idx = myrand((ULONG) polygons.size());
+		//idx = (ULONG)polygons.size()-2;
 		//idx=0;
 		assert(idx<(ULONG)polygons.size() && idx>=0);
 		bestPlane = *(polygons[idx]->GetPlane());
@@ -305,7 +305,7 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
 				// Ignore testing against self
 				if (i == j) continue;
 				// Keep standing count of the various poly-plane relationships
-				switch (polygons[j]->ClassifyPolygonToPlane(plane)) {
+				switch (polygons[j]->ClassifyPolygonToPlane(plane,false)) {
 				case Polygon::POLYGON_COPLANAR_WITH_PLANE:
 					/* Coplanar polygons treated as being in front of plane */
 				case Polygon::POLYGON_IN_FRONT_OF_PLANE:
@@ -344,22 +344,22 @@ BSPNode* Polyhedron2BSP::GetBSP_SolidLeaf_no_split() {
 			return (BSPNode *) NULL;
 		srand( (unsigned)time( NULL ) ); // Initialize the seed for random generator.
 		Plane3D foo;
-		_root = _BuildBSPTree_SL_NS(this->_inputpoly, 0, BSPNode::OUT, foo);
-		//_root = _AutoPartition(this->_inputpoly, 0, BSPNode::OUT, foo);
+		//_root = _BuildBSPTree_SL_NS(this->_inputpoly, 0, BSPNode::OUT, foo);
+		_root = _AutoPartition(this->_inputpoly, 0, BSPNode::OUT, foo);
 		_isbuilt = true;
 		return _root;
 	}
 }
 int Polyhedron2BSP::IsInside(Point& p, double PlaneTHK) {
 	
-	BSPNode *node = this->GetBSP_SolidLeaf_no_split();
-	//return this->PointInSolidSpace(node, p, PlaneTHK);
 	this->SetPlaneThickness(PlaneTHK);
-	//return this->PointInSolidSpace_AutoPartition(node, p, PlaneTHK);
-	return this->PointInSolidSpace(node, p, PlaneTHK);
+	BSPNode *node = this->GetBSP_SolidLeaf_no_split();
+	//return this->PointInSolidSpace(node, p);
+	return this->PointInSolidSpace_AutoPartition(node, p);
+	//return this->PointInSolidSpace(node, p);
 }
 
-int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
+int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p)
 // Using a solid-leaf BSP, determines if point p is inside, outside
 // or on the boundary of polyhedron
 // Returns:
@@ -391,7 +391,7 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
     return node->IsSolid() ? 1 : 0;    
 }
 
-int Polyhedron2BSP::PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, double PlaneTHK)
+int Polyhedron2BSP::PointInSolidSpace_AutoPartition(BSPNode *node, Point& p)
 // Using a solid-leaf BSP, determines if point p is inside, outside
 // or on the boundary of polyhedron
 // Returns:
@@ -407,28 +407,28 @@ int Polyhedron2BSP::PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, dou
 			return 0;
 	}
 	else {
-		int st = node->myplane.ClassifyPointToPlane(p,true);
-		int hit;
+		int st = node->myplane.ClassifyPointToPlane(p,false);
+		/*int hit;
 		if (st == Plane3D::POINT_BEHIND_PLANE)
-			hit = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
+			hit = PointInSolidSpace_AutoPartition(node->backnode, p);
 		else if (st == Plane3D::POINT_IN_FRONT_OF_PLANE)
-			hit = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
+			hit = PointInSolidSpace_AutoPartition(node->frontnode, p);
 		else if (st = Plane3D::POINT_ON_PLANE) {
 			int front = 0, back = 0;
 			if (node->frontnode->IsLeaf())
 				front = -1;
 			else {
-				front = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
+				front = PointInSolidSpace_AutoPartition(node->frontnode, p);
 			}
 			if (node->backnode->IsLeaf())
 				back = -1;
 			else {
-				back = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
+				back = PointInSolidSpace_AutoPartition(node->backnode, p);
 			}
 
 			if (front == back && front == -1) {
-				front = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
-				back = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
+				front = PointInSolidSpace_AutoPartition(node->frontnode, p);
+				back = PointInSolidSpace_AutoPartition(node->backnode, p);
 				return front == back ? front : 2;
 			}
 			if (front == -1)
@@ -438,15 +438,15 @@ int Polyhedron2BSP::PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, dou
 			else {
 				return front == back ? front : 2;
 			}
-		}
-		/*int hit = 0;
+		}*/
+		int hit = 0;
 		if (st == Plane3D::POINT_BEHIND_PLANE || st == Plane3D::POINT_ON_PLANE)
-			hit = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
-		if (!hit && st == Plane3D::POINT_IN_FRONT_OF_PLANE)
-			hit = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);*/
+			hit = PointInSolidSpace_AutoPartition(node->backnode, p);
+		if (!hit && (st == Plane3D::POINT_IN_FRONT_OF_PLANE || st == Plane3D::POINT_ON_PLANE))
+			hit = PointInSolidSpace_AutoPartition(node->frontnode, p);
 		/*if (!hit && st == Plane3D::POINT_ON_PLANE) {
-			int f1 = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
-			int f2 = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
+			int f1 = PointInSolidSpace_AutoPartition(node->frontnode, p);
+			int f2 = PointInSolidSpace_AutoPartition(node->backnode, p);
 			if (f1 == f2)
 				return f1;
 			else
@@ -583,7 +583,7 @@ BSPNode* Polyhedron2BSP::_AutoPartition(std::vector<Polygon *> &P, unsigned long
 		std::vector<Polygon *> P_positive, P_negative;
 		for (ULONG i=0; i< numfacets; ++i) {
 			Polygon* poly = P[i];
-			int st = poly->ClassifyPolygonToPlane(H);
+			int st = poly->ClassifyPolygonToPlane(H,false); // "false" == use distance from plane rather than orient3d
 			if (st != Polygon::POLYGON_COPLANAR_WITH_PLANE) {
 				if (st == Polygon::POLYGON_STRADDLING_PLANE) {
 					P_negative.push_back(poly);

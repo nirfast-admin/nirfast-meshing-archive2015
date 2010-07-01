@@ -9,7 +9,7 @@ Plane3D::Plane3D(Point& A, Point& B, Point& C)
 {
 	Vector v1 = B-A, v2 = C-A;
 	n = v1 ^ v2; // Cross product
-	n.normalize();
+	//n.normalize();
 	_d = -n*A; // Dot product
 	_points[0] = new Point(A);
 	_points[1] = new Point(B);
@@ -21,7 +21,7 @@ Plane3D::Plane3D(Point& A, Point& B, Point& C)
 Plane3D::Plane3D(Point* A, Point* B, Point* C) : _release_verts(false), _has3points(true) {
 	Vector v1 = *B - *A, v2 = *C - *A;
 	n = v1 ^ v2; // Cross product
-	n.normalize();
+	//n.normalize();
 	_d = -n * *A; // Dot product
 	_points[0] = A;
 	_points[1] = B;
@@ -48,7 +48,7 @@ void Plane3D::CopyFrom(const Plane3D& other) {
 }
 Plane3D::Plane3D(Vector& n, Point& A) : _has3points(false) , _release_verts(false)  {
 	this->n = n;
-	this->n.normalize();
+	//this->n.normalize();
 	this->_d = -this->n*A;
 }
 Plane3D& Plane3D::operator =(const Plane3D& other) {
