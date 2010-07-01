@@ -116,6 +116,9 @@ else
     end
 end
 
+% Fix the facets orientation to make sure their normal is poiting outward.
+% [e]=FixPatchOrientation(p,e);
+
 clear P Q;
 resolution=2;
 
@@ -153,7 +156,8 @@ systemcommand = GetSystemCommand(delaunaycommand);
 
 cprintf([0 0 1],'\n---------> Running Delaunay, please wait...');
 
-delaunay_cmd=['! "' systemcommand '" -pqgYYA ' 'input4delaunay' '.poly > junk.txt'];
+% maxvol = sqrt(3)/4*ds^2;
+delaunay_cmd=['! "' systemcommand '" -pqgYYA' ' input4delaunay' '.poly > junk.txt'];
 eval(delaunay_cmd);
 if ~exist('input4delaunay.1.ele','file')
     errordlg(' Delaunay Generator failed. Check your input surface mesh.','Meshing Error');

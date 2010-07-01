@@ -37,53 +37,17 @@ if strcmpi(myext,'.inp') % Each INP file represents a surface in mesh with disjo
         error(['Cannot find file .inp files whose prefix is ' fnprefix]);
     end
 
-    interior_nodes=zeros(no_regions,3);
-
     fprintf('\n\tConverting inp files and re-orienting\n');
-    tnn = 0;
-    telem = [];
-    tnode = [];
-    flag= true; fcounter = num_flag;
+    
+    fcounter = num_flag;
     if num_flag==0
         fn = [fnprefix '.inp'];
     else
         fn = [fnprefix num2str(fcounter) '.inp'];
     end
-    while flag
-        [fid msg]=fopen(fn,'rt');
-        if ~isempty(msg), flag=false; continue; end
-        fclose(fid);
-        fprintf('  Reading mesh file: %s\n', fn);
-        [elem,node] = read_abaqus_inp(fn);
-        % Fix the orientation of the triangles
-        [elem] = FixPatchOrientation(node,elem,[],1);
-        tmp = GetOneInteriorNode(elem,node);
-        if isempty(tmp)
-            errordlg(['Could not find an interior point in surface: ' fn],'Mesh Error');
-            error(['Could not find an interior point in surface: ' fn]);
-        end
-        interior_nodes(fcounter,:) = tmp;
-        % Save the exteriro surface
-        if fcounter == num_flag;
-            extelem = elem; extnode = node;
-        end
-        cnn = size(node,1);
-        elem = elem + tnn;
-        tnn = tnn + cnn;
-        telem = [telem;elem];
-        tnode = [tnode;node];
-        fcounter = fcounter + 1;
-        fn = [fnprefix num2str(fcounter) '.inp'];
-    end
-    if fcounter==num_flag % couldn't read the first file
-        errordlg({[msg ':'], fn},'Meshing Error');
-        error(msg,'Meshing Error');
-    end
-    regions=cell(size(interior_nodes,1),2);
-    for i=1:size(interior_nodes,1)
-        regions{i,1} = interior_nodes(i,:);
-        regions{i,2} = i;
-    end
+    mesh = inp2nirfast_bem(fn);
+    telem = [mesh.elements mesh.region];
+    tnode = mesh.nodes;
 elseif strcmpi(myext,'.ele')
 %     One single .node/.ele file is used to represent the mesh. This is for
 %     meshes whose interior sub-surfaces share some triangles. This format
@@ -95,9 +59,14 @@ elseif strcmpi(myext,'.ele')
         fnprefix = [fnprefix num2str(num_flag)];
     end
     [telem tnode] = read_nod_elm(fnprefix,1);
-    [tags extelem] = SeparateSubVolumes(telem, tnode);
-    extelem = FixPatchOrientation(tnode,extelem,[],1);
 end
+
+output = SeparateSubVolumes(telem, tnode);
+tags = output.tags;
+extelem = output.extelem;
+
+extelem = FixPatchOrientation(tnode,extelem,[],1);
+
 
 [foo ix] = unique(sort(telem(:,1:3),2),'rows');
 clear foo
@@ -112,7 +81,8 @@ myargs.regions = tags;
 myargs.examineinpmesh=0; % Do not run inspection checks on input surface
 myargs.extelem=extelem;
 
-% writenodelm_nod_elm(myargs.bdyfn,extelem,extnode)
+clear output
+%% Call the main checkerboard3d routine
 [mesh.elements, mesh.nodes] = checkerboard3d(telem(:,1:3),tnode,myargs);
 delete('input4delaunay.*','junk.txt');
 
@@ -151,3 +121,4 @@ mesh.elements=mesh.elements(:,1:4);
 
 mesh.elements=mesh.elements(:,1:4);
 fprintf('\n\n--> Finished mesh generation.\n');
+

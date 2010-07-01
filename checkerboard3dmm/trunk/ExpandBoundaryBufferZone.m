@@ -161,6 +161,7 @@ for i=1:nf
     bbx=reshape(prism_facets_bbx(i,:,:),8,6);
     prism_n=reshape(prism_normals(i,:,:),3,8)';
     sub_P=P(istart:iend,jstart:jend,kstart:kend);
+%     myfacet_bbx = GetFacetsBBX(prism,prism_p);
     for ii=istart:iend
         for kk=kstart:kend
             for jj=jstart:jend
@@ -174,7 +175,7 @@ for i=1:nf
                         intersect_ray_shell_mex(rp1,rp2,prism_p,double(prism),tiny,bbx,prism_n,list,indexing,mydir);    
                         t2=t2+toc(t1);
 %                     maxX = max(prism_p(:,1)); minX = min(prism_p(:,1));
-%                     st = involume_mex(rp1, double(prism), prism_p, 200, minX, maxX, tiny);
+%                     st = involume_mex(rp1, double(prism), prism_p, 200, myfacet_bbx, minX, maxX, tiny);
                     if st==1
                         P(ii,jj,kk)=NA;
                     end
