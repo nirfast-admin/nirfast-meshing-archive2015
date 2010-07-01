@@ -63,5 +63,6 @@ private:
 };
 
 extern REAL orient3d(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
+extern REAL orient3dexact(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
 extern REAL exactinit();
 #endif

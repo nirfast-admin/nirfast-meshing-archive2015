@@ -12,6 +12,7 @@
 #endif
 
 extern REAL orient3d(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
+extern REAL orient3dexact(REAL *pa, REAL *pb, REAL *pc, REAL *pd);
 
 class Plane3D :	public Vector
 {

@@ -155,6 +155,13 @@
 #define Absolute(a)  ((a) >= 0.0 ? (a) : -(a))
 /* #define Absolute(a)  fabs(a) */
 
+#ifdef CPU86 // Microsoft Compiler
+// Disables usage of 80-bit register of coprocessor
+// http://msdn.microsoft.com/en-us/library/e7s85ffb(VS.90).aspx
+#pragma fenv_access(on)
+#pragma float_control(precise, on)
+#endif // CPU86
+
 /* Many of the operations are broken up into two pieces, a main part that    */
 /*   performs an approximate operation, and a "tail" that computes the       */
 /*   roundoff error of that operation.                                       */
@@ -646,6 +653,21 @@ float uniformfloatrand()
 
 /*****************************************************************************/
 /*                                                                           */
+/*  set_ctrlword(v)  Sets FPU control word under GCC compilers               */
+/*                                                                           */
+/*  Added: Hamid Ghadyani (hamid@hamid.cc) June 2010                         */
+/*****************************************************************************/
+
+#if defined(__GNUG__) && (!defined(LINUX))
+void set_ctrlword(int v)
+{
+  asm("fldcw %0" :: "m" (v));
+}
+#endif
+
+
+/*****************************************************************************/
+/*                                                                           */
 /*  exactinit()   Initialize the variables used for exact arithmetic.        */
 /*                                                                           */
 /*  `epsilon' is the largest power of two such that 1.0 + epsilon = 1.0 in   */
@@ -672,13 +694,14 @@ REAL exactinit()
   int cword;
 #endif /* LINUX */
 
-#ifdef CPU86
+#ifdef CPU86 // Microsoft Compiler
 #ifdef SINGLE
   _control87(_PC_24, _MCW_PC); /* Set FPU control word for single precision. */
 #else /* not SINGLE */
   _control87(_PC_53, _MCW_PC); /* Set FPU control word for double precision. */
 #endif /* not SINGLE */
 #endif /* CPU86 */
+  
 #ifdef LINUX
 #ifdef SINGLE
   /*  cword = 4223; */
@@ -690,6 +713,21 @@ REAL exactinit()
   _FPU_SETCW(cword);
 #endif /* LINUX */
 
+ 
+/*****************************************************************************/
+#if defined(__GNUG__) && (!defined(LINUX)) /*being compiled by gcc 
+                                            on a non-linux paltform*/
+#ifdef SINGLE
+  set_ctrlword(4210);           /* set FPU control word for single precision */
+#else /* not SINGLE */
+  set_ctrlword(4722);           /* set FPU control word for double precision */
+#endif /* not SINGLE */
+  
+#endif //__GNUG__
+/*                                                                           */
+/*  Added: Hamid Ghadyani (hamid@hamid.cc) June 2010                         */
+/*****************************************************************************/
+  
   every_other = 1;
   half = 0.5;
   epsilon = 1.0;

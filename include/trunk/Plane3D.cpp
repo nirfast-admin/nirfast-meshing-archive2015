@@ -64,7 +64,7 @@ int Plane3D::ClassifyPointToPlane(Point& p) {
 		b[0] = _points[1]->x; b[1] = _points[1]->y; b[2] = _points[1]->z;
 		c[0] = _points[2]->x; c[1] = _points[2]->y; c[2] = _points[2]->z;
 		d[0] = p.x; d[1] = p.y; d[2] = p.z;
-		double ret = orient3d(a,b,c,d);
+		double ret = orient3dexact(a,b,c,d);
 		
 		
 		if (ret == 0.0)
