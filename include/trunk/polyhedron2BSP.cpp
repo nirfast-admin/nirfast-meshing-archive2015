@@ -225,22 +225,6 @@ Polyhedron2BSP::~Polyhedron2BSP() {
 	_inputpoly.clear();
 }
 
-
-BSPNode* Polyhedron2BSP::GetBSP_SolidLeaf_no_split() {
-	if (_isbuilt)
-		return this->_root;
-	else {
-		if (this->_inputpoly.empty())
-			return (BSPNode *) NULL;
-		srand( (unsigned)time( NULL ) ); // Initialize the seed for random generator.
-		Plane3D foo;
-		_root = _BuildBSPTree_SL_NS(this->_inputpoly, 0, BSPNode::OUT, foo);
-		//_root = _AutoPartition(this->_inputpoly, 0, BSPNode::OUT, foo);
-		_isbuilt = true;
-		return _root;
-	}
-}
-
 BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, unsigned long depth, int label, Plane3D& ParentH) {
 
     // Get number of polygons in the input vector
@@ -261,11 +245,12 @@ BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, u
         Polygon *poly = polygons[i]; 
 		switch (poly->ClassifyPolygonToPlane(splitPlane)) {
 			case Polygon::POLYGON_COPLANAR_WITH_PLANE:
-				if (poly->id == splitPlane.id && this->polygonmarker[poly->id - 1])
+				/*if (poly->id == splitPlane.id && this->polygonmarker[poly->id - 1])
 					break;
 				else if (poly->id == splitPlane.id) {
 					this->polygonmarker[poly->id - 1] = true;
-				}
+				}*/
+				break;
 			case Polygon::POLYGON_IN_FRONT_OF_PLANE:
 				frontList.push_back(poly);
 				break;
@@ -349,12 +334,26 @@ Plane3D Polyhedron2BSP::PickSplittingPlane(std::vector<Polygon *> &polygons, uns
     }
 }
 
+BSPNode* Polyhedron2BSP::GetBSP_SolidLeaf_no_split() {
+	if (_isbuilt)
+		return this->_root;
+	else {
+		if (this->_inputpoly.empty())
+			return (BSPNode *) NULL;
+		srand( (unsigned)time( NULL ) ); // Initialize the seed for random generator.
+		Plane3D foo;
+		_root = _BuildBSPTree_SL_NS(this->_inputpoly, 0, BSPNode::OUT, foo);
+		//_root = _AutoPartition(this->_inputpoly, 0, BSPNode::OUT, foo);
+		_isbuilt = true;
+		return _root;
+	}
+}
 int Polyhedron2BSP::IsInside(Point& p, double PlaneTHK) {
 	
 	BSPNode *node = this->GetBSP_SolidLeaf_no_split();
 	//return this->PointInSolidSpace(node, p, PlaneTHK);
 	this->SetPlaneThickness(PlaneTHK);
-	return ((int) (this->PointInSolidSpace(node, p, PlaneTHK)));
+	return this->PointInSolidSpace_AutoPartition(node, p, PlaneTHK);
 }
 
 int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
@@ -399,18 +398,18 @@ int Polyhedron2BSP::PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, dou
 	else {
 		int st = node->myplane.ClassifyPointToPlane(p,true);
 		int hit = 0;
-		if (st == Plane3D::POINT_BEHIND_PLANE)
+		if (st == Plane3D::POINT_BEHIND_PLANE || st == Plane3D::POINT_ON_PLANE)
 			hit = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
 		if (!hit && st == Plane3D::POINT_IN_FRONT_OF_PLANE)
 			hit = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
-		if (!hit && st == Plane3D::POINT_ON_PLANE) {
+		/*if (!hit && st == Plane3D::POINT_ON_PLANE) {
 			int f1 = PointInSolidSpace_AutoPartition(node->frontnode, p, PlaneTHK);
 			int f2 = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
 			if (f1 == f2)
 				return f1;
 			else
 				return 2;
-		}
+		}*/
 		return hit;
 	}
 }
