@@ -30,7 +30,7 @@ public:
 
 	Plane3D& operator=(const Plane3D& other);
 
-	int ClassifyPointToPlane(Point& P);
+	int ClassifyPointToPlane(Point& P, bool flag=true);
 	void SetThreePoints(Point *points[3]);
 	Point *GetThreePoints(int id) const { return this->_points[id]; }
 	void SetThickness(double thk) { this->plane_thk_epsilon = thk; }

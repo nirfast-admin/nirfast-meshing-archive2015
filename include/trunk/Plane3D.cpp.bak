@@ -69,6 +69,7 @@ int Plane3D::ClassifyPointToPlane(Point& p, bool flag) {
 		double ret = orient3d(a,b,c,d);
         //double ret = signed_tetrahedron_vol(a,b,c,d);
 		
+		
 		if (ret == 0.0)
 			return POINT_ON_PLANE;
 		if (ret < 0.0)

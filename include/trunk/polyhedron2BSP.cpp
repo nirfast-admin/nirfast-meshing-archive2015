@@ -387,57 +387,16 @@ int Polyhedron2BSP::PointInSolidSpace(BSPNode *node, Point& p, double PlaneTHK)
 // 1 : Inside
 // 2 : On the boundary
 {
-	double d[3];
-	d[0] = p.x; d[1] = p.y; d[2] = p.z;
     while (!node->IsLeaf()) {
-		if (false) {
-            double a[3],b[3],c[3];
-			a[0] = node->myplane.GetThreePoints(0)->x;
-			a[1] = node->myplane.GetThreePoints(0)->y;
-			a[2] = node->myplane.GetThreePoints(0)->z;
-			b[0] = node->myplane.GetThreePoints(1)->x;
-			b[1] = node->myplane.GetThreePoints(1)->y;
-			b[2] = node->myplane.GetThreePoints(1)->z;
-			c[0] = node->myplane.GetThreePoints(2)->x;
-			c[1] = node->myplane.GetThreePoints(2)->y;
-			c[2] = node->myplane.GetThreePoints(2)->z;
-            
-			double ret = orient3d(a,b,c,d);
-        
-			if (ret < 0.0)
-				node = node->frontnode;
-			else if (ret > 0.0)
-				node = node->backnode;
-			else if (ret == 0.0) {
-				int front = PointInSolidSpace(node->frontnode, p);
-				int back  = PointInSolidSpace(node->backnode,  p);
-				// If results agree, return that, else point is on boundary
-					//std::cout << " Query point on node! " << ((front == back) ? front : 2) << std::endl;
-					//std::cout << " P = (" << p.x << ", " << p.y << ", " << p.z << ')' << std::endl;
-				return (front == back) ? front : 2;
-			}
-			else {
-				std::cout << std::endl << 
-				"  There seems to be a bug!!!" << std::endl << std::endl;
-			}
-		}
-		else {
-            // Compute distance of point to dividing plane
-            double dist = node->myplane.n*p + node->myplane._d;
-            if (dist > PlaneTHK) {
-				// Point in front of plane, so traverse front of tree
-				node = node->frontnode;
-			} else if (dist < -PlaneTHK) {
-				// Point behind of plane, so traverse back of tree
-				node = node->backnode;
-			}
-			else {
-				// Point on dividing plane; must traverse both sides
-				int front = PointInSolidSpace(node->frontnode, p);
-				int back = PointInSolidSpace(node->backnode, p);
-				// If results agree, return that, else point is on boundary
-				return (front == back) ? front : 2;
-			}
+		int st = node->myplane.ClassifyPointToPlane(p);
+		if (st == Plane3D::POINT_IN_FRONT_OF_PLANE)
+			node = node->frontnode;
+		else if (st == Plane3D::POINT_BEHIND_PLANE)
+			node = node->backnode;
+		else if (st == Plane3D::POINT_ON_PLANE) {
+			int front = PointInSolidSpace(node->frontnode, p);
+			int back  = PointInSolidSpace(node->backnode,  p);
+			return (front == back) ? front : 2;
 		}
 	}
 	 // Now at a leaf, inside/outside status determined by solid flag
@@ -460,7 +419,7 @@ int Polyhedron2BSP::PointInSolidSpace_AutoPartition(BSPNode *node, Point& p, dou
 			return 0;
 	}
 	else {
-		int st = node->myplane.ClassifyPointToPlane(p);
+		int st = node->myplane.ClassifyPointToPlane(p,true);
 		int hit = 0;
 		if (st == Plane3D::POINT_BEHIND_PLANE)
 			hit = PointInSolidSpace_AutoPartition(node->backnode, p, PlaneTHK);
