@@ -154,8 +154,8 @@ void CFileOperation::OpenInFile(std::ifstream &ret, std::string fn, std::string 
 	else if (mode == "text")
 		ret.open(fn.c_str(), std::ios::in);
 	if (ret.fail()) {
-		std::cout << "Can not open input file: " << fn;
-	  std::cout << std::endl << "Exitting..." << std::endl << std::endl;
+		std::cerr << "Can not open input file: " << fn;
+		std::cerr << std::endl << "Exitting..." << std::endl << std::endl;
 		exit(1);
 	}
 }
@@ -217,7 +217,7 @@ std::string CFileOperation::GetExtension(std::string s) {
 	int loc = (int) s.rfind('.');
 	return s.substr(loc);
 }
-	
+
 // Read delimeted text file 'fn' and return the list of (x,y,z) coordinates it contains
 std::vector<Point *> CFileOperation::ReadXYZ(std::string fn, std::string delimeter) {
 	char *pend;

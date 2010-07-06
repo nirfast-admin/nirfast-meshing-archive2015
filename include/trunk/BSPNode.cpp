@@ -11,7 +11,7 @@ BSPNode::~BSPNode()
 {
 }
 
-BSPNode::BSPNode(BSPNode *front,BSPNode *back, Plane3D& pplane, unsigned long depth) {
+BSPNode::BSPNode(BSPNode *front, BSPNode *back, Plane3D& pplane, unsigned long depth) {
 	this->leaf = false;
 	this->myplane = pplane;
 	this->frontnode = front;

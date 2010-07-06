@@ -105,8 +105,8 @@ void Polyhedron2BSP::InitFromMatlabMex(double *p, unsigned long *ele, unsigned l
 	    exit(1);
 	}
 	// Two identical points are distinguished by '_mindist'.
-	//_mindist = longest * this->macheps;
 	_mindist = longest * this->macheps;
+	//_mindist = this->macheps;
 
 	_inputpoly[0]->GetPlane()->plane_thk_epsilon = _mindist;
 	// Setup initial split planes
@@ -226,7 +226,6 @@ Polyhedron2BSP::~Polyhedron2BSP() {
 }
 
 BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, unsigned long depth, int label, Plane3D& ParentH) {
-
     // Get number of polygons in the input vector
     ULONG numPolygons = polygons.size();
 	if (numPolygons==0) {
@@ -236,7 +235,6 @@ BSPNode* Polyhedron2BSP::_BuildBSPTree_SL_NS(std::vector<Polygon *> &polygons, u
 	Plane3D splitPlane;
 	std::vector<Polygon *> frontList, backList;
 	if (depth > maxdepth) maxdepth = depth;
-   
 	splitPlane = this->PickSplittingPlane(polygons, depth);
 
     // Test each polygon against the dividing plane, adding them
@@ -529,8 +527,8 @@ int Polyhedron2BSP::ReadPolyhedronFromFile(std::string infn) {
 	    exit(1);
 	}
 	// Two identical points are distinguished by '_mindist'.
-	//_mindist = longest * this->macheps;
 	_mindist = longest * this->macheps;
+	//_mindist = this->macheps;
 
 	_inputpoly[0]->GetPlane()->plane_thk_epsilon = this->_mindist;
 	// Setup initial split planes
