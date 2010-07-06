@@ -167,7 +167,7 @@ end
 cprintf([0 0 1],' done. <---------\n\n');
 
 
-[tets,points_from_tetgen,nodemap_fromtetgen]=read_nod_elm(['input4delaunay.1'],1);
+[tets,points_from_tetgen,nodemap_fromtetgen]=read_nod_elm('input4delaunay.1.',1);
 
 
 function [PP] = TagBoundary3d(p,t,ds,dx,dy,dz,llc,myargs)
@@ -187,15 +187,17 @@ shell_normals=shell_normals./repmat(norm_len,1,3);
 % close to them
 [P]=ExpandBoundaryBufferZone(t,p,P,shell_normals,ds,[dx dy dz],llc);
 clear mex
-interior_p0 = tag_checkerboard3d_mex(P, [dx dy dz], [xmin ymin zmin], ds);
+interior_p0 = tag_checkerboard3d_mex(P, [dx dy dz], [xmin ymin zmin], ds, 1, 1);
 
 t=double(myargs.extelem(:,1:3));
 extnoden=unique(t(:));
 [tf t]=ismember(t, extnoden);
 p=p(extnoden,1:3);
+fbbx = GetFacetsBBX(t,p);
 fprintf('-----> Running BSP tree to filter out nodes.\n');
 clear mex
-st1 = PointInPolyhedron_mex(interior_p0, t, p, tiny);
+% st1 = PointInPolyhedron_mex(interior_p0, t, p, tiny);
+st1 = involume_mex(interior_p0, t, p, 200, fbbx, min(p(:,1)), max(p(:,1)), tiny);
 fprintf('\n-----> done.\n');
 
 % sum(abs(double(st2) - foost))

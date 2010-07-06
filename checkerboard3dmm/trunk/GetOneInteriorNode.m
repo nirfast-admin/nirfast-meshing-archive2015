@@ -27,13 +27,13 @@ pp=p(nodes,:);
 % Check the subvolume's integrity
 input_args.verbose=0;
 input_args.type=1;
-[~,~,~,myst] = CheckMesh3D(ee,pp,[],input_args);
+[junk,junk,junk,myst] = CheckMesh3D(ee,pp,[],input_args);
 
 if isfield(myst,'b') && myst.b~=0 && myst.b~=4
 %     writenodelm_surface_medit('foo.mesh',ee,pp)
 %     system('/usr/local/bin/medit foo.mesh')
 %     disp(' ')
-    cprintf([1 0.5 0.5],'Warning (GetOneInteriorNode.m):\n   The given surface is not closed or single material!\n');
+    cprintf([1 0.5 0.5],'Warning (GetOneInteriorNode.m):\n   The given surface is not closed, single material or manifold!\n');
 end
 
 facets_bbx = GetFacetsBBX(ee,pp);

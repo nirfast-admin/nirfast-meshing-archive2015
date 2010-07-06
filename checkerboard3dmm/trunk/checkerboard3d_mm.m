@@ -30,7 +30,10 @@ end
 
 fprintf('\n\n--> Beginning mesh generation process...\n\n');
 %% Read in the mesh
-if strcmpi(myext,'.inp') % Each INP file represents a surface in mesh with disjoint sub regions
+if strcmpi(myext,'.inp') 
+    % Each INP file represents a surface in mesh with disjoint sub regions
+    % The filename with smallest counter in its name should always be the most
+    % exterior region enclosing other inp surfaces.
     no_regions = length(dir([fnprefix '*.inp']));
     if no_regions==0
         errordlg(['Cannot find file .inp files whose prefix is ' fnprefix],'Mesh Error');
@@ -38,32 +41,66 @@ if strcmpi(myext,'.inp') % Each INP file represents a surface in mesh with disjo
     end
 
     fprintf('\n\tConverting inp files and re-orienting\n');
-    
+
+    telem = [];
+    tnode = [];
     fcounter = num_flag;
     if num_flag==0
         fn = [fnprefix '.inp'];
     else
         fn = [fnprefix num2str(fcounter) '.inp'];
     end
-    mesh = inp2nirfast_bem(fn);
-    telem = [mesh.elements mesh.region];
-    tnode = mesh.nodes;
+    
+    newmatc = 1;
+    tags={};
+    while true
+        fid = fopen(fn,'rt');
+        if fid < 0, break; end
+        fclose(fid);
+        [celem,cnode] = abaqus2nodele_surface(fn);
+        if fcounter == num_flag
+            extelem = celem;
+        end
+        ind_regions = GetIndRegions(celem,cnode);
+        for i=1:length(ind_regions)
+            pin = GetOneInteriorNode(celem,cnode);
+            if isempty(pin)
+                errordlg('Could not find an interior point in surface.','Mesh Error');
+                error('Could not find an interior point in surface.' );
+            end
+            tags{newmatc,1} = pin;
+            tags{newmatc,2} = newmatc;
+            
+            foo_ele = celem(ind_regions{i},1:3);
+            foo_nodes = unique(foo_ele(:));
+            foo_coords = cnode(foo_nodes,:);
+            [tf foo_ele] = ismember(foo_ele,foo_nodes);
+        
+            foo_ele = FixPatchOrientation(foo_coords,foo_ele,[],1);
+            telem = [telem; foo_ele+size(tnode,1)];
+            tnode = [tnode; foo_coords];
+            newmatc = newmatc + 1;
+        end
+        fcounter = fcounter + 1;
+        fn = [fnprefix num2str(fcounter) '.inp'];
+    end
+   
 elseif strcmpi(myext,'.ele')
 %     One single .node/.ele file is used to represent the mesh. This is for
 %     meshes whose interior sub-surfaces share some triangles. This format
 %     is the default output of the MMC.m marching cube algorithm.
 %     This routine assumes that the smallest region id (excluding 0) is the
 %     id for the most exterior region which encloses all other sub regions
-
     if num_flag~=0
         fnprefix = [fnprefix num2str(num_flag)];
     end
     [telem tnode] = read_nod_elm(fnprefix,1);
+    output = SeparateSubVolumes(telem, tnode);
+    tags = output.tags;
+    extelem = output.extelem;
 end
 
-output = SeparateSubVolumes(telem, tnode);
-tags = output.tags;
-extelem = output.extelem;
+
 
 extelem = FixPatchOrientation(tnode,extelem,[],1);
 
