@@ -62,7 +62,7 @@ for i=1:nregions
         for j=1:size(ind_regions,1)
             fooelem = FixPatchOrientation(tnode,subvol(ind_regions{j},1:3),[],1);
             retelem(idx(ind_regions{j}),1:3) = fooelem;
-            all_regions = InsertRegion(all_regions,idx(ind_regions{j}));
+%             all_regions = InsertRegion(all_regions,idx(ind_regions{j}));
             tmpnode = GetOneInteriorNode(fooelem,tnode);
             if isempty(tmpnode)
                 errordlg('Could not find an interior point in surface.','Mesh Error');
@@ -79,15 +79,24 @@ for i=1:nregions
         fooelem = FixPatchOrientation(tnode,subvol(ind_regions{1},1:3),[],1);
         retelem(idx(ind_regions{1}),1:3) = fooelem;
         inode = GetOneInteriorNode(fooelem,tnode);
-        all_regions = InsertRegion(all_regions,idx(ind_regions{1}));
+%         all_regions = InsertRegion(all_regions,idx(ind_regions{1}));
         myidx=1;
     end
     
     % Check if the interior nodes actually belong to current region
     st = IsInsideMatRegion(inode,regions(i),subvol,tnode);
     for k=1:length(st)
-        if st(k)==1
+        % Check if the current sub-boundary is an exterior boundary, i.e.
+        % it separates the domain from nothing (0)
+        bf1 = retelem(idx(ind_regions{k}),4) == 0;
+        bf2 = retelem(idx(ind_regions{k}),5) == 0;
+        assert(sum(bf1)~=sum(bf2) || sum(bf1)==0) % Sanity check
+        if sum(bf1) == length(ind_regions{k}) || sum(bf2) == length(ind_regions{k})
+             interior_nodes = cat(1,interior_nodes,inode(k,:));
+            all_regions = InsertRegion(all_regions,idx(ind_regions{k}));
+        elseif st(k)==1
             interior_nodes = cat(1,interior_nodes,inode(k,:));
+            all_regions = InsertRegion(all_regions,idx(ind_regions{k}));
         end
     end
     if isempty(interior_nodes)
@@ -131,7 +140,7 @@ if isempty(all_regions)
     return
 end
 
-for i=1:size(all_regions,1)
+for i=1:length(all_regions)
     if isempty(setdiff(all_regions{i},cregion))
         flag = false;
         break

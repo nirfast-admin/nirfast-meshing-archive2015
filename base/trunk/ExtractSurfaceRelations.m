@@ -14,7 +14,7 @@ function mesh = ExtractSurfaceRelations(fnprefix, no_regions)
 if exist('surface_relations.txt','file')
     delete('surface_relations.txt');
 end
-fprintf('\tSurface detection.\n\t\t');
+fprintf('\tSurface detection, please wait... ');
 clear mex
 myst = surface_relations_mex(fnprefix,no_regions,2);
 if myst~=0 
@@ -62,3 +62,5 @@ foo(1:no_ext_nodes,:) = 1;
 
 mesh.bndvtx = foo;
 mesh.region = [region1 region2];
+fprintf(' done.\n');
+

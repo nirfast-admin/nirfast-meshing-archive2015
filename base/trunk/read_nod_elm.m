@@ -15,19 +15,21 @@ function [e,p,nodemap,elemap,dim,nnpe]=read_nod_elm(fn,tetgenflag)
 % used for files in which node/element numbers don't start from 1.
 
 e=[];p=[];dim=[];nnpe=[];nodemap=[];elemap=[];
-if nargin>1
-    ext1='.node';
-    ext2='.ele';
-else
+[path fn ext]=fileparts(fn);
+ext1='.node';
+ext2='.ele';
+format=1;
+if strcmpi(ext,'.nod') || strcmpi(ext,'.elm') || (isempty(ext) && nargin==1)
     ext1='.nod';
     ext2='.elm';
-end
-
+    format=2;
+end    
 % first read the node file
 tempfn=add_extension(fn,ext1);
+tempfn = fullfile(path,tempfn);
 fid = OpenFile(tempfn,'rt');
 
-if nargin>1 % tetgen format
+if format==1 % tetgen format
 % read the header line:
 % no_nodes dimension no_attributes bdymarks
     header=textscan(fid,'%u32 %d8 %d8 %d8',1);
@@ -43,7 +45,7 @@ if nargin>1 % tetgen format
     if size(p,1)~=nn
         error('The input .node file is corrupt. Check the header or the last section of .node file.');
     end
-elseif nargin==1 % .nod, .elm format
+elseif format==2 % .nod, .elm format
     header=textscan(fid,'%d8 %u32',1);
     nn=header{2}; numflag=header{1};
     if numflag~=0
@@ -86,9 +88,10 @@ fclose(fid);
 
 % Now read the element file
 tempfn=add_extension(fn,ext2);
+tempfn = fullfile(path,tempfn);
 fid = OpenFile(tempfn,'rt');
 
-if nargin>1
+if format==1
     header=textscan(fid,'%u32 %d8 %d8',1);
     ne=header{1}; nnpe=header{2}; natt=header{3};
     format='%u32 ';
@@ -99,7 +102,7 @@ if nargin>1
     data=textscan(fid,format);
     e=[data{2:end}];
     elemap=data{1};
-elseif nargin==1
+elseif format==2
     header=textscan(fid,'%d8 %d8 %d8 %u32',1);
     if size(header,2)~=4, error(['Corrupt header line in ' tempfn]), end
     numflag=header{1}; nnpe=header{2}; nmat=header{3}; ne=header{4};

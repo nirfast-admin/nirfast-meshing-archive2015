@@ -1,4 +1,4 @@
-function [path fnprefix num_flag ext] = GetFilenameNumbering(filename)
+function [path fnprefix num_flag ext startn endn] = GetFilenameNumbering(filename)
 % Return the file path, its name without ending numberings and its
 % extension:
 % [path fn num_flag ext]
@@ -18,3 +18,16 @@ else
     num_flag=0;
 end
 
+startn=[]; endn = [];
+if num_flag == 0, return, end
+startn = num_flag;
+idx = num_flag;
+while true
+    fn = [fullfile(path,fnprefix) num2str(idx) ext];
+    foo = dir(fn);
+    if isempty(foo)
+        endn = idx - 1;
+        break;
+    end
+    idx = idx + 1;
+end
