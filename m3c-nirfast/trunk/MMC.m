@@ -28,7 +28,7 @@ end
 [t p]=run_mmc(mask,nrow,ncol,nslice,xypixelsize,zpixelsize,edgesize,outputdir,outputfn);
 writenodelm_surface_medit([outputdir filesep outputfn '.mesh'],t(:,1:3),p(:,1:3));
 
-if isempty(t) || ismepty(p)
+if isempty(t) || isempty(p)
     error('MMC: Could not create a surface mesh from provided mast files.');
 end
 
