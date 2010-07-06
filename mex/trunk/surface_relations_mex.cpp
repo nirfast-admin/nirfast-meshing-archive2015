@@ -192,6 +192,21 @@ std::vector< std::vector<int> > core2(char* fn_prefix, int no_regions) {
 				else if (ret == 1 || ret == 2) {
 					inflag = true;
 				}
+				else if (ret == 2) {
+					std::cerr << "    The provided surfaces are not disjoint. I found a node from" << std::endl;
+					std::cerr << "    surface " << j+1 << " sitting on surface " << i+1 << "!." << std::endl;
+					// Free memory
+					for (int jj=0; jj<no_regions; ++jj) {
+						mxDestroyArray(eleArray[jj]);
+						mxDestroyArray(nodeArray[jj]);
+						delete [] BBX[jj];
+						Extreme[jj].clear();
+					}
+					BBX.clear();
+					Extreme.clear();
+					relations.clear();
+					return relations;
+				}
 				else if (ret == 255) {
 					std::cerr << " surface_relations_mex: Could not find a clean direction for the cast ray!" << std::endl;
 					// Free memory

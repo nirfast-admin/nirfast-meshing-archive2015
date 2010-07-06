@@ -19,7 +19,9 @@
 #include "mex.h"
 #include "CStopWatch.h"
 
-typedef unsigned long ULONG;
+#ifndef ULONG
+#define ULONG unsigned long
+#endif
 
 #define outside 5
 #define inside 6
@@ -40,10 +42,10 @@ typedef unsigned long ULONG;
 #endif
 
 #ifndef myrand
-#define myrand(n) ( (long)  ( (double)rand() / ((double)(RAND_MAX)+(double)(1.0)) * (double)n ) )
+#define myrand(n) ( (ULONG)  ( (double)rand() / ((double)(RAND_MAX)+(double)(1.0)) * (double)n ) )
 #endif
 
-inline bool ReadyForTermination(int *row_state, int& nrow, int& ncol, int& npln);
+inline bool ReadyForTermination(char *P, int& nrow, int& ncol, int& npln);
 
 struct mypoint {
 	double coords[3];

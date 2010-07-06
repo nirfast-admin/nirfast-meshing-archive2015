@@ -1,10 +1,10 @@
 // Matlab usage:
-// st = PointInPolyhedron_mex(P, polygons, points, eps)
+// st = PointInPolyhedron_mex(QP, polygons, points, eps)
 // st = 0 : Outside
 // st = 1 : Inside
 // st = 2 : On the boundary of polyhedron
 // Input:
-// P = [x y z]
+// QP = [x y z] Query point
 // polygons : node connectivy 
 //            n1 n2 n3 ...
 //            n4 n5 n2 ...

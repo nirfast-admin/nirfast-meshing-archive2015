@@ -1,6 +1,11 @@
 // Usage: 
-// [nodes] = tag_checkerbaord3d_mex(P, delta, llc, ds)
-
+// [nodes] = tag_checkerbaord3d_mex(P, delta, llc, ds, grading_flag, grading_rate)
+// P is the checkerboard (stencil) matrix
+// delta is size of each pixel in P
+// llc is the lower left corner of the matrix in real world coordinates
+// ds is the average desired edge size of the tetrahedrons
+// grading_flag is the flag for creating a grading or non-grading mesh size.
+// grading_rate is the rate in which we want to increase tet edge size (should be between 0 and 1)
 // To compile:
 // On Windows platforms:
 // mex -v -DWIN32 -I./meshlib tag_checkerboard3d_mex.cpp meshlib/CStopWatch.cpp
@@ -17,6 +22,10 @@
 #define P(i,j,k) P[(i)+nrow*(j)+ncol*nrow*(k)]
 // #define row_state(i,j) row_state[(i)+npln*(j)]
 #define row_state(i,j) row_state[npln*(i)+(j)]
+#define row_state_back(i,j) row_state_back[npln*(i)+(j)]
+#define row_direction(i,j) row_direction[npln*(i)+(j)]
+#define row_visit(i,j) row_visit[npln*(i)+(j)]
+#define row_visit_back(i,j) row_visit_back[npln*(i)+(j)]
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
@@ -32,6 +41,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	double *delta = (double *) mxGetData(prhs[1]);
 	double *llc = (double *) mxGetData(prhs[2]);
 	double ds = *(mxGetPr(prhs[3]));
+	bool grading_flag = true;
+	
+	if (nrhs==5 && !mxIsEmpty(prhs[4])) {
+		grading_flag = (*mxGetPr(prhs[4])) == 0. ? false : true;
+	}
+	
+	double grading_rate = 0.7;
+	
+	if (nrhs==6 && !mxIsEmpty(prhs[5])) {
+		grading_rate = *mxGetPr(prhs[5]);
+	}
 	
 	#ifdef _mydebug
 	mexPrintf(" Input data was read successfully!\n");
@@ -67,12 +87,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	mexPrintf(" nrow = %ld , npln = %ld\n",nrow,npln);
 	#endif
 	int *row_state = new int[nrow*npln];
+	int *row_state_back = new int[nrow*npln];
+	int *row_direction = new int[nrow*npln];
+	int *row_visit = new int[nrow*npln];
+	int *row_visit_back = new int[nrow*npln];
+	
 	for (int i=0; i<nrow; ++i) {
 		for (int j=0; j<npln; ++j) {
 	#ifdef _mydebug
 			mexPrintf(" i = %ld , j = %ld\n", i, j);
 	#endif
 			row_state(i,j) = 0;
+			row_state_back(i,j) = ncol-1;
+			row_direction(i,j) = 1;
+			row_visit(i,j) = 0;
+			row_visit_back(i,j) = 0;
 		}
 	}
 	#ifdef _mydebug
@@ -85,41 +114,87 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		int ii, jj, kk;
         ii = myrand(nrow);
         kk = myrand(npln);
-		jj = row_state(ii,kk);
         
-		if (jj >= ncol) {
-			++cc;
-			continue;
-		}
+		if (ReadyForTermination(P, nrow, ncol, npln))
+			break;
 		
-		int idx = jj;
-		for (idx=jj; idx<ncol; ++idx) {
-			if (P(ii,idx,kk) == 0) {
-				P(ii,idx,kk) = node_code;
-				
-				mypoint foo;
-				foo.coords[0] = (idx-2)*dx+xmin;
-				foo.coords[1] = (nrow-ii-1)*dy+ymin;
-				foo.coords[2] = (npln-kk-1)*dz+zmin;
-				nodes.push_back(foo);
-				++no_tagged_pixels;
-                
-				double dd = ds;
-				int  dI = round(dd/dx) - 1;
-				for (int i=_stupidMS_max(0,ii-dI); i<_stupidMS_min(nrow,ii+dI); ++i) {
-					for (int j=_stupidMS_max(0,idx-dI); j<_stupidMS_min(ncol, idx+dI); ++j) {
-						for (int k=_stupidMS_max(0,kk-dI); k<_stupidMS_min(npln,kk+dI); ++k) {
-							if (P(i,j,k)==0)
-								P(i,j,k) = NA;
+		if (row_direction(ii,kk) == 1) { // Forward
+			jj = row_state(ii,kk);
+			if (jj >= ncol) {
+				++cc;
+				continue;
+			}
+			int idx = jj;
+			for (idx=jj; idx<ncol; ++idx) {
+				if (P(ii,idx,kk) == 0) {
+					P(ii,idx,kk) = node_code;
+					
+					mypoint foo;
+					foo.coords[0] = (idx-2)*dx+xmin;
+					foo.coords[1] = (nrow-ii-1)*dy+ymin;
+					foo.coords[2] = (npln-kk-1)*dz+zmin;
+					nodes.push_back(foo);
+					++no_tagged_pixels;
+					
+					double dd = ds;
+					if (grading_flag && row_visit(ii,kk)>=1) { // Increase the size of dd by grading_rate
+						for (int fooc=0; fooc<row_visit(ii,kk)-1; ++fooc)
+							dd *= (1+grading_rate);
+					}
+					int  dI = round(dd/dx);
+					for (int i=_stupidMS_max(0,ii-dI); i<_stupidMS_min(nrow,ii+dI); ++i) {
+						for (int j=_stupidMS_max(0,idx-dI); j<_stupidMS_min(ncol, idx+dI); ++j) {
+							for (int k=_stupidMS_max(0,kk-dI); k<_stupidMS_min(npln,kk+dI); ++k) {
+								if (P(i,j,k)==0)
+									P(i,j,k) = NA;
+							}
 						}
 					}
+					break;
 				}
-				break;
 			}
+			row_state(ii,kk) = idx + 1;
+			row_direction(ii,kk) = -1;
+			row_visit(ii,kk) = row_visit(ii,kk) + 1;
 		}
-		row_state(ii,kk) = idx + 1;
-		if (ReadyForTermination(row_state,nrow,ncol,npln))
-			break;
+		else if (row_direction(ii,kk)==-1) {
+			jj = row_state_back(ii,kk);
+			if (jj < 0) {
+				++cc;
+				continue;
+			}
+			int idx = jj;
+			for (idx=jj; idx>-1; --idx) {
+				if (P(ii,idx,kk) == 0) {
+					P(ii,idx,kk) = node_code;
+					mypoint foo;
+					foo.coords[0] = (idx-2)*dx+xmin;
+					foo.coords[1] = (nrow-ii-1)*dy+ymin;
+					foo.coords[2] = (npln-kk-1)*dz+zmin;
+					nodes.push_back(foo);
+					++no_tagged_pixels;
+					
+					double dd = ds;
+					if (grading_flag && row_visit_back(ii,kk)>=1) { // Increase the size of dd by grading_rate
+						for (int fooc=0; fooc<row_visit_back(ii,kk)-1; ++fooc)
+							dd *= (1+grading_rate);
+					}
+					int  dI = round(dd/dx);
+					for (int i=_stupidMS_max(0,ii-dI); i<_stupidMS_min(nrow,ii+dI); ++i) {
+						for (int j=_stupidMS_max(0,idx-dI); j<_stupidMS_min(ncol, idx+dI); ++j) {
+							for (int k=_stupidMS_max(0,kk-dI); k<_stupidMS_min(npln,kk+dI); ++k) {
+								if (P(i,j,k)==0)
+									P(i,j,k) = NA;
+							}
+						}
+					}
+					break;
+				}
+			}
+			row_state_back(ii,kk) = idx - 1;
+			row_direction(ii,kk) = 1;
+			row_visit_back(ii,kk) = row_visit_back(ii,kk) + 1;
+		}
 	}
 	mytimer.stopTimer();
 	mexPrintf(" done!\n");
@@ -128,8 +203,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	mexPrintf(" Tagged the pixels successfully\n");
 	#endif
 
-	if (no_tagged_pixels==0)
-		mexErrMsgTxt("checkerboard3d:EmptyMatrix','Based on input matrix, checkerboard3d can not deploy any nodes!");
+	if (no_tagged_pixels==0) {
+		mexPrintf("\n\tWarning!\n");
+		mexPrintf("\t Based on input matrix, checkerboard3d can not deploy any new nodes!\n\n");
+	}
 	
 	/*mexPrintf("  Number of calling rand() function redundantly: %d\n",cc);
 	mexPrintf("  nrow*ncol*npln = %d\n", nrow*ncol*npln);
@@ -147,14 +224,31 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	mexPrintf(" Assigned ouput successfully\n");
 	#endif
 
+	// Free allocated memory
 	nodes.clear();
     delete [] row_state;
-	
+	delete [] row_state_back;
+	delete [] row_direction;
+	delete [] row_visit;
+	delete [] row_visit_back;
 }
 
 
+
+bool ReadyForTermination(char *P, int& nrow, int& ncol, int& npln) {
+	for (int i=0; i<nrow; ++i) {
+		for (int j=0; j<ncol; ++j) {
+			for (int k=0; k<npln; ++k) {
+				if (P(i,j,k) == 0)
+					return false;
+			}
+		}
+	}
+	return true;
+}
+
 	
-bool ReadyForTermination(int *row_state, int& nrow, int& ncol, int& npln) {
+/*bool ReadyForTermination(int *row_state, int& nrow, int& ncol, int& npln) {
 	for (int i=0; i<nrow; ++i) {
 		for (int j=0; j<npln; ++j) {
 			if (row_state(i,j) < ncol)
@@ -162,4 +256,4 @@ bool ReadyForTermination(int *row_state, int& nrow, int& ncol, int& npln) {
 		}
 	}
 	return true;
-}
+}*/
