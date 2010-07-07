@@ -32,7 +32,7 @@ if isfield(myst,'b') && myst.b~=0 && myst.b~=4
 %     writenodelm_surface_medit('foo.mesh',ee,pp)
 %     system('/usr/local/bin/medit foo.mesh')
 %     disp(' ')
-    cprintf([1 0.5 0.5],'Warning (GetOneInteriorNode.m):\n   The given surface is not closed, single material or manifold!\n');
+    fprintf('Warning (GetOneInteriorNode.m):\n   The given surface is not closed, single material or manifold!\n');
 end
 
 facets_bbx = GetFacetsBBX(ee,pp);

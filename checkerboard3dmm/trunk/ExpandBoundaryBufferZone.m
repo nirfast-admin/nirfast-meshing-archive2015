@@ -21,7 +21,7 @@ bethafactor=sqroot2;
 tmp=load('prism_topology');
 prism=tmp.prism;
 clear tmp;
-cprintf([0 0 1],'\tCalculating desired length at boundary nodes...')
+fprintf('\tCalculating desired length at boundary nodes...')
 tp1=p(t(:,1),:); tp2=p(t(:,2),:); tp3=p(t(:,3),:);
 [pc]= incircle(tp1,tp2,tp3);
 v=[tp1 tp2 tp3]-repmat(pc,1,3);
@@ -57,7 +57,7 @@ end
 % Get bbx of prisms' facets
 prism_facets_bbx=zeros(nf,8,6,'single');
 % prism_normals=zeros(nf,3,8,'double');
-cprintf([0 0 1],'\tCalculating prism normals and bounding boxes...')
+fprintf('\tCalculating prism normals and bounding boxes...')
 for i=1:nf
     tpp=(reshape(pp(i,:,:),3,6))';
     n1=tpp(prism(:,1),:); n2=tpp(prism(:,2),:); n3=tpp(prism(:,3),:);
@@ -116,10 +116,10 @@ edges=[t(:,[1 2]); t(:,[1 3]); t(:,[2 3])];
 edgelength=sqrt(sum((p(edges(:,2),:)-p(edges(:,1),:)).^2,2));
 
 
-cprintf([0 0 1],'\tSealing boundary buffer zone...')
+fprintf('\tSealing boundary buffer zone...')
 
 clear mex
 P = expand_bdybuffer_mex(P,pp,density,prisms_bbx,double(prism_facets_bbx),[dx dy dz],[xmin ymin zmin],edgelength,n,tiny);
 
-cprintf([0 0 1],'\b%s\n\n',' done.')
+fprintf('\b%s\n\n',' done.')
 

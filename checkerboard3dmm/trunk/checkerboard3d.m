@@ -154,7 +154,7 @@ end
 delaunaycommand = 'delaunaygen';
 systemcommand = GetSystemCommand(delaunaycommand);
 
-cprintf([0 0 1],'\n---------> Running Delaunay, please wait...');
+fprintf('\n---------> Running Delaunay, please wait...');
 
 % maxvol = sqrt(3)/4*ds^2;
 delaunay_cmd=['! "' systemcommand '" -pqgYYA' ' input4delaunay' '.poly > junk.txt'];
@@ -164,7 +164,7 @@ if ~exist('input4delaunay.1.ele','file')
     error(' Delaunay Generator failed. Check your input surface mesh.')
 end
 
-cprintf([0 0 1],' done. <---------\n\n');
+fprintf(' done. <---------\n\n');
 
 
 [tets,points_from_tetgen,nodemap_fromtetgen]=read_nod_elm('input4delaunay.1.',1);
