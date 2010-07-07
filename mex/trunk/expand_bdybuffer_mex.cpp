@@ -42,8 +42,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	
 	ULONG nf = mxGetM(_prismbbx);
 	
+	// Allocate memory for intermediate variables
+	double *ffbbx = new double[8*6];
+	mxArray *coords = mxCreateDoubleMatrix(6,3,mxREAL);
+	/*mwSize nsubs = 3;
+	mwIndex *subs = (mwIndex*) mxCalloc(nsubs,sizeof(mwIndex));*/
 	mxArray *prisme = mxCreateDoubleMatrix(8,3,mxREAL);
 	double *fooprisme = mxGetPr(prisme);
+	// Load up prism connectivity
 	for (int i=0; i<8; ++i) {
 		for (int j=0; j<3; ++j) {
 			fooprisme[i+j*8] = pconn[i][j];
@@ -51,12 +57,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	}
 	
 	double sqroot2 = sqrt(2.)/1.4;
-	double *ffbbx = new double[8*6];
+	
 	for (ULONG i=0; i<nf; ++i) {
 		// Check the maximum edge against ds
 		double foomax = -std::numeric_limits<double>::max();
 		for (int j=0; j<3; ++j) {
-			ULONG idx = edgeidx[i+j*nf];
+			ULONG idx = edgeidx[i+j*nf]-1;
 			if (edgelen[idx] > foomax)
 				foomax = edgelen[idx];
 		}
@@ -83,25 +89,34 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		istart=std::max(istart,(ULONG)0); jstart=std::max(jstart,(ULONG)0); kstart=std::max(kstart,(ULONG)0);
 		iend=std::min(iend,(ULONG)nrow-1); jend=std::min(jend,(ULONG)ncol-1); kend=std::min(kend,(ULONG)npln-1);
 		
+		//subs[0] = i;
 		// Create mxArray for coords of prism
-		mxArray *coords = mxCreateDoubleMatrix(6,3,mxREAL);
 		double *fcoords = (double *) mxGetPr(coords);
 		double xMin =  std::numeric_limits<double>::max();
 		double xMax = -std::numeric_limits<double>::max();
 		for (int ii=0; ii<6; ++ii) {
+			//subs[2] = ii;
 			for (int jj=0; jj<3; ++jj) {
+				//subs[1] = jj;
 				fcoords[ii+jj*6] = prismp(i,jj,ii);
-				if (fcoords[ii+jj*6] < xMin)
+				/*mwIndex idx = mxCalcSingleSubscript(_prismp, nsubs, subs);
+				fcoords[ii+jj*6] = prismp[idx];*/
+				if (jj==0 && fcoords[ii+jj*6] < xMin)
 					xMin = fcoords[ii+jj*6];
-				if (fcoords[ii+jj*6] > xMax)
+				if (jj==0 && fcoords[ii+jj*6] > xMax)
 					xMax = fcoords[ii+jj*6];
 			}
 		}
 		
 		// Create mxArray for bbx of prism facets
+		
 		for (int ii=0; ii<8; ++ii) {
+			//subs[1] = ii;
 			for (int jj=0; jj<6; ++jj) {
+				//subs[2] = jj;
 				ffbbx[ii+jj*8] = prismfbbx(i,ii,jj);
+				/*mwIndex idx = mxCalcSingleSubscript(_prismfbbx, nsubs, subs);
+				ffbbx[ii+jj*8] = prismfbbx[idx];*/
 			}
 		}
 		
@@ -135,6 +150,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		}
 	}
 	
+	mxDestroyArray(prisme);
+	mxDestroyArray(coords);
+	//mxFree(subs);
 	delete [] ffbbx;
 }
 

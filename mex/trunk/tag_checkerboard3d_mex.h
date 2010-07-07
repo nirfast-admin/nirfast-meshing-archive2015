@@ -46,6 +46,7 @@
 #endif
 
 inline bool ReadyForTermination(char *P, int& nrow, int& ncol, int& npln);
+void GetRandom(int &ii, int &kk, int *row_state, int &nrow, int &ncol, int &npln);
 
 struct mypoint {
 	double coords[3];

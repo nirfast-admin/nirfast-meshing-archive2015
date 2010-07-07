@@ -27,6 +27,8 @@
 #define row_visit(i,j) row_visit[npln*(i)+(j)]
 #define row_visit_back(i,j) row_visit_back[npln*(i)+(j)]
 
+//#define _mydebug
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	srand( (unsigned)time( NULL ) );
@@ -43,7 +45,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	double ds = *(mxGetPr(prhs[3]));
 	bool grading_flag = true;
 	
-	if (nrhs==5 && !mxIsEmpty(prhs[4])) {
+	if (nrhs>=5 && !mxIsEmpty(prhs[4])) {
 		grading_flag = (*mxGetPr(prhs[4])) == 0. ? false : true;
 	}
 	
@@ -112,9 +114,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	
 	while (true) {
 		int ii, jj, kk;
-        ii = myrand(nrow);
-        kk = myrand(npln);
-        
+		
+        /*ii = myrand(nrow);
+        kk = myrand(npln);*/
+        GetRandom(ii, kk, row_state, nrow, ncol, npln);
+		
 		if (ReadyForTermination(P, nrow, ncol, npln))
 			break;
 		
@@ -125,7 +129,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 				continue;
 			}
 			int idx = jj;
-			for (idx=jj; idx<ncol; ++idx) {
+			while (idx<ncol) {
 				if (P(ii,idx,kk) == 0) {
 					P(ii,idx,kk) = node_code;
 					
@@ -152,6 +156,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 					}
 					break;
 				}
+				++idx;
 			}
 			row_state(ii,kk) = idx + 1;
 			row_direction(ii,kk) = -1;
@@ -164,7 +169,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 				continue;
 			}
 			int idx = jj;
-			for (idx=jj; idx>-1; --idx) {
+			while (idx >= 0) {
 				if (P(ii,idx,kk) == 0) {
 					P(ii,idx,kk) = node_code;
 					mypoint foo;
@@ -190,6 +195,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 					}
 					break;
 				}
+				--idx;
 			}
 			row_state_back(ii,kk) = idx - 1;
 			row_direction(ii,kk) = 1;
@@ -247,7 +253,23 @@ bool ReadyForTermination(char *P, int& nrow, int& ncol, int& npln) {
 	return true;
 }
 
+void GetRandom(int &ii, int &kk, int *row_state, int &nrow, int &ncol, int &npln) {
 	
+	std::vector<ULONG> randpool;
+	for (int i=0; i<nrow; ++i) {
+		for (int j=0; j<npln; ++j) {
+			if (row_state(i,j)>ncol || row_state(i,j)<0) {
+				continue;
+			}
+			randpool.push_back(i*npln+j);
+		}
+	}
+	
+	ULONG foo = randpool[myrand(randpool.size())];
+	ii = (int) foo / npln;
+	kk = foo % npln;
+}
+
 /*bool ReadyForTermination(int *row_state, int& nrow, int& ncol, int& npln) {
 	for (int i=0; i<nrow; ++i) {
 		for (int j=0; j<npln; ++j) {
