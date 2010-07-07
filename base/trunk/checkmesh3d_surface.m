@@ -23,7 +23,7 @@ end
 tf =ismember(nodenumbers,e);
 s=sum(~tf);
 if s~=0
-    cprintf([1 0.5 0.5],...
+    fprintf(...
         'checkmesh3d_surface:\n The provided mesh has extra nodes that are not used in the patch element list\n');
     warning('Meshing:check', ' Not all nodes are used in the element connectivity list');
 end

@@ -94,24 +94,24 @@ if nnpe==3
             case 1
                 status.b=1;
                 if verbose, 
-                    cprintf([1 0.4 0.1],'\n Some of mesh edges are shared by more than two triangles! (multiple material mesh ?!)\n');
-                    cprintf([1 0.4 0.1],' Please check all the diagnostic results stored in %s-.txt files.\n',fn);
+                    fprintf('\n Some of mesh edges are shared by more than two triangles! (multiple material mesh ?!)\n');
+                    fprintf(' Please check all the diagnostic results stored in %s-.txt files.\n',fn);
                 end
             case 2
                 status.b=2;
                 if verbose, 
-                    cprintf([1 0.4 0.1], '\n  Provided surface is not closed:\n');
-                    cprintf([0.1 0.5 0.9], '  At least one of the edges is only shared by only one triagnle (it should be two, at least)\n');
+                    fprintf('\n  Provided surface is not closed:\n');
+                    cfprintf('  At least one of the edges is only shared by only one triagnle (it should be two, at least)\n');
                 end
             otherwise
-                if verbose, cprintf([1 0.4 0.1], '\n Surface mesh is open AND has edges shared by more than 2 triangles!\n');end
+                if verbose, fprintf('\n Surface mesh is open AND has edges shared by more than 2 triangles!\n');end
                 status.b=3;
         end
     end
     qcheck=q_area<q_area_threshold;
     a=sum(qcheck);
     if a~=0
-        if verbose, cprintf([1 0.4 0.1],'There are %d faces that have a very low quality (q<%f).\n', a, q_area_threshold);end
+        if verbose, fprintf('There are %d faces that have a very low quality (q<%f).\n', a, q_area_threshold);end
         status.b=4;
     end
 elseif nnpe==4
@@ -120,7 +120,7 @@ elseif nnpe==4
     qcheck=q<TetrahedronFailQuality;
     a=sum(qcheck);
     if a~=0
-        if verbose, cprintf([1 0.4 0.1],'There are %d tetrahedrons that have a very low quality (q<%f).\n', a, TetrahedronFailQuality);end
+        if verbose, fprintf('There are %d tetrahedrons that have a very low quality (q<%f).\n', a, TetrahedronFailQuality);end
         status.b=4;
     end
 end
@@ -139,14 +139,14 @@ if isfield(input_flags,'writefiles') && input_flags.writefiles==1
     end
     fprintf('\n');
     if ~isempty(q) && nnpe==3
-        cprintf('-comment',' Avg Quality (radius ratio): %f\n', mean(q));
-        cprintf('-comment',' Avg Quality (area   ratio): %f\n', mean(q_area));
+        fprintf(' Avg Quality (radius ratio): %f\n', mean(q));
+        fprintf(' Avg Quality (area   ratio): %f\n', mean(q_area));
         dlmwrite(fn1,q,'delimiter',' ','newline',newlinech);
         fn1=[fn '-quality-area.txt'];
         dlmwrite(fn1,q_area,'delimiter',' ','newline',newlinech);
     end
     if nnpe==3 && ~isempty(area)
-        cprintf('-comment',' Avg Area: %f\n', mean(area));
+        fprintf(' Avg Area: %f\n', mean(area));
         dlmwrite(fn2,area,'delimiter',' ','newline',newlinech);
     end
     if nnpe==3 && ~isempty(edges)
@@ -157,7 +157,7 @@ if isfield(input_flags,'writefiles') && input_flags.writefiles==1
         dlmwrite(fn5,[idx v],'delimiter',' ','newline',newlinech);
     end
     if nnpe==4 && ~isempty(q)
-        cprintf('-comment',' Avg Quality (vol ratio): %f\n', mean(q));
+        fprintf(' Avg Quality (vol ratio): %f\n', mean(q));
         dlmwrite([fn 'quality-vol-ratio.txt'],q,'delimiter',' ','newline',newlinech);
     end
 end

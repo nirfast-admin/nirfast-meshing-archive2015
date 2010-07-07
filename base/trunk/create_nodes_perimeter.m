@@ -68,7 +68,7 @@ d=enorm0_2d(bdyp(bdye(:,1),1), bdyp(bdye(:,1),2), bdyp(bdye(:,2),1), bdyp(bdye(:
 perimeter=sum(d);
 nsegments=floor(perimeter/dl);
 if nsegments < 3
-    cprintf([0.5 0.5 0],'  Loop too short to create a triagnel! Returning the first and last nodes!\n');
+    fprintf('  Loop too short to create a triagnel! Returning the first and last nodes!\n');
     newbdye = [1 2];
     newbdyp = [bdyp(1,1:2); bdyp(end,1:2)];
     return

@@ -37,7 +37,7 @@ ind_regions = extract_ind_regions_mex(foo, list);
 % Check to see if each region has at least 4 surfaces (a tetrahedron)
 for i=1:size(ind_regions,1)
     if length(ind_regions{i})<4
-        cprintf([1 0.4 0.4],' Found a surface with less than 4 triangles!\n');
+        fprintf(' Found a surface with less than 4 triangles!\n');
         error('Aborting');
     end
     % Renumber the nodes in 'ind_regions' back to the way they were before
