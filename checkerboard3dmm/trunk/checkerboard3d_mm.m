@@ -28,7 +28,7 @@ if nargin~=2
     type='generic';
 end
 
-fprintf('\n\n--> Beginning mesh generation process...\n\n');
+fprintf('\n\n--> Beginning mesh generation process, please wait...\n\n');
 %% Read in the mesh
 if strcmpi(myext,'.inp') 
     % Each INP file represents a surface in mesh with disjoint sub regions
@@ -99,7 +99,7 @@ elseif strcmpi(myext,'.ele')
     tags = output.tags;
     extelem = output.extelem;
 end
-
+fprintf(' done with sub-volume separation\n');
 
 
 extelem = FixPatchOrientation(tnode,extelem,[],1);

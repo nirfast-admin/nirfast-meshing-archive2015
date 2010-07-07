@@ -4,8 +4,7 @@ function pin = GetOneInteriorNode(t,p)
 % It assumes the surface is oriented and the normals of the triangles are
 % pointing outward.
 
-ne=size(t,1);
-foundflag=false;
+pin = [];
 
 bbx1=max(p);
 bbx2=min(p);
@@ -48,10 +47,16 @@ cent = (pp(ee(:,1),:)+pp(ee(:,2),:)+pp(ee(:,3),:))/3;
 offset = min([sqrt(sum(v1.^2,2)) sqrt(sum(v2.^2,2)) sqrt(sum(v3.^2,2))],[],2);
 offsetp = cent + 0.01 * repmat(offset,1,3) .* normal;
 
-st = involume_mex(offsetp, double(ee), pp, 200, facets_bbx, min(pp(:,1)), max(pp(:,1)), tiny);
-[tf idx] = ismember(1,st);
-if ~tf
-    pin = [];
-else
-    pin = offsetp(idx,:);
+for i=1:size(offsetp,1)
+    st = involume_mex(offsetp, double(ee), pp, 200, facets_bbx, min(pp(:,1)), max(pp(:,1)), tiny);
+    if st == 1
+        pin = offsetp(i,:);
+        return
+    end
 end
+
+    
+
+
+
+

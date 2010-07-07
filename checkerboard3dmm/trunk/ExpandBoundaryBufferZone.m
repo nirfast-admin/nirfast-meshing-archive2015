@@ -56,7 +56,7 @@ end
     
 % Get bbx of prisms' facets
 prism_facets_bbx=zeros(nf,8,6,'single');
-prism_normals=zeros(nf,3,8,'double');
+% prism_normals=zeros(nf,3,8,'double');
 cprintf([0 0 1],'\tCalculating prism normals and bounding boxes...')
 for i=1:nf
     tpp=(reshape(pp(i,:,:),3,6))';
@@ -67,11 +67,11 @@ for i=1:nf
     prism_facets_bbx(i,:,4)=max([n1(:,1) n2(:,1) n3(:,1)],[],2);
     prism_facets_bbx(i,:,5)=max([n1(:,2) n2(:,2) n3(:,2)],[],2);
     prism_facets_bbx(i,:,6)=max([n1(:,3) n2(:,3) n3(:,3)],[],2);
-    v1=tpp(prism(:,2),:)-tpp(prism(:,1),:);
-    v2=tpp(prism(:,3),:)-tpp(prism(:,2),:);
-    tmp=cross(v1,v2);
-    norm_len=v_magn(tmp);
-    prism_normals(i,:,:)=(tmp./repmat(norm_len,1,3))';
+%     v1=tpp(prism(:,2),:)-tpp(prism(:,1),:);
+%     v2=tpp(prism(:,3),:)-tpp(prism(:,2),:);
+%     tmp=cross(v1,v2);
+%     norm_len=v_magn(tmp);
+%     prism_normals(i,:,:)=(tmp./repmat(norm_len,1,3))';
 end
 fprintf('\b%s\n',' done.')
 % Get bbx of prisms
