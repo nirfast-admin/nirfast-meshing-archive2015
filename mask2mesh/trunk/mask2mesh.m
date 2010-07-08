@@ -93,7 +93,7 @@ if exist([foofn '.1.node'],'file')
 end
 % Run the mesh generator
 eval(['! ' syscommand ' -pqAa' num2str(tri_area) ' "' foofn '.poly"']);
-[mesh_e,mesh_p]=read_nod_elm([foofn '.1'],1);
+[mesh_e,mesh_p]=read_nod_elm([foofn '.1.'],1);
 delete([foofn '.1.ele']);  delete([foofn '.1.node']);
 
 %% Get the nodes on the exterior of the mesh
