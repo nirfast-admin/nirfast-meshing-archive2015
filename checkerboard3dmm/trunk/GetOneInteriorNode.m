@@ -48,7 +48,7 @@ offset = min([sqrt(sum(v1.^2,2)) sqrt(sum(v2.^2,2)) sqrt(sum(v3.^2,2))],[],2);
 offsetp = cent + 0.01 * repmat(offset,1,3) .* normal;
 
 for i=1:size(offsetp,1)
-    st = involume_mex(offsetp, double(ee), pp, 200, facets_bbx, min(pp(:,1)), max(pp(:,1)), tiny);
+    st = involume_mex(offsetp(i,1:3), double(ee), pp, 200, facets_bbx, min(pp(:,1)), max(pp(:,1)), tiny);
     if st == 1
         pin = offsetp(i,:);
         return
