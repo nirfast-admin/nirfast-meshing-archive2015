@@ -6,7 +6,7 @@ cd(outputdir);
 
 props.dim = 3;
 props.mysize = [nrow ncol nslice];
-props.fov = [[nrow ncol]*xypixelsize zpixelsize*nslice];
+props.fov = [[ncol nrow]*xypixelsize zpixelsize*nslice];
 props.interval = [xypixelsize xypixelsize zpixelsize];
 props.orient = 'axis';
 props.datatype = 'WORD';
