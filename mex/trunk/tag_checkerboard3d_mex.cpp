@@ -146,9 +146,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 							dd *= (1+grading_rate);
 					}
 					int  dI = round(dd/dx);
-					for (int i=_stupidMS_max(0,ii-dI); i<_stupidMS_min(nrow,ii+dI); ++i) {
-						for (int j=_stupidMS_max(0,idx-dI); j<_stupidMS_min(ncol, idx+dI); ++j) {
-							for (int k=_stupidMS_max(0,kk-dI); k<_stupidMS_min(npln,kk+dI); ++k) {
+					for (int i=_stupidMS_max(0,ii-dI); i<=_stupidMS_min(nrow-1,ii+dI); ++i) {
+						for (int j=_stupidMS_max(0,idx-dI); j<=_stupidMS_min(ncol-1, idx+dI); ++j) {
+							for (int k=_stupidMS_max(0,kk-dI); k<=_stupidMS_min(npln-1,kk+dI); ++k) {
 								if (P(i,j,k)==0)
 									P(i,j,k) = NA;
 							}
@@ -158,7 +158,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 				}
 				++idx;
 			}
-			row_state(ii,kk) = idx + 1;
+			row_state(ii,kk) = idx + dI + 1;
 			row_direction(ii,kk) = -1;
 			row_visit(ii,kk) = row_visit(ii,kk) + 1;
 		}
@@ -185,9 +185,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 							dd *= (1+grading_rate);
 					}
 					int  dI = round(dd/dx);
-					for (int i=_stupidMS_max(0,ii-dI); i<_stupidMS_min(nrow,ii+dI); ++i) {
-						for (int j=_stupidMS_max(0,idx-dI); j<_stupidMS_min(ncol, idx+dI); ++j) {
-							for (int k=_stupidMS_max(0,kk-dI); k<_stupidMS_min(npln,kk+dI); ++k) {
+					for (int i=_stupidMS_max(0,ii-dI); i<=_stupidMS_min(nrow-1,ii+dI); ++i) {
+						for (int j=_stupidMS_max(0,idx-dI); j<=_stupidMS_min(ncol-1, idx+dI); ++j) {
+							for (int k=_stupidMS_max(0,kk-dI); k<=_stupidMS_min(npln-1,kk+dI); ++k) {
 								if (P(i,j,k)==0)
 									P(i,j,k) = NA;
 							}
@@ -197,7 +197,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 				}
 				--idx;
 			}
-			row_state_back(ii,kk) = idx - 1;
+			row_state_back(ii,kk) = idx + dI + 1;
 			row_direction(ii,kk) = 1;
 			row_visit_back(ii,kk) = row_visit_back(ii,kk) + 1;
 		}
@@ -258,7 +258,7 @@ void GetRandom(int &ii, int &kk, int *row_state, int &nrow, int &ncol, int &npln
 	std::vector<ULONG> randpool;
 	for (int i=0; i<nrow; ++i) {
 		for (int j=0; j<npln; ++j) {
-			if (row_state(i,j)>ncol || row_state(i,j)<0) {
+			if (row_state(i,j)>=ncol || row_state(i,j)<0) {
 				continue;
 			}
 			randpool.push_back(i*npln+j);

@@ -122,8 +122,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 						CheckOrientation(v,u);
 					else {
 						myst = CalculateOrientation(v,prhs[0],prhs[1]);
-						if (myst>1)
-							continue;
+						if (myst>1) {
+							st = 3;
+							goto EXIT;
+						//	continue;
+						}
 					}
 					color[v-1] = Gray;
 					q.push(v);
@@ -146,6 +149,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	for (ulong i=0; i<ne; ++i) {
 		if (color[i]!=Black) {
 			mexPrintf("Couldn't visit all triangles. Please send your input files to ccni-support@wpi.edu\n");
+			delete [] facets_bbx;
 			mexErrMsgTxt("Aborting...");
 		}
 	}
