@@ -188,7 +188,7 @@ shell_normals=shell_normals./repmat(norm_len,1,3);
 [P]=ExpandBoundaryBufferZone(t,p,P,shell_normals,ds,[dx dy dz],llc);
 clear mex
 fprintf('\t Tagging interior nodes... ');
-interior_p0 = tag_checkerboard3d_mex(P, [dx dy dz], [xmin ymin zmin], ds, 1, 1);
+interior_p0 = tag_checkerboard3d_mex(P, [dx dy dz], [xmin ymin zmin], ds, 0, 1);
 fprintf('done\n');
 
 t=double(myargs.extelem(:,1:3));
