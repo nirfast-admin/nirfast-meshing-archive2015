@@ -97,8 +97,12 @@ elseif strcmpi(myext,'.ele')
     [telem tnode] = read_nod_elm(fnprefix,1);
     output = SeparateSubVolumes(telem, tnode);
     tags = output.tags;
-    bf = telem(:,4)==0 | telem(:,5)==0;
-    extelem = telem(bf,1:3);
+    if size(telem,2)==5
+        bf = telem(:,4)==0 | telem(:,5)==0;
+        extelem = telem(bf,1:3);
+    else
+        extelem = telem;
+    end
 end
 fprintf(' done with sub-volume separation\n');
 
