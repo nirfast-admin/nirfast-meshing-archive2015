@@ -28,7 +28,7 @@ if nargin~=2
     type='generic';
 end
 
-fprintf('\n\n--> Beginning mesh generation process, please wait...\n\n');
+fprintf('\n\n--> Beginning mesh generation process, please wait...\n');
 %% Read in the mesh
 if strcmpi(myext,'.inp') 
     % Each INP file represents a surface in mesh with disjoint sub regions
@@ -40,7 +40,7 @@ if strcmpi(myext,'.inp')
         error(['Cannot find file .inp files whose prefix is ' fnprefix]);
     end
 
-    fprintf('\n\tConverting inp files and re-orienting\n');
+    fprintf('\n\tConverting inp files and re-orienting...\n');
 
     telem = [];
     tnode = [];
@@ -104,7 +104,7 @@ elseif strcmpi(myext,'.ele')
         extelem = telem;
     end
 end
-fprintf(' done with sub-volume separation\n');
+fprintf('\tDone with sub-volume separation.\n');
 
 
 extelem = FixPatchOrientation(tnode,extelem,[],1);

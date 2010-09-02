@@ -141,14 +141,15 @@ P = zeros(nrow,ncol,npln,'int8');
 [PP] = TagBoundary3d(p,e,ds,dx,dy,dz,llc,myargs);
 
 noPLCp = size(p,1);
-int_nodes=(noPLCp+1):(size(PP,1)+noPLCp);
+
+delete('input4delaunay.*','junk.txt');
 
 % Write input files for delaunaygen
-delete('input4delaunay.*','junk.txt');
+writenodes_tetgen('input4delaunay.a.node',PP);
 if isfield(myargs,'regions') && ~isempty(myargs.regions)
-    writenodelm_poly3d('input4delaunay',e,[p;PP],int_nodes,[],myargs.regions,1,[]);
+    writenodelm_poly3d('input4delaunay',e,p,[],[],myargs.regions,1,[]);
 else
-    writenodelm_poly3d('input4delaunay',e,[p;PP],int_nodes,[],[],1,[]);
+    writenodelm_poly3d('input4delaunay',e,p,[],[],[],1,[]);
 end
 
 delaunaycommand = 'delaunaygen';
@@ -156,8 +157,7 @@ systemcommand = GetSystemCommand(delaunaycommand);
 
 fprintf('\n---------> Running Delaunay, please wait...');
 
-% maxvol = sqrt(3)/4*ds^2;
-delaunay_cmd=['! "' systemcommand '" -pqgYYA' ' input4delaunay' '.poly > junk.txt'];
+delaunay_cmd=['! "' systemcommand '" -pqigVYYA' ' input4delaunay' '.poly > junk.txt'];
 eval(delaunay_cmd);
 if ~exist('input4delaunay.1.ele','file')
     errordlg(' Delaunay Generator failed. Check your input surface mesh.','Meshing Error');
