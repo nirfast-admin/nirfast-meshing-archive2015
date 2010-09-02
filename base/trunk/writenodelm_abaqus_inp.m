@@ -13,16 +13,16 @@ fprintf(fid,'*HEADING\n');
 fprintf(fid,'Written by writenodelm_abaqus_inp\n\n');
 % Write nodes
 fprintf(fid,'*NODE\n');
-formatstring = '%d %.12f %.12f %.12f';
+formatstring = '%d, %.12f, %.12f, %.12f';
 fprintf(fid,[formatstring '\n'],[(1:size(p,1))' p]');
 
 % Write elements
 fprintf(fid,'ELEMENT, TYPE=S3R\n');
-formatstring = '%d ';
+formatstring = '%d';
 for i=1:size(e,2)
-    formatstring=[formatstring '%d '];
+    formatstring=[formatstring ', %d'];
 end
-formatstring = formatstring(1:end-1);
+
 fprintf(fid,[formatstring '\n'],[(1:size(e,1))' e]');
 
 % Write elements type
