@@ -15,6 +15,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <assert.h>
 
 #include "mex.h"
 #include "CStopWatch.h"

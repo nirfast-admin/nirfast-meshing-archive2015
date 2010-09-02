@@ -129,6 +129,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 				continue;
 			}
 			int idx = jj;
+            int dI;
 			while (idx<ncol) {
 				if (P(ii,idx,kk) == 0) {
 					P(ii,idx,kk) = node_code;
@@ -145,10 +146,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 						for (int fooc=0; fooc<row_visit(ii,kk)-1; ++fooc)
 							dd *= (1+grading_rate);
 					}
-					int  dI = round(dd/dx);
+					dI = round(dd/dx);
 					for (int i=_stupidMS_max(0,ii-dI); i<=_stupidMS_min(nrow-1,ii+dI); ++i) {
 						for (int j=_stupidMS_max(0,idx-dI); j<=_stupidMS_min(ncol-1, idx+dI); ++j) {
 							for (int k=_stupidMS_max(0,kk-dI); k<=_stupidMS_min(npln-1,kk+dI); ++k) {
+								assert(i>=0 && j>=0 && k>=0 && i<nrow && j<ncol && k<npln);
 								if (P(i,j,k)==0)
 									P(i,j,k) = NA;
 							}
@@ -169,6 +171,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 				continue;
 			}
 			int idx = jj;
+            int dI;
 			while (idx >= 0) {
 				if (P(ii,idx,kk) == 0) {
 					P(ii,idx,kk) = node_code;
@@ -184,10 +187,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 						for (int fooc=0; fooc<row_visit_back(ii,kk)-1; ++fooc)
 							dd *= (1+grading_rate);
 					}
-					int  dI = round(dd/dx);
+					dI = round(dd/dx);
 					for (int i=_stupidMS_max(0,ii-dI); i<=_stupidMS_min(nrow-1,ii+dI); ++i) {
 						for (int j=_stupidMS_max(0,idx-dI); j<=_stupidMS_min(ncol-1, idx+dI); ++j) {
 							for (int k=_stupidMS_max(0,kk-dI); k<=_stupidMS_min(npln-1,kk+dI); ++k) {
+								assert(i>=0 && j>=0 && k>=0 && i<nrow && j<ncol && k<npln);
 								if (P(i,j,k)==0)
 									P(i,j,k) = NA;
 							}
@@ -197,7 +201,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 				}
 				--idx;
 			}
-			row_state_back(ii,kk) = idx + dI + 1;
+			row_state_back(ii,kk) = idx - dI - 1;
 			row_direction(ii,kk) = 1;
 			row_visit_back(ii,kk) = row_visit_back(ii,kk) + 1;
 		}
