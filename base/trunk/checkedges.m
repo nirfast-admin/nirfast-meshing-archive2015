@@ -27,7 +27,11 @@ if sumb~=0 % Some edges are used only once.
     retflag=2;
 end
 if sumc~=0 % Some esges are used more than twice
-    dlmwrite('SurfaceMesh-InvalidEdges.txt',edges(jx(c),:),'delimiter',' ','newline',newlinech);
+    if sumb~=0
+        dlmwrite('SurfaceMesh-InvalidEdges.txt',edges(jx(c),:),'delimiter',' ','-append','newline',newlinech);
+    else
+        dlmwrite('SurfaceMesh-InvalidEdges.txt',edges(jx(c),:),'delimiter',' ','newline',newlinech);
+    end
     if retflag==2
         retflag=3;
     else

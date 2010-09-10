@@ -101,7 +101,7 @@ if nnpe==3
                 status.b=2;
                 if verbose, 
                     fprintf('\n  Provided surface is not closed:\n');
-                    cfprintf('  At least one of the edges is only shared by only one triagnle (it should be two, at least)\n');
+                    fprintf('  At least one of the edges is only shared by only one triagnle (it should be two, at least)\n');
                 end
             otherwise
                 if verbose, fprintf('\n Surface mesh is open AND has edges shared by more than 2 triangles!\n');end
