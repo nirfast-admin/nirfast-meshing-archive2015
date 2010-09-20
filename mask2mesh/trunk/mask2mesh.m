@@ -92,7 +92,7 @@ if exist([foofn '.1.node'],'file')
     delete([foofn '.1.node'])
 end
 % Run the mesh generator
-eval(['! ' syscommand ' -pqAa' num2str(tri_area) ' "' foofn '.poly"']);
+eval(['! "' syscommand '" -pqAa' num2str(tri_area) ' "' foofn '.poly"']);
 [mesh_e,mesh_p]=read_nod_elm([foofn '.1.'],1);
 delete([foofn '.1.ele']);  delete([foofn '.1.node']);
 
