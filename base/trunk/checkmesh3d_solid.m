@@ -9,7 +9,7 @@ ntet=size(e,1); np=size(p,1);
 os=computer;
 if ~isempty(strfind(os,'PCWIN')) % Windows
     newlinech ='pc';
-elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX')) % Mac OS or Linux
+elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX86')) % Mac OS or Linux
     newlinech ='unix';
 end
 nodes = unique([e(:,1);e(:,2);e(:,3);e(:,4)]);
@@ -51,9 +51,7 @@ disp(['Avg., Min, Max volume: ' num2str(mean(abs(vol))) ', ' ...
 vol_ratio=simpqual(p,ren_tet,2);
 
 zeroflag=vol_ratio<=TetrahedronFailQuality;
-% if type~=0
-%     q=simpqual(p,ren_tet);
-% end
+
 nvoids=sum(zeroflag);
 
 if nvoids~=0
@@ -77,7 +75,7 @@ if sum(~tf)~=0
 end
 
 % check faces to make sure every face is only used by 1 or 2 tetrahedrons
-disp(sprintf('Checking faces..... '))
+fprintf('Checking faces..... ')
 faces=[e(:,[1 2 3]);e(:,[1 2 4]);e(:,[2 3 4]);e(:,[1 3 4])];
 faces=sort(faces,2);
 [foo ix jx]=unique(faces,'rows');
@@ -89,11 +87,10 @@ jx2=range(bf);
 badfaces=foo(jx2,:);
 badtets=[];
 if nbadfaces~=0 % Some of faces are shared by more than tetrahedron: a definite problem
-    disp(sprintf('\t\n@@@@@@@@@@@@@@@@@ Invalid solid mesh! @@@@@@@@@@@@@@@@@\n'))
-    disp(sprintf('\tA total %d faces of the mesh are shared by more than two tetrahedrons!\n',nbadfaces))
-    disp(sprintf('\tThose faces can be found in bad_faces_extra_shared_solid.txt\n'))
-    [fid st]=OpenFile('bad_faces_extra_shared_solid.txt','wt');
-    if st==1, error('Error in writing the file bad_faces_extra_shared_solid.txt'); end
+    fprintf('\t\n@@@@@@@@@@@@@@@@@ Invalid solid mesh! @@@@@@@@@@@@@@@@@\n')
+    fprintf('\tA total %d faces of the mesh are shared by more than two tetrahedrons!\n',nbadfaces)
+    fprintf('\tThose faces can be found in bad_faces_extra_shared_solid.txt\n')
+    fid = OpenFile('bad_faces_extra_shared_solid.txt','wt');
     for i=1:nbadfaces
         fprintf(fid,'Face: %d %d %d\t',badfaces(i,:));
         [tf idx]=ismember(badfaces(i,:),foo,'rows');
@@ -114,11 +111,8 @@ if nbadfaces~=0 % Some of faces are shared by more than tetrahedron: a definite 
     badtets=unique(badtets);
 %     writenodelm_3dm('bad_faces_extra_shared_solid.3dm',e(badtets,:),p);
 end
-disp(sprintf('\bDone\n'))
+fprintf('\bDone\n');
 
-
-% if nargin>3 && ~isempty(eb) && ~isempty(pb)
-%     CalcEnclosedVolBySurfaceMesh(eb,pb);
-% end
-
-
+fprintf('\n\n===> Checking integrity of the surface of the solid mesh...\n')
+CheckMesh3D(foo,p)
+fprintf('===> Done.\n\n');

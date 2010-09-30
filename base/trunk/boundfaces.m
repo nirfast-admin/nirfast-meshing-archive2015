@@ -17,6 +17,6 @@ vec=histc(jx,1:max(jx));
 qx= vec==1;
 bdy_faces=faces(ix(qx),:);
 
-nodes=unique([bdy_faces(:,1); bdy_faces(:,2); bdy_faces(:,3)]);
+nodes=unique(bdy_faces(:));
 [tf new_faces]=ismember(bdy_faces,nodes);
 new_points = points(nodes,:); 

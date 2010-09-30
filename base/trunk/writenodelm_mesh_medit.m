@@ -5,7 +5,7 @@ function writenodelm_mesh_medit(fn,tet,p,nodemap)
 % Note that this routine renumbers the node numbers from 1 to N and accordingly
 % adjust the node numbers in mesh list.
 
-disp(sprintf('%s','Writing data to file... '))
+fprintf('%s','Writing data to file... ')
 ref=0;
 tet_mat=10;
 np=size(p,1); dim=size(p,2);

@@ -95,7 +95,7 @@ if nnpe==3
                 status.b=1;
                 if verbose, 
                     fprintf('\n Some of mesh edges are shared by more than two triangles! (multiple material mesh ?!)\n');
-                    fprintf(' Please check all the diagnostic results stored in %s-.txt files.\n',fn);
+                    fprintf(' Please check all the diagnostic results stored in %s.txt files.\n',fn);
                 end
             case 2
                 status.b=2;
@@ -111,7 +111,7 @@ if nnpe==3
     qcheck=q_area<q_area_threshold;
     a=sum(qcheck);
     if a~=0
-        if verbose, fprintf('There are %d faces that have a very low quality (q<%f).\n', a, q_area_threshold);end
+        if verbose, fprintf(' There are %d faces with low quality (q<%f).\n', a, q_area_threshold);end
         status.b=4;
     end
 elseif nnpe==4
