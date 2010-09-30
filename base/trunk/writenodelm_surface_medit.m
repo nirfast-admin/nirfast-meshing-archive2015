@@ -21,7 +21,7 @@ if isempty(fn), error('Filename should be specified'), end
 os=computer;
 if ~isempty(strfind(os,'PCWIN')) % Windows
     newlinech ='pc';
-elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX86')) % Mac OS or Linux
+elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX')) % Mac OS or Linux
     newlinech ='unix';
 end
 fn = add_extension(fn,'.mesh');

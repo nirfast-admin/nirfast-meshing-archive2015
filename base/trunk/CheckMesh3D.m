@@ -134,7 +134,7 @@ if isfield(input_flags,'writefiles') && input_flags.writefiles==1
     os=computer;
     if ~isempty(strfind(os,'PCWIN')) % Windows
         newlinech ='pc';
-    elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX86')) % Mac OS or Linux
+    elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX')) % Mac OS or Linux
         newlinech ='unix';
     end
     fprintf('\n');

@@ -9,7 +9,7 @@ ntet=size(e,1); np=size(p,1);
 os=computer;
 if ~isempty(strfind(os,'PCWIN')) % Windows
     newlinech ='pc';
-elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX86')) % Mac OS or Linux
+elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX')) % Mac OS or Linux
     newlinech ='unix';
 end
 nodes = unique([e(:,1);e(:,2);e(:,3);e(:,4)]);
