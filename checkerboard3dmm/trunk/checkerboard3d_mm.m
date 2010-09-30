@@ -1,4 +1,4 @@
-function mesh = checkerboard3d_mm(filename, type)
+function mesh = checkerboard3d_mm(filename, type, edgesize)
 % checkerbaord3d_mm(fnprefix, type)
 % Reads input surfaces which are either in .inp format (Mimics exported in Abaqus
 % file format) or .ele format (tetgen format) and then generates a 3D 
@@ -24,7 +24,7 @@ if isempty(myext) || (~strcmpi(myext,'.inp') && ~strcmpi(myext,'.ele'))
     errordlg('Surface filenaem should have either .inp or .ele as its extension','Meshing Error');
     error('Surface filenaem should have either .inp or .ele as its extension');
 end
-if nargin~=2
+if nargin<2
     type='generic';
 end
 
@@ -116,6 +116,9 @@ telem=telem(ix,:);
 myargs.silentflag=1;
 myargs.bdyfn = fnprefix;
 myargs.regions = tags;
+if nargin==3
+    myargs.edgesize = edgesize;
+end
 % Remove the following line to create a mesh based on average size of the
 % input surfaces
 % myargs.edgesize = 4.1;
