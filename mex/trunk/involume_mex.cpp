@@ -11,6 +11,10 @@ For Linux/Mac:
  * mex -v -I./meshlib involume_mex.cpp isinvolume_randRay.cpp meshlib/geomath.cpp meshlib/vector.cpp
  */
 
+#ifdef _OPENMP
+#include "omp.h"
+#endif
+
 // st = involume_mex(qp, ele, p, ntries, facets_bbx, xMin, xMax, tiny)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -37,7 +41,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     ULONG nqp = mxGetM(_inqp);
     //double *p = mxGetPr(_innode);
     double *qp = mxGetPr(_inqp);
-    double tmpqp[3] = {0.,0.,0.};
+    double tmpqp[3] = {0., 0., 0.};
     
 	double ntries = mxGetScalar(_inntries);
     double xMin = mxGetScalar(_inxmin);
@@ -59,13 +63,36 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     if (debug)
         mexPrintf("Entering the loop to call isinvolume_ranRay\n");
-	std::vector<ULONG> int_facets;
-	std::vector<points> int_points;
-    for (ULONG i=0; i<nqp; ++i) {
-        for (int j=0; j<3; tmpqp[j] = qp(i,j), ++j);
-        st[i] = isinvolume_randRay(tmpqp,prhs[2],prhs[1],tiny,facets_bbx,ntries,xMin,xMax,int_facets,int_points);
-		int_facets.clear();
-		int_points.clear();
-    }
+	
+#ifdef _OPENMP
+    mexPrintf("\n\tOpenMP is enabled.\n");
+	omp_set_num_threads(omp_get_num_procs());
+	mexPrintf("\n    CPUs Available: %d\n\n",omp_get_num_procs());
+#endif
+	long i;
+	int j;
+    std::vector<ULONG> int_facets;
+    std::vector<points> int_points;
+#ifdef _OPENMP
+	#pragma omp parallel default(none) \
+	    private(i,j) \
+        firstprivate(int_facets,int_points,tmpqp) \
+	    shared(st,qp,nqp,prhs,tiny,facets_bbx,ntries,xMin,xMax)
+#endif
+	{
+#ifdef _OPENMP
+        #pragma omp for nowait
+#endif
+        for (i=0; i<nqp; ++i) {
+    	    for (j=0; j<3; tmpqp[j] = qp(i,j), ++j);
+    		st[i] = isinvolume_randRay(tmpqp,prhs[2],prhs[1],tiny,facets_bbx,(int)ntries,xMin,xMax,int_facets,int_points);
+    	}
+	}
 }
+
+
+
+
+
+
 
