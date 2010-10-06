@@ -75,7 +75,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	
 #ifdef _OPENMP	
 	omp_set_num_threads(omp_get_num_procs());
-	mexPrintf("\n    CPUs Available: %d\n\n",omp_get_num_procs());
+    if (debug)
+        mexPrintf("\n    CPUs Available: %d\n\n",omp_get_num_procs());
 #endif
 	long i;
 	int j;
