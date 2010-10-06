@@ -5,10 +5,19 @@
 #define qp(i,j) qp[(i)+nqp*(j)]
 
 /* To compile this file use:
+ * Compile without OpenMP support:
+ *-------------
 * For Windows:
 * mex -v -DWIN32 -I./meshlib involume_mex.cpp isinvolume_randRay.cpp meshlib/geomath.cpp meshlib/vector.cpp
 For Linux/Mac:
  * mex -v -I./meshlib involume_mex.cpp isinvolume_randRay.cpp meshlib/geomath.cpp meshlib/vector.cpp
+ *
+ *Compile with OpenMP support:
+ *For Windows:
+ *mex -v COMPFLAGS="$COMPFLAGS /openmp" LINKFLAGS="$LINKFLAGS /openmp" -DWIN32 -I./meshlib involume_mex.cpp isinvolume_randRay.cpp meshlib/geomath.cpp meshlib/vector.cpp
+ *
+ *For Linux/Mac:
+ *mex -v CXXFLAGS="\$CXXFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp" -I./meshlib involume_mex.cpp isinvolume_randRay.cpp meshlib/geomath.cpp meshlib/vector.cpp
  */
 
 #ifdef _OPENMP
@@ -38,7 +47,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
 	/*ULONG ne = mxGetM(_inele);
     ULONG np = mxGetM(_innode);*/
-    ULONG nqp = mxGetM(_inqp);
+    ULONG nqp = (ULONG) mxGetM(_inqp);
     //double *p = mxGetPr(_innode);
     double *qp = mxGetPr(_inqp);
     double tmpqp[3] = {0., 0., 0.};
@@ -64,8 +73,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (debug)
         mexPrintf("Entering the loop to call isinvolume_ranRay\n");
 	
-#ifdef _OPENMP
-    mexPrintf("\n\tOpenMP is enabled.\n");
+#ifdef _OPENMP	
 	omp_set_num_threads(omp_get_num_procs());
 	mexPrintf("\n    CPUs Available: %d\n\n",omp_get_num_procs());
 #endif
