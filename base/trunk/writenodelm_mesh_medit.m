@@ -28,7 +28,7 @@ end
 os=computer;
 if ~isempty(strfind(os,'PCWIN')) % Windows
     newlinech ='pc';
-elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX')) % Mac OS or Linux
+elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX86')) % Mac OS or Linux
     newlinech ='unix';
 end
 if nargin==4

@@ -17,16 +17,15 @@ pp=p(nodes,:);
 [tf ee]=ismember(t,nodes);
 
 ne = size(ee,1);
+np = size(pp,1);
 % calculate centroid of shell as p0 if it's not provided.
 if nargin==2
     p0 = (pp(ee(:,1),:)+pp(ee(:,2),:)+pp(ee(:,3),:));
     p0 = sum(p0)/ne;
 end
 
-tets=zeros(4,3,ne);
-for i=1:3
-    tets(i,:,:)=reshape(pp(ee(:,i),:)',[1 3 ne]);
-end
-tets(4,:,:)=reshape(repmat(p0,ne,1)',[1 3 ne]);
-tet_vol = signed_tetrahedron_vol(tets);
+ee(:,4)=ones(size(ee,1),1)*(np+1);
+pp(np+1,:)=p0;
+
+tet_vol = signed_tetrahedron_vol(ee,pp(:,1),pp(:,2),pp(:,3));
 totvol = abs(sum(tet_vol));

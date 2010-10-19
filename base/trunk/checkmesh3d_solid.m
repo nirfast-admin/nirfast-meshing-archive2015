@@ -17,6 +17,9 @@ if nargin==3
     nodemap=nodes;
 end
 [tf1 ren_tet]=ismember(e(:,1:4),nodemap);
+p=p(nodes,:);
+e=ren_tet;
+
 sumtf=sum(tf1,2);
 bf=sumtf~=4;
 if sum(bf)~=0
@@ -37,13 +40,9 @@ if isempty(tiny)
 %     tiny=1e-6;
 end
 
-tetra=zeros(4,3,ntet);
-for i=1:ntet
-    tetra(:,:,i)=[p(ren_tet(i,1),:); p(ren_tet(i,2),:); p(ren_tet(i,3),:); p(ren_tet(i,4),:)];
-end
 % Getting the min volume and finding all tets that have volumes close to
 % the minimum one
-vol=signed_tetrahedron_vol(tetra);
+vol=signed_tetrahedron_vol(e(:,1:4),p(:,1),p(:,2),p(:,3));
 disp(' ');
 disp(['Avg., Min, Max volume: ' num2str(mean(abs(vol))) ', ' ...
     num2str(min(abs(vol))) ', ' num2str(max(abs(vol)))]);

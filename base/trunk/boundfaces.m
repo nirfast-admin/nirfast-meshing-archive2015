@@ -2,7 +2,7 @@ function [new_faces new_points]=boundfaces(points,tet)
 % boundfaces Find boundary faces from tetrahedral mesh
 %   bdy_faces = boundfaces(tet)
 % NOTE : The returned faces and points are renumbered and
-%        the node numbers in 'bdy_faces' does not follow
+%        the node numbers in 'new_faces' does not follow
 %        the node numbering in input mesh 'tet'
 % Written by: Hamid Ghadyani, March 2010
 
