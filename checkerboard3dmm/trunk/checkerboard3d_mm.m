@@ -164,6 +164,5 @@ for i=1:length(region_ids)
 end
 mesh.elements=mesh.elements(:,1:4);
 
-mesh.elements=mesh.elements(:,1:4);
 fprintf('\n\n--> Finished mesh generation.\n');
 
