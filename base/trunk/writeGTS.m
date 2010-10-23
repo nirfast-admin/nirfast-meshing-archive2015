@@ -1,7 +1,9 @@
-function writeGTS(fn,t,p)
+function e = writeGTS(fn,t,p)
 % Writes the triangulated surface in 't' and 'p' into a .gts file which is
 % based on GNU Triangulated Surface format:
 % http://gts.sourceforge.net
+% 
+% It returns the edges of the surface.
 % 
 % Written by:
 %   Hamid Ghadyani Sep 2010
@@ -16,15 +18,17 @@ nt = size(t,1);
 edges = [t(:,[1 2]);t(:,[1 3]);t(:,[2 3])];
 [e ix jx] = unique(sort(edges,2),'rows');
 
-fid = OpenFile(fn,'wt');
+% Always write in UNIX mode
+fid = OpenFile(fn,'wb');
+eolc=sprintf('%s',char(10));
 
-fprintf(fid,'%d %d %d\n',size(p,1),size(e,1),nt);
-fprintf(fid,'%.18f %.18f %.18f\n',p');
-fprintf(fid,'%d %d\n',e');
+fprintf(fid,['%d %d %d' eolc],size(p,1),size(e,1),nt);
+fprintf(fid,['%.18f %.18f %.18f' eolc],p');
+fprintf(fid,['%d %d' eolc],e');
 
 eidx = [(1:nt)' (1:nt)'+nt (1:nt)'+2*nt];
 te = jx(eidx);
-fprintf(fid,'%d %d %d\n',te');
+fprintf(fid,['%d %d %d' eolc],te');
 fclose(fid);
 
 
