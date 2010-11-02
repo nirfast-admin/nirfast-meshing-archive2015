@@ -40,7 +40,8 @@ q_radius_ratio=quality_triangle_radius(p,ee);
 q_area_ratio=quality_triangle_area(p,ee,area);
 
 if sum(zeroflag)>0;
-    warning('Meshing:check', ' At least one of the patches has a very small area!');
+    fprintf('At least one of the patches has a very small area!\n');
+    fprintf('Avg Min Max of patch areas: %f %f %f\n\n',mean(area), min(area), max(area));
 end
 
 
