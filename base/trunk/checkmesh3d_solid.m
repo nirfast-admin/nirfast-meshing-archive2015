@@ -1,4 +1,4 @@
-function [vol,vol_ratio,zeroflag]=checkmesh3d_solid(e,p,type,nodemap,eb,pb)
+function [vol,vol_ratio,zeroflag]=checkmesh3d_solid(e,p,type,nodemap)
 % If type=0 then it will only check the volume of each tet, otherwise it
 % will also check the quality and output some general ifno
 global TetrahedronFailQuality
@@ -12,14 +12,30 @@ if ~isempty(strfind(os,'PCWIN')) % Windows
 elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX86')) % Mac OS or Linux
     newlinech ='unix';
 end
+
+
+if nargin~=4
+    nodenumbers=(1:size(p,1))';
+else
+    nodenumbers=nodemap;
+end
+
+% check to see if all nodes belong to at least one tet.
+tf =ismember(nodenumbers,e);
+s=sum(~tf);
+if s~=0
+    fprintf(...
+        'checkmesh3d_solid:\n The provided mesh has extra nodes that are not used in the element list\n');
+    warning('Meshing:check', ' Not all nodes are used in the element connectivity list');
+end
+
 nodes = unique([e(:,1);e(:,2);e(:,3);e(:,4)]);
 if nargin==3
     nodemap=nodes;
 end
-[tf1 ren_tet]=ismember(e(:,1:4),nodemap);
 p=p(nodes,:);
+[tf1 ren_tet]=ismember(e(:,1:4),nodemap);
 e=ren_tet;
-
 sumtf=sum(tf1,2);
 bf=sumtf~=4;
 if sum(bf)~=0
@@ -28,7 +44,7 @@ if sum(bf)~=0
     dlmwrite('tets_with_extra_nodes.txt',tempe(bf),'newline',newlinech);
     error('Some of the tets are using nodes that are not defined in node list!');
 end
-q=[];
+
 global tiny
 if isempty(tiny)
     bbx=[min(p(:,1)) min(p(:,2)) min(p(:,3)) ...
@@ -43,9 +59,8 @@ end
 % Getting the min volume and finding all tets that have volumes close to
 % the minimum one
 vol=signed_tetrahedron_vol(e(:,1:4),p(:,1),p(:,2),p(:,3));
-disp(' ');
-disp(['Avg., Min, Max volume: ' num2str(mean(abs(vol))) ', ' ...
-    num2str(min(abs(vol))) ', ' num2str(max(abs(vol)))]);
+fprintf('Avg Min Max volume: %f %f %f\n',mean(abs(vol)),min(abs(vol)),max(abs(vol)));
+
 % vol_ratio=quality_vol_ratio(ren_tet,p);
 vol_ratio=simpqual(p,ren_tet,2);
 
@@ -60,17 +75,8 @@ if nvoids~=0
 end
 
 if type~=0
-    disp(['Avg., Min, Max volume ratio quality: ' num2str(mean(vol_ratio)) ', ' num2str(min(vol_ratio)) ', ' num2str(max(vol_ratio))]);
-end
-
-% check to see if all nodes belong to at least one tet and also that no tet
-% is using a node which is not in node list
-[tf idx]=ismember(nodemap,e);
-if sum(~tf)~=0
-    disp(' ==== checkmesh3d_solid: There are some nodes that have not been used in any tet. ===== ');
-    disp('Check unused_nodes_in_tet.txt file!');
-    badnodes=nodemap(~tf,:);
-    dlmwrite('unused_nodes_in_tet.txt', badnodes, 'delimiter', '\t','newline',newlinech);
+    fprintf('Avg Min Max volume ratio quality: %f %f %f\n',...
+        mean(vol_ratio), min(vol_ratio), max(vol_ratio));
 end
 
 % check faces to make sure every face is only used by 1 or 2 tetrahedrons
@@ -86,7 +92,7 @@ jx2=range(bf);
 badfaces=foo(jx2,:);
 badtets=[];
 if nbadfaces~=0 % Some of faces are shared by more than tetrahedron: a definite problem
-    fprintf('\t\n@@@@@@@@@@@@@@@@@ Invalid solid mesh! @@@@@@@@@@@@@@@@@\n')
+    fprintf('\t\n------------ Invalid solid mesh! ------------\n')
     fprintf('\tA total %d faces of the mesh are shared by more than two tetrahedrons!\n',nbadfaces)
     fprintf('\tThose faces can be found in bad_faces_extra_shared_solid.txt\n')
     fid = OpenFile('bad_faces_extra_shared_solid.txt','wt');
@@ -112,6 +118,7 @@ if nbadfaces~=0 % Some of faces are shared by more than tetrahedron: a definite 
 end
 fprintf('\bDone\n');
 
-fprintf('\n\n===> Checking integrity of the surface of the solid mesh...\n')
-CheckMesh3D(foo,p)
-fprintf('===> Done.\n\n');
+[foo p]=boundfaces(p,e);
+fprintf('\n\n----> Checking integrity of the surface of the solid mesh...\n')
+CheckMesh3D(foo,p);
+fprintf('----> Done.\n\n');

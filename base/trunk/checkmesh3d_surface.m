@@ -8,7 +8,7 @@ function [q_radius_ratio,q_area_ratio,area,zeroflag,...
 % 3- edge connectivity
 % 4- quality of each surface patch
 e=e(:,1:3);
-if nargin~=4
+if nargin~=3
     nodenumbers=(1:size(p,1))';
 else
     nodenumbers=nodemap;
