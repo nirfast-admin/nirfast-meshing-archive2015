@@ -12,7 +12,9 @@ fprintf(fid,'OFF\n%d %d 0\n',size(p,1),size(t,1));
 
 fprintf(fid,'%.16f %.16f %.16f\n',(p(:,1:3))');
 
-fprintf(fid,'3 %d %d %d\n',(t(:,1:3)-1)');
+if ~isempty(t)
+    fprintf(fid,'3 %d %d %d\n',(t(:,1:3)-1)');
+end
 
 
 fclose(fid);

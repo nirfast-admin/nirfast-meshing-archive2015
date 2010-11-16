@@ -2,8 +2,9 @@ function [t p] = readGTS(fn)
 % Reads a surface mesh from a file formatted in GNU Triangulated Surface mesh
 
 fid = OpenFile(fn,'rt');
+junk = fgetl(fid);
+blah = sscanf(junk,'%d %d %d');
 
-blah = str2num(fgetl(fid));
 nnodes = blah(1);
 nedges = blah(2);
 nfaces = blah(3);

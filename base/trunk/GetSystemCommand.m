@@ -28,6 +28,14 @@ elseif ~isempty(strfind(os,'MAC')) % Mac OS
     % We will use Universal code for mac which contains all the platforms
     % in one bundle. So no need for '64' suffix
     systemcommand = which([command_name '-mac.exe']);
+    if isempty(systemcommand) % Try to find mac64.exe or mac32.exe
+        if strcmpi(os,'MACI64')
+            suff='64';
+        else
+            suff='32';
+        end
+        systemcommand = which([command_name '-mac' suff '.exe']);
+    end
 elseif ~isempty(strfind(os,'GLNX')) % Linux
     if strcmpi(os,'GLNXA64')
         suff='64';

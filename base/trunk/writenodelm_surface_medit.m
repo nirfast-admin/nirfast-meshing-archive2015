@@ -10,7 +10,7 @@ ref=0;
 face_att=1;
 np=size(p,1); dim=size(p,2);
 nf=size(faces,1);
-if size(faces,2)~=3
+if size(faces,2)~=3 && ~isempty(faces)
     disp('The provided face list is not a triangular facet list!');
     error('writenodelm_surface_medit() can only write shell surfaces to medit format');
 end
