@@ -16,6 +16,7 @@ nodes=unique(t(:));
 pp=p(nodes,:);
 [tf ee]=ismember(t,nodes);
 
+ee = FixPatchOrientation(pp,ee,[],1);
 ne = size(ee,1);
 np = size(pp,1);
 % calculate centroid of shell as p0 if it's not provided.

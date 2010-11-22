@@ -118,7 +118,9 @@ if nbadfaces~=0 % Some of faces are shared by more than tetrahedron: a definite 
 end
 fprintf('\bDone\n');
 
-[foo p]=boundfaces(p,e);
+
+[foo p]=boundfaces(p,e(:,1:4));
 fprintf('\n\n----> Checking integrity of the surface of the solid mesh...\n')
 CheckMesh3D(foo,p);
 fprintf('----> Done.\n\n');
+
