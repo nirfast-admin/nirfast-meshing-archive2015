@@ -25,12 +25,12 @@ if ~isempty(strfind(os,'PCWIN')) % Windows
     
     systemcommand = which([command_name suff '.exe']);
 elseif ~isempty(strfind(os,'MAC')) % Mac OS
-    if strcmpi(os,'MACI64')
-        suff='64';
-    else
+        if strcmpi(os,'MACI64')
+            suff='64';
+        else
         suff='';
-    end
-    systemcommand = which([command_name '-mac' suff '.exe']);
+        end
+        systemcommand = which([command_name '-mac' suff '.exe']);
     if isempty(systemcommand) % Try to find a Universal binary
         systemcommand = which([command_name '-mac.exe']);
     end
