@@ -50,6 +50,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     ULONG nqp = (ULONG) mxGetM(_inqp);
     //double *p = mxGetPr(_innode);
     double *qp = mxGetPr(_inqp);
+
     double tmpqp[3] = {0., 0., 0.};
     
 	double ntries = mxGetScalar(_inntries);
