@@ -27,7 +27,7 @@ if fid==0
 end
 
 % We will write the nodes to a different .node file
-fprintf(fid,'0 0 0 0\n');
+fprintf(fid,'0 2 0 0\n');
 fprintf(fid,'%d 0\n',size(e,1));
 for i=1:size(e,1)
     fprintf(fid,'%d\t%d\t%d\n',i,e(i,1),e(i,2));
