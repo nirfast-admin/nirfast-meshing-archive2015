@@ -19,17 +19,35 @@ end
 p = [data{1} data{2} data{3}];
 
 
-
+tri=0;tet=0;
 while true
     junk = fgetl(fid);
+    if strcmp(junk,'Triangles')
+        tri=1;
+        break
+    end
     if strcmp(junk,'Tetrahedra')
+        tet=1;
         break;
     end
 end
 
-ne = str2num(fgetl(fid));
+if tri==1
+    nt = str2num(fgetl(fid));
+    textscan(fid,'%d %d %d %d%*[^\n]',nt);
+    while ~feof(fid)
+        junk = fgetl(fid);
+        if strcmp(junk,'Tetrahedra')
+            tet=1;
+            break
+        end
+    end
+end
+if tet==1
+    ne = str2num(fgetl(fid));
+    data = textscan(fid,'%d %d %d %d %d%*[^\n]',ne);
+end
 
-data = textscan(fid,'%d %d %d %d %d%*[^\n]',ne);
 fclose(fid);
 
 if length(data{1}) ~= ne
