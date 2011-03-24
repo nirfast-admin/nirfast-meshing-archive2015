@@ -41,7 +41,7 @@ end
 function mask = GetBMPStack(filename)
 
 [path fnprefix num_flag myext startn endn] = GetFilenameNumbering(filename);
-if num_flag==0
+if num_flag==-1
     errordlg('You need more than one 2D mask to create a surface','Meshing Error');
     error('You need more than one 2D mask to create a surface');
 end
