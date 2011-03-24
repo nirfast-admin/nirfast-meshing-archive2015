@@ -15,11 +15,11 @@ if idx
     idx = regexpi(foo,['[0-9]+' ext '\>']);
     num_flag = str2num(foo(idx:end-4));
 else
-    num_flag=0;
+    num_flag=-1;
 end
 
 startn=[]; endn = [];
-if num_flag == 0, return, end
+if num_flag == -1, return, end
 startn = num_flag;
 idx = num_flag;
 while true

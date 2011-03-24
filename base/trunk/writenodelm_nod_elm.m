@@ -77,7 +77,7 @@ else
     error('At least 4 input arguments are required');
 end
 
-
+fn = remove_extension(fn);
 
 f=add_extension(fn,'.node');
 fid = OpenFile(f,'wt');
