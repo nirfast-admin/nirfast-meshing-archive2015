@@ -45,7 +45,8 @@ if strcmpi(myext,'.inp')
     telem = [];
     tnode = [];
     fcounter = num_flag;
-    if num_flag==0
+    if num_flag==-1
+        fcounter=0; num_flag=0;
         fn = [fnprefix '.inp'];
     else
         fn = [fnprefix num2str(fcounter) '.inp'];
@@ -91,7 +92,7 @@ elseif strcmpi(myext,'.ele')
 %     is the default output of the MMC.m marching cube algorithm.
 %     This routine assumes that the smallest region id (excluding 0) is the
 %     id for the most exterior region which encloses all other sub regions
-    if num_flag~=0
+    if num_flag~=-1
         fnprefix = [fnprefix num2str(num_flag)];
     end
     [telem tnode] = read_nod_elm(fnprefix,1);
