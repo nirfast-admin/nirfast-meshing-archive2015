@@ -22,7 +22,6 @@ if ~isempty(strfind(os,'PCWIN')) % Windows
     else
         suff='';
     end
-    
     systemcommand = which([command_name suff '.exe']);
 elseif ~isempty(strfind(os,'MAC')) % Mac OS
     if strcmpi(os,'MACI64')

@@ -94,8 +94,9 @@ if nnpe==3
             case 1
                 status.b=1;
                 if verbose, 
-                    fprintf('\n Some of mesh edges are shared by more than two triangles! (multiple material mesh ?!)\n');
-                    fprintf(' Please check all the diagnostic results stored in %s.txt files.\n',fn);
+                    fprintf('\n Some of mesh edges are shared by more than two triangles!\n');
+                    fprintf(' This can be caused by a non-manifold mesh or a multi-region one.\n');
+                    fprintf(' Please check all the diagnostic results stored in SurfaceMesh-InvalidEdges.txt file.\n');
                 end
             case 2
                 status.b=2;

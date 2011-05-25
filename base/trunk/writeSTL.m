@@ -35,7 +35,7 @@ end
 fclose(fid);
 
 [mypath myfn myext]=fileparts(filename);
-fprintf('\b%s','Done writing surface mesh to:')
+fprintf('\b%s\n','Done writing surface mesh to:')
 if ~isempty(mypath)
     fprintf('\t%s',['Path: ' mypath])
 end
