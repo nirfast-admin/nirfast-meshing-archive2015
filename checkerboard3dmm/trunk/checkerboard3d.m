@@ -141,8 +141,9 @@ P = zeros(nrow,ncol,npln,'int8');
 [PP] = TagBoundary3d(p,e,ds,dx,dy,dz,llc,myargs);
 
 noPLCp = size(p,1);
-
+warning('off','MATLAB:DELETE:FileNotFound');
 delete('input4delaunay.*','junk.txt');
+warning('on','MATLAB:DELETE:FileNotFound');
 
 % Write input files for delaunaygen
 writenodes_tetgen('input4delaunay.a.node',PP);

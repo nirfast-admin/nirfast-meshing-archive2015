@@ -130,7 +130,9 @@ myargs.extelem=extelem;
 clear output
 %% Call the main checkerboard3d routine
 [mesh.elements, mesh.nodes] = checkerboard3d(telem(:,1:3),tnode,myargs);
+warning('off','MATLAB:DELETE:FileNotFound');
 delete('input4delaunay.*','junk.txt');
+warning('on','MATLAB:DELETE:FileNotFound');
 
 %% Write NIRFAST-format mesh files
 mesh.dimension = 3;
