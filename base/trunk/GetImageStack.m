@@ -1,6 +1,6 @@
-function mask = GetImageStack(filename,param)
+function [mask info] = GetImageStack(filename,param)
 % Tries to read all the 2D image files whose file name is 'filename' plus
-% an incremental numbering.
+% an incremental numbering. Also it can read an image stack from Meta
 % It returns a 3D matrix of 'int16' type.
 % If param.pad is non-zero, it will add zero padding to four sides of each
 % 2D image.
@@ -53,8 +53,11 @@ if num_flag~=-1 && ~strcmpi(myext,'.mha')
             mask(:,:,i) = a; % flipdim(a,1);
         end
     end
+    info.NumberOfDimensions = 3;
+    info.Dimensions = [nrow ncol endn-startn+1];
 else
-    mask = mha_read_volume(filename);
+    info = mha_read_header(filename);
+    mask = mha_read_volume(info);
 end
 
 fprintf(' done.\n');
