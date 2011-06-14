@@ -1,7 +1,9 @@
-function writeVTK(fn,e,p)
+function writeVTK(fn,e,p,varargin)
 
 if size(e,2)==3
     writevtk_polydata(fn,e,p)
+elseif size(e,2)==4
+    writenodelm_vtk_mesh(fn,e,p,varargin)
 else
     error('Can not handle this type of mesh')
 end

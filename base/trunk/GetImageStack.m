@@ -6,9 +6,13 @@ function [mask info] = GetImageStack(filename,param)
 % 2D image.
 
 pad = 0;
+medfilter = 0;
 if nargin==2
     if isfield(param,'pad') && param.pad ~= 0
         pad = 1;
+    end
+    if isfield(param,'medfilter') && param.medfilter ~= 0
+        medfilter = 1;
     end
 end
 [path fnprefix num_flag myext startn endn] = GetFilenameNumbering(filename);
@@ -45,8 +49,9 @@ if num_flag~=-1 && ~strcmpi(myext,'.mha')
         if ndims(a)==3
             a=rgb2gray(a);
         end
-        a(234:end,1:65)=0;
-        a(234:end,199:end)=0;
+        if medfilter == 1
+            a = medfilt2(a,[5 5]);
+        end
         if pad == 1
             mask(2:end-1,2:end-1,i) = a; % flipdim(a,1);
         else
