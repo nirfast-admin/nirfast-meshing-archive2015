@@ -6,6 +6,7 @@ function [mask info] = GetImageStack(filename,param)
 % 2D image.
 
 pad = 0;
+info=[];
 medfilter = 0;
 if nargin==2
     if isfield(param,'pad') && param.pad ~= 0
