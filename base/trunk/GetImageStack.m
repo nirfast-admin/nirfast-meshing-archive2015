@@ -66,5 +66,4 @@ else
     mask = mha_read_volume(info);
 end
 
-fprintf(' done.\n');
 
