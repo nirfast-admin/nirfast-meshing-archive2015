@@ -14,8 +14,6 @@ function saveinr(vol,fname,stackInfo)
 %      vol: input, a binary volume
 %      fname: output file name
 %
-% -- this function is part of iso2mesh toolbox (http://iso2mesh.sf.net)
-%
 
 fname = add_extension(fname,'.inr');
 fid=fopen(fname,'wb');

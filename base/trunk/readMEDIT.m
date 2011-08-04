@@ -1,6 +1,6 @@
-function [e p] = readMEDIT(fn)
+function [e p tris_] = readMEDIT(fn)
 % Reads mesh form a .mesh file formatted in MEDIT style
-
+tris_=[];
 fid = OpenFile(fn,'rt');
 
 while true
@@ -34,7 +34,8 @@ end
 
 if tri==1
     nt = str2num(fgetl(fid));
-    textscan(fid,'%d %d %d %d%*[^\n]',nt);
+    tris_ = textscan(fid,'%d %d %d %d%*[^\n]',nt);
+    tris_ = [tris_{1} tris_{2} tris_{3} tris_{4}];
     while ~feof(fid)
         junk = fgetl(fid);
         if strcmp(junk,'Tetrahedra')

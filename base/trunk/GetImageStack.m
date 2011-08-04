@@ -59,6 +59,7 @@ if num_flag~=-1 && ~strcmpi(myext,'.mha')
             mask(:,:,i) = a; % flipdim(a,1);
         end
     end
+    fprintf(' done.\n');
     info.NumberOfDimensions = 3;
     info.Dimensions = [nrow ncol endn-startn+1];
 else
