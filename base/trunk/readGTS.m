@@ -1,4 +1,4 @@
-function [t p] = readGTS(fn)
+function [t p edges] = readGTS(fn)
 % Reads a surface mesh from a file formatted in GNU Triangulated Surface mesh
 
 fid = OpenFile(fn,'rt');

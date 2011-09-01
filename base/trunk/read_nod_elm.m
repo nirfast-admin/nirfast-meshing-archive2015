@@ -35,7 +35,7 @@ if format==1 % tetgen format
     header=textscan(fid,'%u32 %d8 %d8 %d8',1);
     nn=header{1}; dim=header{2}; natt=header{3}; bdymark=header{4};
     if dim==3
-        data  =textscan(fid,'%u32 %f %f %f%*[^\n]');
+        data = textscan(fid,'%u32 %f %f %f%*[^\n]','bufsize',409500);
         p=[data{2} data{3} data{4}];
     elseif dim==2
         data = textscan(fid,'%u32 %f %f%*[^\n]');
@@ -46,7 +46,7 @@ if format==1 % tetgen format
         error('The input .node file is corrupt. Check the header or the last section of .node file.');
     end
 elseif format==2 % .nod, .elm format
-    header=textscan(fid,'%d8 %u32',1);
+    header = textscan(fid,'%d8 %u32',1);
     nn=header{2}; numflag=header{1};
     if numflag~=0
         data=textscan(fid,'%u32 %f %f %f%*[^\n]',1);

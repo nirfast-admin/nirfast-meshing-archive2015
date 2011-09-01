@@ -2,6 +2,8 @@ function writenodelm_abaqus_inp(fn,e,p)
 % Writes list of nodes 'p' and elements 'e' into Abaqus .inp file format.
 % Written By: Hamid Ghadyani
 
+fprintf('Writing data to file... ')
+
 fn = add_extension(fn,'.inp');
 
 [fid,st]=OpenFile(fn,'wt');
@@ -30,4 +32,12 @@ fprintf(fid,'*ELSET, ELSET=f_Surface\n');
 fprintf(fid,'%d\n',1:size(e,1));
 
 fclose(fid);
+
+[mypath myfn myext]=fileparts(fn);
+fprintf('\b%s\n','Done writing surface mesh to:')
+if ~isempty(mypath)
+    fprintf('\t%s\n',['Path: ' mypath])
+end
+fprintf('\t%s\n',['Filename: ' myfn myext])
+
 

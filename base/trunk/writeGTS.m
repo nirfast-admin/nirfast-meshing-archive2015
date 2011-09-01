@@ -12,6 +12,10 @@ function e = writeGTS(fn,t,p)
 %     error('Can only handle triangulated surfaces.')
 % end
 
+
+fn = remove_extension(fn);
+fn = [fn '.gts'];
+
 fprintf('Writing data to file... ')
 
 nt = size(t,1);
