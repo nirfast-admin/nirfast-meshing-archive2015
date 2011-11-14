@@ -44,6 +44,7 @@ q_area=0;
 edgeflag=0;
 q_area_threshold=0.1;
 status.a=0; status.b=0; status.c=0;
+
 global TetrahedronFailQuality
 if isempty(TetrahedronFailQuality)
     TetrahedronFailQuality=0.03;

@@ -1,10 +1,17 @@
-function writenodelm_surface_medit(fn,faces,p,nodemap)
+function writenodelm_surface_medit(fn,faces,p,nodemap,verbose)
 % writenodelm_surface_medit(fn,faces,p,nodemap)
 % Writes a shell surface defined in 'faces' and 'p' to a file called 'fn'
 % in medit format (.mesh) so it can be viewed using medit.
 % Note that this routine renumbers the node numbers from 1 to N and accordingly
 % adjust the node numbers in face list.
-fprintf('%s','Writing data to file... ')
+
+if nargin<5
+    verbose=1;
+end
+
+if verbose
+    fprintf('%s','Writing data to file... ')
+end
 
 ref=0;
 face_att=1;
@@ -62,8 +69,10 @@ fclose(fid);
 
 
 [mypath myfn myext]=fileparts(fn);
-fprintf('\b%s\n','Done writing surface mesh to:')
-if ~isempty(mypath)
-    fprintf('\t%s\n',['Path: ' mypath])
+if verbose
+    fprintf('\b%s\n','Done writing surface mesh to:')
+    if ~isempty(mypath)
+        fprintf('\t%s\n',['Path: ' mypath])
+    end
+    fprintf('\t%s\n',['Filename: ' myfn myext])
 end
-fprintf('\t%s\n',['Filename: ' myfn myext])

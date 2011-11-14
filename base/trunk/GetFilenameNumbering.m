@@ -7,8 +7,14 @@ function [path fnprefix num_flag ext startn endn] = GetFilenameNumbering(filenam
 [path fname ext]=fileparts(filename);
 idx = regexpi([fname ext],['[0-9]+' ext '\>']);
 
+% File name starts with a number try to see if there are files like
+% 3245_1.bmp, 3245_2.bmp, ...
+if idx==1
+    idx = regexpi([fname ext],['_[0-9]+' ext '\>']);
+end
+
 fnprefix = fname;
-if idx
+if ~isempty(idx) && idx
     fnprefix = fname(1:(idx(end)-1));
     foo = dir([fullfile(path,fnprefix) '*' ext]);
     foo = foo(1).name;

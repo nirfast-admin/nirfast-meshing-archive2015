@@ -17,7 +17,7 @@ if length(data{1}) ~= nn
 end
 
 p = [data{1} data{2} data{3}];
-
+clear data;
 
 tri=0;tet=0;
 while true
@@ -35,6 +35,9 @@ end
 if tri==1
     nt = str2num(fgetl(fid));
     tris_ = textscan(fid,'%d %d %d %d%*[^\n]',nt);
+    if length(tris_{1}) ~= nt
+        error('Expecting %d faces, but got %d instead!\n', nt, length(tris_{1}));
+    end
     tris_ = [tris_{1} tris_{2} tris_{3} tris_{4}];
     while ~feof(fid)
         junk = fgetl(fid);
@@ -44,15 +47,18 @@ if tri==1
         end
     end
 end
+
 if tet==1
     ne = str2num(fgetl(fid));
     data = textscan(fid,'%d %d %d %d %d%*[^\n]',ne);
+    if length(data{1}) ~= ne
+        error('Expecting %d elements, but got %d instead!\n', ne, length(data));
+    end
+    e = [data{1} data{2} data{3} data{4} data{5}];
+else
+    e = tris_;
 end
 
 fclose(fid);
 
-if length(data{1}) ~= ne
-    error('Expecting %d faces, but got %d instead!\n', ne, length(data));
-end
 
-e = [data{1} data{2} data{3} data{4} data{5}];
