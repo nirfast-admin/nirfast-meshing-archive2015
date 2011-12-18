@@ -1,12 +1,18 @@
 function [t p] = readVTK(fn)
+% This is a basic VTK reader that is intended to read meshes with uniform
+% number of nodes per elements (ex. triangular surface or tetrahedral
+% meshes)
+% Written by Hamid Ghadyani
 
 fn = add_extension(fn,'.vtk');
 
 fid = OpenFile(fn,'rt');
 
 s = fgetl(fid);
-if isempty(regexp(s,'Version 3\.0', 'once'))
-    error('Can only read version 2.0 if vtk file format.')
+if isempty(regexp(s,'Version 3\.0', 'once')) &&...
+        isempty(regexp(s,'Version 2\.0', 'once')) && ...
+        isempty(regexp(s,'Version 1\.0', 'once'))
+    error('Can only read versions 2.0 or 3.0 of vtk file format.')
 end
 s = fgetl(fid);
 s = fgetl(fid);
@@ -16,8 +22,12 @@ if ~strcmp(s,'ASCII')
 end
 
 s = fgetl(fid);
+while isempty(s)
+    s = fgetl(fid);
+end
 tmp = sscanf(s,'%*s%s');
-if ~strcmp(tmp,'POLYDATA')
+% if 
+if ~strcmp(tmp,'UNSTRUCTURED_GRID') && ~strcmp(tmp,'POLYDATA')
     error(['Can not read dataset of type: ' tmp])
 end
 
@@ -32,7 +42,7 @@ p=zeros(nn*3,1);
 s = fgetl(fid);
 sidx = 1;
 
-while ~strcmp(sscanf(s,'%s',1),'POLYGONS')
+while ~strcmp(sscanf(s,'%s',1),'CELLS') && ~strcmp(sscanf(s,'%s',1),'POLYGONS')
     tmp = textscan(s,'%f');
     tmp=tmp{1};
     eidx = sidx + length(tmp) - 1;
@@ -45,13 +55,23 @@ while ~strcmp(sscanf(s,'%s',1),'POLYGONS')
 end
 p = (reshape(p,3,nn))';
 
-ne = str2double(sscanf(s,'%*s%s'));
-
-data = textscan(fid,'%d %d %d %d');
+if strcmp(sscanf(s,'%s',1),'CELLS')
+    kw = 'CELLS';
+else
+    kw = 'POLYGONS';
+end
+tmp = textscan(s,[kw '%d %d']);
+ne = tmp{1}; totent = tmp{2};
+nnpe = totent/ne - 1;
+fmtstr = repmat('%d',1,nnpe);
+data = textscan(fid,['%*d' fmtstr]);
 if length(data{1}) ~= ne
     error('Can not parse the vtk file.')
 end
-t = [data{2} data{3} data{4}];
+t=zeros(ne,nnpe,'uint32');
+for i=1:nnpe
+    t(:,i) = data{i};
+end
 t=t+1;
 fclose(fid);
 

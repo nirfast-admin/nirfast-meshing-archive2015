@@ -25,7 +25,7 @@ fprintf(fid, '%.18f %.18f %.18f\n', nodes');
 
 line5 = ['CELLS ',num2str(numelems),' ',num2str(numelems*4+numelems)]; %connectivity maps
 fprintf(fid,'%s\n',line5);
-fprintf(fid,'%d %d %d %d %d\n',[4*ones(numelems,1) elems-1]');
+fprintf(fid,'%d %d %d %d %d\n',[4*ones(numelems,1) elems(:,1:4)-1]');
 line6 = ['CELL_TYPES ', num2str(numelems)]; %specify the mesh basis 10-tetrahedral for all connectivity maps 
 fprintf(fid,'%s\n',line6);
 fprintf(fid,'%d\n', ones(numelems,1)*10);
@@ -38,5 +38,13 @@ if nargin>3 && ~isempty(soldata)
         fprintf(fid,'%s\n','LOOKUP_TABLE default');
         fprintf(fid,'%f\n', soldata{2}(:,i));
     end;
+end
+
+if size(elems,2)>4
+    fprintf(fid,'CELL_DATA %d\n', numelems);
+    fprintf(fid,'SCALARS materials float 1\n');
+    fprintf(fid,'LOOKUP_TABLE default\n');
+    fprintf(fid,'%f\n', elems(:,5));
+
 end
 fclose(fid);
