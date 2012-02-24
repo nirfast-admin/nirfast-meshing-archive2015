@@ -140,17 +140,18 @@ P = zeros(nrow,ncol,npln,'int8');
 % Tag the 'pixels' inside P and create nodes for each tagged pixel
 [PP] = TagBoundary3d(p,e,ds,dx,dy,dz,llc,myargs);
 
+tmpath=getuserdir();
 noPLCp = size(p,1);
 warning('off','MATLAB:DELETE:FileNotFound');
-delete('input4delaunay.*','junk.txt');
+delete([tmpath filesep 'input4delaunay.*'],[tmpath filesep 'junk.txt']);
 warning('on','MATLAB:DELETE:FileNotFound');
 
 % Write input files for delaunaygen
-writenodes_tetgen('input4delaunay.a.node',PP);
+writenodes_tetgen([tmpath filesep 'input4delaunay.a.node'],PP);
 if isfield(myargs,'regions') && ~isempty(myargs.regions)
-    writenodelm_poly3d('input4delaunay',e,p,[],[],myargs.regions,1,[]);
+    writenodelm_poly3d([tmpath filesep 'input4delaunay'],e,p,[],[],myargs.regions,1,[]);
 else
-    writenodelm_poly3d('input4delaunay',e,p,[],[],[],1,[]);
+    writenodelm_poly3d([tmapth filesep 'input4delaunay'],e,p,[],[],[],1,[]);
 end
 
 delaunaycommand = 'delaunaygen';
@@ -158,17 +159,16 @@ systemcommand = GetSystemCommand(delaunaycommand);
 
 fprintf('\n---------> Running Delaunay, please wait...');
 
-delaunay_cmd=['! "' systemcommand '" -pqigVYYA' ' input4delaunay' '.poly > junk.txt'];
+delaunay_cmd=['! "' systemcommand '" -pqigVYYA ' tmpath filesep 'input4delaunay' '.poly > ' tmpath filesep 'junk.txt'];
 eval(delaunay_cmd);
-if ~exist('input4delaunay.1.ele','file')
+if ~exist([tmpath filesep 'input4delaunay.1.ele'],'file')
     errordlg(' Delaunay Generator failed. Check your input surface mesh.','Meshing Error');
     error(' Delaunay Generator failed. Check your input surface mesh.')
 end
 
 fprintf(' done. <---------\n\n');
 
-
-[tets,points_from_tetgen,nodemap_fromtetgen]=read_nod_elm('input4delaunay.1.',1);
+[tets,points_from_tetgen,nodemap_fromtetgen]=read_nod_elm([tmpath filesep 'input4delaunay.1.'],1);
 
 
 function [PP] = TagBoundary3d(p,t,ds,dx,dy,dz,llc,myargs)
@@ -189,7 +189,17 @@ shell_normals=shell_normals./repmat(norm_len,1,3);
 [P]=ExpandBoundaryBufferZone(t,p,P,shell_normals,ds,[dx dy dz],llc);
 clear mex
 fprintf('\t Tagging interior nodes... ');
-interior_p0 = tag_checkerboard3d_mex(P, [dx dy dz], [xmin ymin zmin], ds, 0, 1);
+
+if isfield(myargs,'gradingflag') && myargs.gradingflag ~= 0
+    grading_flag = 1;
+    grading_rate = 0.75;
+else
+    grading_flag = 0;
+    grading_rate = 0;
+end
+% [nodes] = tag_checkerbaord3d_mex(P, delta, llc, ds, grading_flag, grading_rate)
+interior_p0 = tag_checkerboard3d_mex(P, [dx dy dz], [xmin ymin zmin], ds, grading_flag, grading_rate);
+
 fprintf('done\n');
 
 t=double(myargs.extelem(:,1:3));

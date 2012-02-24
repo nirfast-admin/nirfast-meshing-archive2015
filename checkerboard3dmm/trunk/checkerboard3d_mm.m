@@ -1,4 +1,4 @@
-function mesh = checkerboard3d_mm(filename, type, edgesize)
+function mesh = checkerboard3d_mm(filename, type, edgesize, gradingflag)
 % checkerbaord3d_mm(fnprefix, type)
 % Reads input surfaces which are either in .inp format (Mimics exported in Abaqus
 % file format) or .ele format (tetgen format) and then generates a 3D 
@@ -117,9 +117,15 @@ telem=telem(ix,:);
 myargs.silentflag=1;
 myargs.bdyfn = fnprefix;
 myargs.regions = tags;
-if nargin==3
+if nargin>=3 && ~isempty(edgesize)
     myargs.edgesize = edgesize;
 end
+if nargin>=4 && ~isempty(gradingflag)
+    myargs.gradingflag = gradingflag;
+elseif nargin>=4 && isempty(gradingflag)
+    myargs.gradingflag = 0;
+end
+
 % Remove the following line to create a mesh based on average size of the
 % input surfaces
 % myargs.edgesize = 4.1;
@@ -130,8 +136,9 @@ myargs.extelem=extelem;
 clear output
 %% Call the main checkerboard3d routine
 [mesh.elements, mesh.nodes] = checkerboard3d(telem(:,1:3),tnode,myargs);
+tmpath=getuserdir();
 warning('off','MATLAB:DELETE:FileNotFound');
-delete('input4delaunay.*','junk.txt');
+delete([tmpath filesep 'input4delaunay.*'],[tmpath filesep 'junk.txt']);
 warning('on','MATLAB:DELETE:FileNotFound');
 
 %% Write NIRFAST-format mesh files
