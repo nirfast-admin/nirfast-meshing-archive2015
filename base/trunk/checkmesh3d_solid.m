@@ -1,10 +1,12 @@
-function [vol,vol_ratio,zeroflag]=checkmesh3d_solid(e,p,type,nodemap)
+function [vol,vol_ratio,zeroflag,badfaces]=checkmesh3d_solid(e,p,type,nodemap)
 % If type=0 then it will only check the volume of each tet, otherwise it
 % will also check the quality and output some general ifno
-global TetrahedronFailQuality
+global TetrahedronFailQuality TetrahedronZeroVol
 if isempty(TetrahedronFailQuality)
     TetrahedronFailQuality=0.03;
 end
+badfaces = [];
+
 ntet=size(e,1); np=size(p,1);
 os=computer;
 if ~isempty(strfind(os,'PCWIN')) % Windows
@@ -45,82 +47,46 @@ if sum(bf)~=0
     error('Some of the tets are using nodes that are not defined in node list!');
 end
 
-global tiny
-if isempty(tiny)
-    bbx=[min(p(:,1)) min(p(:,2)) min(p(:,3)) ...
-        max(p(:,1)) max(p(:,2)) max(p(:,3))];
-    for i=1:3
-        temp(i)=bbx(i+3)-bbx(i);
-    end
-    tiny=max(temp)*1e-6;
-%     tiny=1e-6;
+
+bbx=[min(p(:,1)) min(p(:,2)) min(p(:,3)) ...
+    max(p(:,1)) max(p(:,2)) max(p(:,3))];
+for i=1:3
+    temp(i)=bbx(i+3)-bbx(i);
+end
+tiny=max(temp)*1e-6;
+if isempty(TetrahedronZeroVol)
+    TetrahedronZeroVol = tiny;
 end
 
 % Getting the min volume and finding all tets that have volumes close to
 % the minimum one
 vol=signed_tetrahedron_vol(e(:,1:4),p(:,1),p(:,2),p(:,3));
 fprintf('Avg Min Max volume: %f %f %f\n',mean(abs(vol)),min(abs(vol)),max(abs(vol)));
+zeroflag = abs(vol) <= TetrahedronZeroVol;
 
 % vol_ratio=quality_vol_ratio(ren_tet,p);
 vol_ratio=simpqual(p,ren_tet,2);
 
-zeroflag=vol_ratio<=TetrahedronFailQuality;
-
-nvoids=sum(zeroflag);
-
-if nvoids~=0
-    disp(['There are ' num2str(nvoids) ' elements with undesirable quality.']);
-    disp('Check voidelements.txt');
-    dlmwrite('voidelements.txt',e(zeroflag,:),'delimiter',' ','newline',newlinech);
-end
-
+qualflag=vol_ratio<=TetrahedronFailQuality;
 if type~=0
-    fprintf('Avg Min Max volume ratio quality: %f %f %f\n',...
+    fprintf('\nAvg Min Max volume ratio quality: %f %f %f\n',...
         mean(vol_ratio), min(vol_ratio), max(vol_ratio));
 end
+nvoids=sum(qualflag);
 
-% check faces to make sure every face is only used by 1 or 2 tetrahedrons
-fprintf('Checking faces..... ')
-faces=[e(:,[1 2 3]);e(:,[1 2 4]);e(:,[2 3 4]);e(:,[1 3 4])];
-faces=sort(faces,2);
-[foo ix jx]=unique(faces,'rows');
-range=1:max(jx);
-vec=histc(jx,range);
-bf=vec>2;
-nbadfaces=sum(bf);
-jx2=range(bf);
-badfaces=foo(jx2,:);
-badtets=[];
-if nbadfaces~=0 % Some of faces are shared by more than tetrahedron: a definite problem
-    fprintf('\t\n------------ Invalid solid mesh! ------------\n')
-    fprintf('\tA total %d faces of the mesh are shared by more than two tetrahedrons!\n',nbadfaces)
-    fprintf('\tThose faces can be found in bad_faces_extra_shared_solid.txt\n')
-    fid = OpenFile('bad_faces_extra_shared_solid.txt','wt');
-    for i=1:nbadfaces
-        fprintf(fid,'Face: %d %d %d\t',badfaces(i,:));
-        [tf idx]=ismember(badfaces(i,:),foo,'rows');
-        MyAssert(vec(idx)>2);
-        tmpjx = jx;
-        fprintf(fid,'Tets: ');
-        for j=1:vec(idx)
-            [tf2 idx2]=ismember(idx,tmpjx);
-            MyAssert(tf2);
-            idx3 = mod(idx2,ntet); if idx3==0, idx3=ntet; end
-            badtets=[badtets idx3];
-            fprintf(fid,'%d ',idx3);
-            tmpjx(idx2)=0;
-        end
-        fprintf(fid,'\n');
-    end
-    fclose(fid);
-    badtets=unique(badtets);
-%     writenodelm_3dm('bad_faces_extra_shared_solid.3dm',e(badtets,:),p);
+if nvoids~=0
+    disp([' There are ' num2str(nvoids) ' elements with undesirable quality.']);
+    disp(' Check voidelements.txt');
+    dlmwrite('voidelements.txt',e(qualflag,:),'delimiter',' ','newline',newlinech);
 end
-fprintf('\bDone\n');
 
-
+[st2 badtets bfaces] = check_tetrahedron_faces(e);
+if st2~=0
+    badfaces.faces = bfaces;
+    badfaces.tets = badtets;
+end
 [foo p]=boundfaces(p,e(:,1:4));
-fprintf('\n\n----> Checking integrity of the surface of the solid mesh...\n')
+fprintf('\n----> Checking integrity of the surface of the solid mesh...\n')
 CheckMesh3D(foo,p);
 fprintf('----> Done.\n\n');
 
