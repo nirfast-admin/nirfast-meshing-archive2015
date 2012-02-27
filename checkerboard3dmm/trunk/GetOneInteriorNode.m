@@ -28,11 +28,14 @@ input_args.verbose=0;
 input_args.type=1;
 [junk,junk,junk,myst] = CheckMesh3D(ee,pp,[],input_args);
 
-if isfield(myst,'b') && myst.b~=0 && myst.b~=4
+if isfield(myst,'surface') % && myst.b~=0 && myst.b~=4
 %     writenodelm_surface_medit('foo.mesh',ee,pp)
 %     system('/usr/local/bin/medit foo.mesh')
 %     disp(' ')
-    fprintf('Warning (GetOneInteriorNode.m):\n   The given surface is not closed, single material or manifold!\n');
+    st_ = myst.surface;
+    if bitand(st_,2) || bitand(st_,4)
+        fprintf('Warning (GetOneInteriorNode.m):\n   The given surface is not closed, single material or manifold!\n');
+    end
 end
 
 facets_bbx = GetFacetsBBX(ee,pp);
