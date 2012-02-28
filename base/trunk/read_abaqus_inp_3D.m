@@ -60,6 +60,8 @@ while endflag
         pattern = '%u64, %u64, %u64, %u64%*[^\n]'; % surface mesh
     elseif ~isempty(strfind(s,'TYPE=C3D4'))
         pattern = ' %u64, %u64, %u64, %u64, %u64%*[^\n]'; % solid/tetrahedral mesh
+    else
+        error('read_abaqus_inp_3D: this type of CELL (%s) is not supported.\n',s)
     end
 
     % read element list
