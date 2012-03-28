@@ -17,14 +17,14 @@ if nargin==2
     end
 end
 [path fnprefix num_flag myext startn endn] = GetFilenameNumbering(filename);
-if num_flag==-1 && ~strcmpi(myext,'.mha')
+if num_flag==-1 && ~strcmpi(myext,'.mha') && ~strcmpi(myext,'.mhd')
     errordlg('You need more than one 2D mask to create a surface','Meshing Error');
     error('You need more than one 2D mask to create a surface');
 end
 
 maskloc = fullfile(path,fnprefix);
 
-if num_flag~=-1 && ~strcmpi(myext,'.mha')
+if num_flag~=-1 && ~strcmpi(myext,'.mha') && ~strcmpi(myext,'.mhd')
     foo = dir([maskloc '*' myext]);
     if isempty(foo)
         errordlg({'Can not find BMP files:';[fnprefix '*' myext]},'Meshing Error');

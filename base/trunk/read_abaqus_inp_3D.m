@@ -60,6 +60,8 @@ while endflag
         pattern = '%u64, %u64, %u64, %u64%*[^\n]'; % surface mesh
     elseif ~isempty(strfind(s,'TYPE=C3D4'))
         pattern = ' %u64, %u64, %u64, %u64, %u64%*[^\n]'; % solid/tetrahedral mesh
+    elseif ~isempty(strfind(s,'TYPE=C3D8'))
+        pattern = '%u64, %u64, %u64, %u64, %u64, %u64, %u64, %u64, %u64%*[^\n]'; % Hexahedral mesh
     else
         error('read_abaqus_inp_3D: this type of CELL (%s) is not supported.\n',s)
     end
@@ -70,6 +72,10 @@ while endflag
         surf_elem  = double([data{2} data{3} data{4}]); % surface mesh
     elseif ~isempty(strfind(s,'TYPE=C3D4'))
         elem  = cat(1,elem,double([data{2} data{3} data{4} data{5} ones(size(data{5},1),1)*elset])); % solid/tetrahedral mesh
+        elset = elset + 1;
+    elseif ~isempty(strfind(s,'TYPE=C3D8'))
+        foo = cell2mat(data);
+        elem = cat(1,elem,double([foo(:,2:9) ones(size(foo(:,9),1),1)*elset]));
         elset = elset + 1;
     end
 end
