@@ -88,7 +88,7 @@ if nnpe==3
     qcheck=q_area<q_tri_area_threshold;
     a=sum(qcheck);
     if a~=0
-        if verbose, fprintf(' There are %d faces with low quality (q<%f).\n', a, q_area_threshold);end
+        if verbose, fprintf(' There are %d faces with low quality (q<%f).\n', a, q_tri_area_threshold);end
         status.surface = bitor(status.surface,8);
     end
 elseif nnpe==4
@@ -105,6 +105,11 @@ elseif nnpe==4
         if verbose, fprintf(' There are %d tetrahedrons that have a very low quality (q<%f).\n', a, TetrahedronFailQuality);end
         status.solid = bitor(status.solid,4);
     end
+    [foo p]=boundfaces(p,e(:,1:4));
+    fprintf('\n----> Checking integrity of the surface of the solid mesh...\n')
+    [vol q q_area status1] = CheckMesh3D(foo,p);
+    status.surface = status1.surface;
+    fprintf('----> Done.\n\n');
 end
 
 

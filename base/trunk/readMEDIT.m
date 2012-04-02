@@ -1,4 +1,4 @@
-function [e p tris_] = readMEDIT(fn)
+function [e p tris_ nnpe] = readMEDIT(fn)
 % Reads mesh form a .mesh file formatted in MEDIT style
 tris_=[];
 fid = OpenFile(fn,'rt');
@@ -55,8 +55,10 @@ if tet==1
         error('Expecting %d elements, but got %d instead!\n', ne, length(data));
     end
     e = [data{1} data{2} data{3} data{4} data{5}];
+    nnpe = 4;
 else
     e = tris_;
+    nnpe = 3;
 end
 
 fclose(fid);

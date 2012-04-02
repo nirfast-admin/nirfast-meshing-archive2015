@@ -1,4 +1,4 @@
-function [t p] = readVTK(fn)
+function [t p nnpe] = readVTK(fn)
 % This is a basic VTK reader that is intended to read meshes with uniform
 % number of nodes per elements (ex. triangular surface or tetrahedral
 % meshes)

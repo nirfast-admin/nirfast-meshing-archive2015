@@ -1,4 +1,4 @@
-function [elem, points, surf_elem] = read_abaqus_inp_3D(mesh_fn)
+function [elem, points, surf_elem nnpe] = read_abaqus_inp_3D(mesh_fn)
 % Reads abaqus mesh files exported by Mimics V.13
 % 
 % Written by Hamid Ghadyani, Apr 2010
@@ -58,10 +58,13 @@ while endflag
     if ~isempty(strfind(s,'TYPE=S3'))
         surf_flag=true;
         pattern = '%u64, %u64, %u64, %u64%*[^\n]'; % surface mesh
+        nnpe = 3;
     elseif ~isempty(strfind(s,'TYPE=C3D4'))
         pattern = ' %u64, %u64, %u64, %u64, %u64%*[^\n]'; % solid/tetrahedral mesh
+        nnpe = 4;
     elseif ~isempty(strfind(s,'TYPE=C3D8'))
         pattern = '%u64, %u64, %u64, %u64, %u64, %u64, %u64, %u64, %u64%*[^\n]'; % Hexahedral mesh
+        nnpe = 8;
     else
         error('read_abaqus_inp_3D: this type of CELL (%s) is not supported.\n',s)
     end

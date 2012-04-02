@@ -17,6 +17,7 @@ vec=histc(jx,range);
 
 bf = vec>2 | vec==0;
 
+ntet = size(e,1);
 nbadfaces=sum(bf);
 jx2=range(bf);
 badfaces=foo(jx2,:);

@@ -85,8 +85,4 @@ if st2~=0
     badfaces.faces = bfaces;
     badfaces.tets = badtets;
 end
-[foo p]=boundfaces(p,e(:,1:4));
-fprintf('\n----> Checking integrity of the surface of the solid mesh...\n')
-CheckMesh3D(foo,p);
-fprintf('----> Done.\n\n');
 
