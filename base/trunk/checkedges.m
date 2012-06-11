@@ -21,16 +21,22 @@ elseif ~isempty(strfind(os,'MAC')) ||  ~isempty(strfind(os,'GLNX')) % Mac OS or 
     newlinech ='unix';
 end
 
+if ~canwrite(pwd)
+    savepath = tempdir;
+    fprintf(' No write access to %s\n Writing mesh edge diagnostics here instead: %s\n',pwd,savepath);
+else
+    savepath = pwd;
+end
 
 if sumb~=0 % Some edges are used only once.
-    dlmwrite('SurfaceMesh-InvalidEdges.txt',edges(b,:),'delimiter',' ','newline',newlinech);
+    dlmwrite([savepath 'SurfaceMesh-InvalidEdges.txt'],edges(b,:),'delimiter',' ','newline',newlinech);
     retflag=2;
 end
 if sumc~=0 % Some esges are used more than twice
     if sumb~=0
-        dlmwrite('SurfaceMesh-InvalidEdges.txt',edges(c,:),'delimiter',' ','-append','newline',newlinech);
+        dlmwrite([savepath 'SurfaceMesh-InvalidEdges.txt'],edges(c,:),'delimiter',' ','-append','newline',newlinech);
     else
-        dlmwrite('SurfaceMesh-InvalidEdges.txt',edges(c,:),'delimiter',' ','newline',newlinech);
+        dlmwrite([savepath 'SurfaceMesh-InvalidEdges.txt'],edges(c,:),'delimiter',' ','newline',newlinech);
     end
     if retflag==2
         retflag=3;

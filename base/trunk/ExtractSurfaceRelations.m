@@ -11,17 +11,21 @@ function mesh = ExtractSurfaceRelations(fnprefix, no_regions)
 % ...
 % fnprefixno_regions.node fnprefixno_regions.ele
 
-if exist('surface_relations.txt','file')
-    delete('surface_relations.txt');
-end
+warning('off','MATLAB:DELETE:FileNotFound');
+delete('surface_relations.txt');
+warning('on','MATLAB:DELETE:FileNotFound');
+
 fprintf('\tSurface detection, please wait... ');
 clear mex
+mypwd = pwd;
+cd(tempdir);
 myst = surface_relations_mex(fnprefix,no_regions,2);
 if myst~=0 
     fprintf('\n  Can not establish spatial relation between input surfaces!\n');
     error('  Aborting...');
 end
 relations = textread('surface_relations.txt');
+cd(mypwd);
 
 region_id=zeros(no_regions,1);
 idcounter=1;

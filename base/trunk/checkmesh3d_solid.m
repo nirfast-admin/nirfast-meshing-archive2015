@@ -75,9 +75,10 @@ end
 nvoids=sum(qualflag);
 
 if nvoids~=0
-    disp([' There are ' num2str(nvoids) ' elements with undesirable quality.']);
-    disp(' Check voidelements.txt');
-    dlmwrite('voidelements.txt',e(qualflag,:),'delimiter',' ','newline',newlinech);
+    voidfn = [tempdir 'voidelements.txt'];
+    fprintf(' There are %d elements with undesirable quality.\n', nvoids);
+    fprintf(' Check %s.\n',voidfn);
+    dlmwrite(voidfn,e(qualflag,:),'delimiter',' ','newline',newlinech);
 end
 
 [st2 badtets bfaces] = check_tetrahedron_faces(e);

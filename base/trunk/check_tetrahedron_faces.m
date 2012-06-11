@@ -25,8 +25,8 @@ badtets=[];
 if nbadfaces~=0 % Some of faces are shared by more than tetrahedron: a definite problem
     fprintf('\t\n------------ Invalid solid mesh! ------------\n')
     fprintf('\tA total %d faces of the mesh are shared by more than two tetrahedrons!\n',nbadfaces)
-    fprintf('\tThose faces can be found in $HOME/bad_faces_extra_shared_solid.txt\n')
-    fid = OpenFile([getuserdir filesep 'bad_faces_extra_shared_solid.txt'],'wt');
+    fprintf(['\tThose faces can be found in ' tempdir 'bad_faces_extra_shared_solid.txt\n'])
+    fid = OpenFile([tempdir 'bad_faces_extra_shared_solid.txt'],'wt');
     for i=1:nbadfaces
         fprintf(fid,'Face: %d %d %d\t',badfaces(i,:));
         [tf idx]=ismember(badfaces(i,:),foo,'rows');
