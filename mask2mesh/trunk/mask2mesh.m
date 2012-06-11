@@ -74,7 +74,7 @@ edge_size = edge_size/pixel_dim;
 mask=flipdim(a,1);
 
 % Create a 2D boundary for the exterior of the mask
-foofn = [fn '_ext'];
+foofn = [tempdir filesep 'image2mesh2D' '_ext'];
 [extb_e, extb_p] = GetExteriorBoundary(mask,edge_size);
 write_nodelm_poly2d(foofn,extb_e(:,1:2),extb_p(:,1:2));
 
@@ -92,7 +92,7 @@ if exist([foofn '.1.node'],'file')
     delete([foofn '.1.node'])
 end
 % Run the mesh generator
-eval(['! "' syscommand '" -pqAa' num2str(tri_area/pixel_dim) ' "' foofn '.poly" > junk.txt']);
+eval(['! "' syscommand '" -pqAa' num2str(tri_area/pixel_dim) ' "' foofn '.poly" > ' tempdir filesep 'junk.txt']);
 [mesh_e,mesh_p]=read_nod_elm([foofn '.1.'],1);
 delete([foofn '.1.ele']);  delete([foofn '.1.node']);
 
