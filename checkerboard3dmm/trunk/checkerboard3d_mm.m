@@ -1,4 +1,4 @@
-function mesh = checkerboard3d_mm(filename, type, edgesize, gradingflag)
+function mesh = checkerboard3d_mm(filename, type, edgesize, gradingflag,savefn)
 % checkerbaord3d_mm(fnprefix, type)
 % Reads input surfaces which are either in .inp format (Mimics exported in Abaqus
 % file format) or .ele format (tetgen format) and then generates a 3D 
@@ -16,7 +16,18 @@ if nargin==0
                              'Please select a 3D surface mesh file',...
                              'MultiSelect','off');
     filename =[pname fname];
+    saveloc = pname;
 end
+
+if nargin < 5 || isempty(savefn)
+    savefn = tempdir;
+end
+
+[saveloc fn1 ext1] = fileparts(savefn);
+if isempty(saveloc)
+    saveloc = pwd;
+end
+
 [path fnprefix num_flag myext] = GetFilenameNumbering(filename);
 fnprefix=fullfile(path,fnprefix);
 
@@ -51,14 +62,14 @@ if strcmpi(myext,'.inp')
     else
         fn = [fnprefix num2str(fcounter) '.inp'];
     end
-    
+
     newmatc = 1;
     tags={};
     while true
         fid = fopen(fn,'rt');
         if fid < 0, break; end
         fclose(fid);
-        [celem,cnode] = abaqus2nodele_surface(fn);
+        [celem,cnode] = abaqus2nodele_surface(fn,saveloc);
         if fcounter == num_flag
             extelem = celem;
         end
@@ -122,8 +133,26 @@ if nargin>=3 && ~isempty(edgesize)
 end
 if nargin>=4 && ~isempty(gradingflag)
     myargs.gradingflag = gradingflag;
-elseif nargin>=4 && isempty(gradingflag)
+elseif (nargin < 4)  || (nargin>=4 && isempty(gradingflag))
     myargs.gradingflag = 0;
+end
+
+if myargs.gradingflag
+    volf1 = 0.8;
+    volf2 = 1.2;
+else
+    volf1 = 1;
+    volf2 = 1;
+end
+if isfield(myargs,'regions') && ~isempty(myargs.regions)
+    for i=1:size(myargs.regions,1)
+        foo = myargs.regions{i,2};
+        if i==1, volfactor = volf1; else volfactor = volf2; end
+        if length(foo) < 2
+            foo = [foo volfactor];
+            myargs.regions{i,2} = foo;
+        end
+    end
 end
 
 % Remove the following line to create a mesh based on average size of the
@@ -136,7 +165,9 @@ myargs.extelem=extelem;
 clear output
 %% Call the main checkerboard3d routine
 [mesh.elements, mesh.nodes] = checkerboard3d(telem(:,1:3),tnode,myargs);
-tmpath=getuserdir();
+[mesh.elements(:,1:4) mesh.nodes] = remove_unused_nodes(mesh.elements(:,1:4), mesh.nodes);
+
+tmpath=tempdir;
 warning('off','MATLAB:DELETE:FileNotFound');
 delete([tmpath filesep 'input4delaunay.*'],[tmpath filesep 'junk.txt']);
 warning('on','MATLAB:DELETE:FileNotFound');

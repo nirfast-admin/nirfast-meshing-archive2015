@@ -14,7 +14,9 @@ function [tets, points_from_tetgen] = checkerboard3d(e,p,myargs)
 % (material). It also can contain region ID and the volume constraint.
 % regions{:,1} : coordinaets of a point inside the region
 % regions{:,2} : material/attribute ID for the hole and volume constraint.
-% 
+%                if region{:,2} has more than one entity the second one
+%                will be used a scaling factor for the maximum size of a
+%                tetraheron volume in that region
 % myargs.extelem : list of elements of the most exterior surface that
 % encloses all other sub surfaces
 % 
@@ -140,18 +142,31 @@ P = zeros(nrow,ncol,npln,'int8');
 % Tag the 'pixels' inside P and create nodes for each tagged pixel
 [PP] = TagBoundary3d(p,e,ds,dx,dy,dz,llc,myargs);
 
-tmpath=getuserdir();
+tmpath=tempdir;
 noPLCp = size(p,1);
 warning('off','MATLAB:DELETE:FileNotFound');
 delete([tmpath filesep 'input4delaunay.*'],[tmpath filesep 'junk.txt']);
 warning('on','MATLAB:DELETE:FileNotFound');
 
 % Write input files for delaunaygen
+maxtetvol = sqrt(2)/12*edgesize^3;
+inpolyfn = [tmpath filesep 'input4delaunay'];
+junkfn = [tmpath filesep 'junk.txt'];
+
 writenodes_tetgen([tmpath filesep 'input4delaunay.a.node'],PP);
 if isfield(myargs,'regions') && ~isempty(myargs.regions)
-    writenodelm_poly3d([tmpath filesep 'input4delaunay'],e,p,[],[],myargs.regions,1,[]);
+    for i=1:size(myargs.regions,1)
+        ttags = myargs.regions{i,2};
+        if length(ttags) == 1
+            myargs.regions{i,2} = [myargs.regions{i,2} maxtetvol];
+        elseif length(ttags) == 2
+            foo = myargs.regions{i,2};
+            myargs.regions{i,2} = [foo(1) foo(2)*maxtetvol];
+        end
+    end
+    writenodelm_poly3d(inpolyfn,e,p,[],[],myargs.regions,1,[]);
 else
-    writenodelm_poly3d([tmapth filesep 'input4delaunay'],e,p,[],[],[],1,[]);
+    writenodelm_poly3d(inpolyfn,e,p,[],[],[],1,[]);
 end
 
 delaunaycommand = 'delaunaygen';
@@ -159,11 +174,16 @@ systemcommand = GetSystemCommand(delaunaycommand);
 
 fprintf('\n---------> Running Delaunay, please wait...');
 
-delaunay_cmd=['! "' systemcommand '" -pqigVYYA ' tmpath filesep 'input4delaunay' '.poly > ' tmpath filesep 'junk.txt'];
+delaunay_cmd = sprintf('! "%s" -pqgjGViA "%s.poly" > "%s"',systemcommand,inpolyfn,junkfn);
+% delaunay_cmd = sprintf('! "%s" -pq1.5gjGVAa "%s.poly" > "%s"',systemcommand,inpolyfn,junkfn);
 eval(delaunay_cmd);
 if ~exist([tmpath filesep 'input4delaunay.1.ele'],'file')
-    errordlg(' Delaunay Generator failed. Check your input surface mesh.','Meshing Error');
-    error(' Delaunay Generator failed. Check your input surface mesh.')
+    warning(' Delaunay Generator failed. Trying again...');
+    delaunay_cmd = sprintf('! "%s" -pq1.7gjGVAa%.12f "%s.poly" > "%s"',systemcommand,sqrt(2)*maxtetvol,inpolyfn,junkfn);
+    eval(delaunay_cmd);
+    if ~exist([tmpath filesep 'input4delaunay.1.ele'],'file')
+        error(' Delaunay Generator failed again. Check your input setting!')
+    end
 end
 
 fprintf(' done. <---------\n\n');
