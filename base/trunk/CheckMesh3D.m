@@ -107,7 +107,7 @@ elseif nnpe==4
     end
     [foo p]=boundfaces(p,e(:,1:4));
     fprintf('\n----> Checking integrity of the surface of the solid mesh...\n')
-    [vol q q_area status1] = CheckMesh3D(foo,p);
+    [junk q1 q_area1 status1] = CheckMesh3D(foo,p);
     status.surface = status1.surface;
     fprintf('----> Done.\n\n');
 end
