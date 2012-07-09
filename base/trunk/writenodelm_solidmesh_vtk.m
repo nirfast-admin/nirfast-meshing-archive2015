@@ -11,7 +11,7 @@ nodes = p;
 numnodes = size(nodes,1);
 elems = e;
 numelems = size(elems,1);
-if nargin<5 || isempty(nnpe) % assuming tet mesh
+if nargin<5 % assuming tet mesh
     nnpe = 4;
 end
 
@@ -33,7 +33,7 @@ fprintf(fid,'%s\n',line5);
 
 sf = repmat(' %d',1,nnpe); 
 sf = sprintf('%d%s\n',nnpe,sf);
-fprintf(fid, sf, [nnpe*ones(numelems,1) elems(:,1:nnpe)-1]');
+fprintf(fid, sf, (elems(:,1:nnpe)-1)');
 
 % cell id: right now we support tet and hex only
 if nnpe == 4

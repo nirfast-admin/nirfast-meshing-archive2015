@@ -1,10 +1,14 @@
 function writenodelm_surface_vtk(fn,t,p)
 % writenodelm_vtk_surface(fn,t,p)
 % Writes the surface defined in 't' and 'p' to a file called 'fn'
-% 
+% This routine renumbers elements before writing them.
 % Written by Hamid Ghadyani 2009
 
 fprintf('%s','Writing data to file... ')
+
+nodes = unique(t(:));
+p = p(nodes,:);
+[tf t] = ismember(t,nodes);
 
 fn = add_extension(fn,'.vtk');
 fid=OpenFile(fn,'wt');
