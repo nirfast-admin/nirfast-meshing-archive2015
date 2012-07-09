@@ -9,9 +9,9 @@ function writeVTK(fn,e,p,varargin)
 % 
 
 if size(e,2)==3
-    writenodelm_vtk_surface(fn,e,p)
+    writenodelm_surface_vtk(fn,e,p)
 elseif size(e,2)>=4
-    writenodelm_vtk_mesh(fn,e,p,varargin)
+    writenodelm_solidmesh_vtk(fn,e,p,varargin)
 else
     error('Can not handle this type of mesh')
 end

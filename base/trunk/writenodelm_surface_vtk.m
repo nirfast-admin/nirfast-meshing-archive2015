@@ -1,14 +1,15 @@
-function writenodelm_vtk_surface(fn,t,p)
-% writenodelm_vtk_solid(fn,tet,p)
-% Writes the mesh defined in 'tet' and 'p' to a file called 'fn'
-% It will renumber the nodes from 1 to N
+function writenodelm_surface_vtk(fn,t,p)
+% writenodelm_vtk_surface(fn,t,p)
+% Writes the surface defined in 't' and 'p' to a file called 'fn'
+% 
+% Written by Hamid Ghadyani 2009
 
 fprintf('%s','Writing data to file... ')
 
 fn = add_extension(fn,'.vtk');
 fid=OpenFile(fn,'wt');
 
-t=t(:,1:3);
+nnpe = size(t,2);
 np = size(p,1); ne = size(t,1);
 
 [mypath myfn myext]=fileparts(fn);
@@ -23,8 +24,11 @@ fprintf(fid,'POINTS %d double\n',np);
 fprintf(fid,'%.18f %.18f %.18f\n',p');
 fprintf(fid,'\n');
 
-fprintf(fid,'POLYGONS %d %d\n',ne,4*ne);
-fprintf(fid,'3 %d %d %d\n',(t-1)');
+sf = repmat(' %d',1,nnpe); 
+sf = sprintf('%d%s\n',nnpe,sf);
+
+fprintf(fid,'POLYGONS %d %d\n',ne,(nnpe+1)*ne);
+fprintf(fid, sf, (t-1)');
 fprintf(fid,'\n');
 
 fclose(fid);
