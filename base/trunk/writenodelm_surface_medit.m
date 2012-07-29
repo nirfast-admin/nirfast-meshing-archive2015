@@ -17,10 +17,7 @@ ref=0;
 face_att=1;
 np=size(p,1); dim=size(p,2);
 nf=size(faces,1);
-if size(faces,2)~=3 && ~isempty(faces)
-    disp('The provided face list is not a triangular facet list!');
-    error('writenodelm_surface_medit() can only write shell surfaces to medit format');
-end
+nnpe = size(faces,2);
 if dim~=3
     error('Input points are not 3D');
 end
@@ -37,33 +34,33 @@ fid=fopen(fn,'wt');
 fprintf(fid,'MeshVersionFormatted 1\r');
 fprintf(fid,'Dimension\n3\nVertices\n%u\r',np);
 
-if nargin==4
-    if size(nodemap,1)==1
-        nn=nodemap';
-    elseif size(nodemap,2)==1
-        nn=nodemap;
-    elseif size(nodemap,2)~=1
-        error('The nodemap list provided should be an n by 1 vector');
-    end
-    [mytflag newfaces]=ismember(faces,nodemap);
-    sum1=sum(mytflag,2);
-    sumbflag=sum1==3;
-    if sum(sumbflag)~=nf % not all vertices of 'faces' are given in nodemap list!
-        disp(' ');
-        disp('writenodelm_surface_medit: Not all vertices of the input face could be found in given nodemap list!')
-        error('writenodelm_surface_medit: faces and nodemap lists are not compatible!')
-    end
-%     newfaces=nodemap(faces);
-%     newfaces=faces;
-else
-    nn=(1:np)';
-    newfaces=faces;
+if nargin == 3 || isempty(nodemap)
+    nn = (1:np)';
+elseif size(nodemap,1)==1
+    nn=nodemap';
+elseif size(nodemap,2)==1
+    nn=nodemap;
+elseif size(nodemap,2)~=1
+    error('The nodemap list provided should be an n by 1 vector');
 end
-% dlmwrite(fn,[nn p],'precision',8,'delimiter',' ','-append','newline',newlinech);
-fprintf(fid,'%.10f %.10f %.10f %d\n',[p(:,1:3) ones(size(p,1),1)*ref]');
-fprintf(fid,'Triangles\n%u\n',nf);
+[mytflag newfaces]=ismember(faces,nn);
+sum1=sum(mytflag,2);
+sumbflag = sum1==nnpe;
+if sum(sumbflag)~=nf % not all vertices of 'faces' are given in nodemap list!
+    fprintf('\nwritenodelm_surface_medit: Not all vertices of the input face could be found in given nodemap list!')
+    error('writenodelm_surface_medit: faces and nodemap lists are not compatible!')
+end
 
-fprintf(fid,'%d %d %d %d\n',[newfaces ones(nf,1)*face_att]');
+fprintf(fid,'%.10f %.10f %.10f %d\n',[p(:,1:3) ones(size(p,1),1)*ref]');
+if nnpe == 3
+    fprintf(fid,'Triangles\n%u\n',nf);
+elseif nnpe == 4
+    fprintf(fid,'Quadrilaterals\n%u\n',nf);
+else
+    error(' this type of element is not supported');
+end
+sf = repmat('%d ',1,nnpe); 
+fprintf(fid,[sf '%d\n'],[newfaces ones(nf,1)*face_att]');
 fprintf(fid,'End\n');
 fclose(fid);
 
