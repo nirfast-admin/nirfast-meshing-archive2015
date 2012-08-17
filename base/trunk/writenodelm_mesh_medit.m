@@ -69,7 +69,7 @@ fprintf(fid,'MeshVersionFormatted 1\n');
 fprintf(fid,'Dimension\n3\nVertices\n%u\n',np);
 
 
-fprintf(fid,'%.12f %.12f %.12f %d\n',[p(:,1:3) ones(np,1,'int8')]');
+fprintf(fid,'%.12f %.12f %.12f %d\n',[p(:,1:3) ones(np,1)]');
 
 if nnpe == 4
     ekeyword = 'Tetrahedra';

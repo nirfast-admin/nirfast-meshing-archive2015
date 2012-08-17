@@ -16,6 +16,16 @@ function [e,p,nodemap,elemap,dim,nnpe]=read_nod_elm(fn,tetgenflag)
 
 e=[];p=[];dim=[];nnpe=[];nodemap=[];elemap=[];
 [path fn ext]=fileparts(fn);
+
+foo = str2double(ext(2:end));
+if ~(isempty(foo) && isnan(foo))
+    fn = [fn ext];
+end
+
+if strcmp(ext,'.')
+    fn = fn(1:end-1);
+end
+
 ext1='.node';
 ext2='.ele';
 format=1;
