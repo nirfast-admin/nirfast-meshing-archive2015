@@ -108,9 +108,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	}
 	#ifdef _mydebug
 	mexPrintf(" Initialized row_state() successfully!\n");
+	mexPrintf("  Tagging Possible Interior Nodes...");
 	#endif
 
-	mexPrintf("  Tagging Possible Interior Nodes...");
+	
 	
 	while (true) {
 		int ii, jj, kk;
@@ -207,10 +208,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 		}
 	}
 	mytimer.stopTimer();
-	mexPrintf(" done!\n");
 	
 	#ifdef _mydebug
 	mexPrintf(" Tagged the pixels successfully\n");
+	//mexPrintf(" done!\n");
 	#endif
 
 	if (no_tagged_pixels==0) {

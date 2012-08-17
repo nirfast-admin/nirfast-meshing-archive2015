@@ -1,11 +1,26 @@
 #ifndef __involume_mex_h
 #define __involume_mex_h
-
-#include <cmath>
 #include "mex.h"
+#include <vector>
+#include <cmath>
+#include <limits>
+#include "vector.h"
+#include <iostream>
+#include <assert.h>
+#include "geomath.h"
+//#include "isinvolume_randRay.h"
+template<class T> inline T sqr(T x) { return (x)*(x); }
+template<class T> inline T length(T x,T y,T z) { return sqrt(sqr(x)+sqr(y)+sqr(z)); }
 
-#include "isinvolume_randRay.h"
+struct points {
+    double c[3];
+};
 
+unsigned char isinvolume_randRay(double *p0, double *pp, unsigned long npp,
+					   double *tt, unsigned long nee, double tiny,
+					   double *myfacets_bbx, int numPerturb, double minX, double maxX,
+					std::vector<ULONG>& int_facets, std::vector<points>& int_points);
+					
 #define _inqp     prhs[0]
 #define _inele    prhs[1]
 #define _innode   prhs[2]
