@@ -14,21 +14,24 @@
 /* times the signed volume of the tetrahedron defined by the   */
 /* four points.                                                */
 
-// To mex under all platforms:
+// To mex under Linux/OSX platforms:
 // mex -v CXXFLAGS="\$CXXFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp" orient3d_mex.cpp meshlib/geomath.cpp meshlib/vector.cpp meshlib/predicates.cpp -I./meshlib
+// Windows:
+// mex -v COMPFLAGS="$COMPFLAGS /openmp" LINKFLAGS="$LINKFLAGS /openmp" -DWIN32  orient3d_mex.cpp meshlib/geomath.cpp meshlib/vector.cpp meshlib/predicates.cpp -I./meshlib
 
-int orient3d(double *pa, double *pb, double *pc, double *pd);
+double orient3d(double *pa, double *pb, double *pc, double *pd);
+double exactinit();
 
 #ifdef _OPENMP
 #include "omp.h"
 #endif
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
-    if (nlhs!=1 || nrhs!=4)
+    if (nlhs!=1 || nrhs<4)
         mexErrMsgTxt("orient3d_mex: needs 4 input and 1 output\n");
     
-    unsigned long nvert = mxGetM(prhs[0]);
-    if (nvert < 1)
+    unsigned long ntets = mxGetM(prhs[0]);
+    if (ntets < 1)
       return;
     if (mxGetM(prhs[0]) != mxGetM(prhs[1]) ||
         mxGetM(prhs[0]) != mxGetM(prhs[2]) ||
@@ -40,8 +43,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     if (mxGetN(prhs[0]) != 3 || mxGetN(prhs[1]) != 3 ||
         mxGetN(prhs[2]) != 3 || mxGetN(prhs[3]) != 3 )
       mexErrMsgTxt("orient3d_mex: need 3D input vertices!\n");
+    
+    //~ double mytinyzero = TinyZero;
+    //~ if (nrhs >= 4)
+        //~ mytinyzero = *(mxGetPr(prhs[4]));
+    //~ mexPrintf("mytinyzero: %g\n", mytinyzero);
 
-    plhs[0] = mxCreateNumericMatrix(nvert, 1, mxINT8_CLASS, mxREAL);
+    plhs[0] = mxCreateNumericMatrix(ntets, 1, mxINT8_CLASS, mxREAL);
     char *c = (char *) mxGetData(plhs[0]);
     long i = 0, j = 0;
     double foo = 0.;
@@ -52,27 +60,33 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
       pc[j] = 0.;
       pd[j] = 0.;
     }
-
+    
+    double myeps = exactinit();
+    //~ mexPrintf("\n myeps: %g\n", myeps);
+    
     #ifdef _OPENMP
     int nt = omp_get_num_procs();
     #endif
     #pragma omp parallel default(none) \
-    firstprivate(i, j, foo, pa, pb, pc, pd) \
-    shared (nvert, prhs, plhs, c, nt)
+    private(i, j, foo, pa, pb, pc, pd) \
+    shared (ntets, prhs, plhs, c, nt, myeps)
     {
-      #pragma omp master
-      mexPrintf("Number of threads: %d\n", nt);
+      #ifdef _OPENMP
+      //~ #pragma omp master
+      //~ mexPrintf("Number of threads: %d\n", nt);
+      #endif
 
       #pragma omp for
-      for (i=0; i<nvert; ++i) {
+      for (i=0; i<ntets; ++i) {
         for (j=0; j<3; ++j) {
-          pa[j] = mxGetPr(prhs[0])[i + j*nvert];
-          pb[j] = mxGetPr(prhs[1])[i + j*nvert];
-          pc[j] = mxGetPr(prhs[2])[i + j*nvert];
-          pd[j] = mxGetPr(prhs[3])[i + j*nvert];
+          pa[j] = mxGetPr(prhs[0])[i + j*ntets];
+          pb[j] = mxGetPr(prhs[1])[i + j*ntets];
+          pc[j] = mxGetPr(prhs[2])[i + j*ntets];
+          pd[j] = mxGetPr(prhs[3])[i + j*ntets];
         }
         foo = orient3d(pa, pb, pc, pd);
-        if (IsEqual(foo, 0., TinyZero))
+        //~ mexPrintf("foo: %g\n", foo);
+        if (IsEqual(foo, 0., myeps))
           *(c+i) = 0;
         else if (foo > 0)
           *(c+i) = 1;

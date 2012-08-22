@@ -1,3 +1,5 @@
 meshlib
 *.pdb
 *.bak
+*.manifest
+*.map
