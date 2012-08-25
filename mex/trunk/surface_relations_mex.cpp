@@ -40,7 +40,7 @@ Windows:
 mex -v -DCPU86 -DWIN32 -I./meshlib surface_relations_mex.cpp isinvolume_randRay.cpp meshlib/geomath.cpp meshlib/vector.cpp meshlib/polyhedron2BSP.cpp meshlib/CPoint.cpp meshlib/CVector.cpp meshlib/Plane3D.cpp meshlib/BSPNode.cpp meshlib/MeshIO.cpp meshlib/FileOperation.cpp meshlib/CPolygon.cpp meshlib/predicates.cpp meshlib/CStopWatch.cpp
 
 Linux:
-mex -v -DCPU86 -DLinux -I./meshlib ssurface_relations_mex.cpp isinvolume_randRay.cpp meshlib/geomath.cpp meshlib/vector.cpp meshlib/polyhedron2BSP.cpp meshlib/CPoint.cpp meshlib/CVector.cpp meshlib/Plane3D.cpp meshlib/BSPNode.cpp meshlib/MeshIO.cpp meshlib/FileOperation.cpp meshlib/CPolygon.cpp meshlib/predicates.cpp meshlib/CStopWatch.cpp
+mex -v -DLINUX -I./meshlib surface_relations_mex.cpp isinvolume_randRay.cpp meshlib/geomath.cpp meshlib/vector.cpp meshlib/polyhedron2BSP.cpp meshlib/CPoint.cpp meshlib/CVector.cpp meshlib/Plane3D.cpp meshlib/BSPNode.cpp meshlib/MeshIO.cpp meshlib/FileOperation.cpp meshlib/CPolygon.cpp meshlib/predicates.cpp meshlib/CStopWatch.cpp
 
 Mac OSX:
 mex -v -I./meshlib                 surface_relations_mex.cpp isinvolume_randRay.cpp meshlib/geomath.cpp meshlib/vector.cpp meshlib/polyhedron2BSP.cpp meshlib/CPoint.cpp meshlib/CVector.cpp meshlib/Plane3D.cpp meshlib/BSPNode.cpp meshlib/MeshIO.cpp meshlib/FileOperation.cpp meshlib/CPolygon.cpp meshlib/predicates.cpp meshlib/CStopWatch.cpp
@@ -168,7 +168,7 @@ std::vector< std::vector<int> > core2(char* fn_prefix, int no_regions) {
 	std::vector<ULONG> int_facets;
     std::vector<points> int_points;
 	bool allin_flag = true, inflag = false, loopflag = true;
-	relations.assign(no_regions,0);
+	//~ relations.assign(no_regions,0);
 	std::vector<int> foo;
 	for (int i=0; i<no_regions; ++i) {
 		mxArray *nodes_i = nodeArray[i];
@@ -392,7 +392,7 @@ std::vector< std::vector<int> > core(std::vector<std::string>&surface_fnames) {
 
 	bool allin_flag = true, inflag = false, loopflag = true;;
 	
-	relations.assign(NumberOfDomains,0);
+	//~ relations.assign(NumberOfDomains,0);
 	std::vector<int> foo;
 	for (int i=0; i<NumberOfDomains; ++i) {
 		double foothk = tree[i].GetPlaneThickness();
