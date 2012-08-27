@@ -1,3 +1,5 @@
+function remove_git_folders_from_path()
+
 c=textscan(path,'%s','delimiter',pathsep);
 toberemoved = '';
 for i=1:length(c{1,1})

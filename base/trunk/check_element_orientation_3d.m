@@ -26,6 +26,10 @@ pd = p(e(:,4),:);
 
 st = orient3d_mex(pa, pb, pc, pd);
 
-bf = st > 0;
+if ismac
+    bf = st < 0;
+elseif isunix
+    bf = st < 0;
+end
 
 e(bf,[1 2]) = e(bf,[2 1]);

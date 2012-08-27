@@ -33,7 +33,7 @@ tempfn=[outfn '-edges.txt'];
 if edgeflag
     fprintf(' Some of the edges of this mesh are shared by more than 2 triangles.\n');
     fprintf(' Check $HOME/mesh2d-check-badedges.txt\n');
-    dlmwrite([getuserdir filesep fn '-badedges.txt'],badedges,' ');
+    dlmwrite(fullfile(getuserdir,[fn '-badedges.txt']),badedges,' ');
     disp(['Check ' tempfn]);
 end
 fprintf('\n Quality: ranges between 0 and 1, with 1 being best quality:\n');

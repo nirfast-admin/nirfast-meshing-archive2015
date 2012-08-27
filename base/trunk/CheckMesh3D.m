@@ -43,7 +43,7 @@ global TetrahedronFailQuality
 if isempty(TetrahedronFailQuality)
     TetrahedronFailQuality=0.03;
 end
-fn=[getuserdir filesep 'Diagnostic-3DMesh'];
+fn = fullfile(getuserdir,'Diagnostic-3DMesh');
 nnpe = size(e,2);
 
 if nnpe==3

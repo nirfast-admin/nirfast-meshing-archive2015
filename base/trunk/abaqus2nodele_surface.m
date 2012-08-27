@@ -37,7 +37,7 @@ for i=1:length(files)
     % remove extention of file name
     [fname ext] = remove_extension(files{i});
     [junk fn] = fileparts(fname);
-    outputfn = [outputdir filesep fn];
+    outputfn = fullfile(outputdir,fn);
     if isempty(strfind(ext,'.inp'))
         error('Input files have to have .inp extensions!')
     end

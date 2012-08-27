@@ -1,4 +1,4 @@
-function [e,p,nodemap,elemap,dim,nnpe]=read_nod_elm(fn,tetgenflag)
+function [e,p,nodemap,elemap,dim,nnpe]=read_nod_elm(infn,tetgenflag)
 % [e,p,nodemap,elemap,dim,nnpe]=read_nod_elm(fn,tetgenflag) reads the node/elm list 
 % from a file whose format is as follows. fn should not have any extension.
 % The format of .nod header is:
@@ -15,33 +15,30 @@ function [e,p,nodemap,elemap,dim,nnpe]=read_nod_elm(fn,tetgenflag)
 % used for files in which node/element numbers don't start from 1.
 
 e=[];p=[];dim=[];nnpe=[];nodemap=[];elemap=[];
-[path fn ext]=fileparts(fn);
 
-foo = str2double(ext(2:end));
-if ~(isempty(foo) && isnan(foo))
-    fn = [fn ext];
-end
+[path foo ext]=fileparts(infn);
 
-if strcmp(ext,'.')
-    fn = fn(1:end-1);
+if isempty(ext) || length(ext) == 1 ...
+        || strcmp(ext,'.node') || strcmp(ext,'.ele')
+    fn = foo;
+else
+    fn = [foo ext];
 end
 
 ext1='.node';
 ext2='.ele';
-format=1;
-if strcmpi(ext,'.nod') || strcmpi(ext,'.elm') || (isempty(ext) && nargin==1)
-    ext1='.nod';
-    ext2='.elm';
-    format=2;
-end    
+
 % first read the node file
 tempfn=add_extension(fn,ext1);
-tempfn = fullfile(path,tempfn);
-fid = OpenFile(tempfn,'rt');
+fid = fopen(fullfile(path,tempfn),'rt');
 
-if format==1 % tetgen format
+if nargin < 2 || isempty(tetgenflag) || tetgenflag == 1
+    format = 1;
+else
+    format = tetgenflag;
+end
+if format == 1 % tetgen format
 % read the header line:
-% no_nodes dimension no_attributes bdymarks
     header=textscan(fid,'%u32 %d8 %d8 %d8',1);
     nn=header{1}; dim=header{2}; natt=header{3}; bdymark=header{4};
     if dim==3
@@ -98,8 +95,7 @@ fclose(fid);
 
 % Now read the element file
 tempfn=add_extension(fn,ext2);
-tempfn = fullfile(path,tempfn);
-fid = OpenFile(tempfn,'rt');
+fid = fopen(fullfile(path,tempfn),'rt');
 
 if format==1
     header=textscan(fid,'%u32 %d8 %d8',1);
