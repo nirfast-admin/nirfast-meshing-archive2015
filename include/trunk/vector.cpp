@@ -12,8 +12,8 @@ c         pnt1,2 - input point coordinates
 c         n - number of coordinates
 c         vec - returned vector components
 c*/
-	// double *ret = new double[n];
-	for (register int k=0; k<n; vec[k] = pnt2[k] - pnt1[k], ++k);
+    // double *ret = new double[n];
+    for (register int k=0; k<n; vec[k] = pnt2[k] - pnt1[k], ++k);
 
 }
 //cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -29,15 +29,15 @@ c               normalized vector (output)
 c         n = number of vector components
 c */   
       
-	int ret=OK;
-	double magvec = v_magn(vec, n);
+    int ret=OK;
+    double magvec = v_magn(vec, n);
       
-	if ( fabs(magvec-0.0) < FloatTol ) {
-		magvec = FloatTol;
-		ret = BAD;
-	}
-	for (register int k=0; k<n; vec[k] /= magvec, ++k);
-	return ret;
+    if ( fabs(magvec-0.0) < FloatTol ) {
+        magvec = FloatTol;
+        ret = BAD;
+    }
+    for (register int k=0; k<n; vec[k] /= magvec, ++k);
+    return ret;
 }
 // cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 void v_cros(double *vec1, double *vec2, int n, double *prod) { //      subroutine v_cros( vec1, vec2, n, prod )
@@ -61,7 +61,7 @@ c*/
       prod[1] = vec1[2]*vec2[0] - vec1[0]*vec2[2];
       prod[2] = vec1[0]*vec2[1] - vec1[1]*vec2[0];
       if (n==4)  
-		prod[3] = 1.0;
+        prod[3] = 1.0;
 }
 //ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 double v_magn(double *vec, int n) { //      real function v_magn(vec, n)
@@ -71,10 +71,10 @@ c    parameters:
 c         vec - the vector
 c         n   - dimension of the vector
 c*/    
-	double sum = 0.;
-	int nn = (n>3) ? 3 : n;
+    double sum = 0.;
+    int nn = (n>3) ? 3 : n;
     for (register int k=0; k<nn; sum += vec[k]*vec[k], ++k);
-	return sqrt(sum);
+    return sqrt(sum);
 }
 
 //cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -89,30 +89,30 @@ c         vec1,2 - the two vectors
 c              n - their dimension
 c*/
       //real vec1(1), vec2(1), 
-	double val=0.0;
-	register int k;	
+    double val=0.0;
+    register int k; 
 
       for (k=0;k<n;++k) {  // do 10 k=1,n
          val += vec1[k]*vec2[k];
-	}  // 10   continue
+    }  // 10   continue
       
-	return val; //v_dot = val
+    return val; //v_dot = val
 }
 
 //cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 double *v_add(double *v1, double *v2, int n) {
 /*
-	adds v1 and v2 and returns the result;
-	written by: Hamid Ghadyani
-	parameters
-		v1, v2 : two input vectors
-		return value: a n-dimension vector containing the addition of v1 and v2
-		n : dimension
+    adds v1 and v2 and returns the result;
+    written by: Hamid Ghadyani
+    parameters
+        v1, v2 : two input vectors
+        return value: a n-dimension vector containing the addition of v1 and v2
+        n : dimension
 */
-	double *ret = new double[n];
-	for (register int i=0; i<n; ret[i] = v1[i] + v2[i], i++)
-		;
-	return ret;
+    double *ret = new double[n];
+    for (register int i=0; i<n; ret[i] = v1[i] + v2[i], i++)
+        ;
+    return ret;
 }
 
 //cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -150,7 +150,7 @@ c     purpose: to compute the distance between two x, y, z points.
 c*/
    //   real    vec0(1), vec1(1)
      // integer n, 
-	int i;
+    int i;
       double work;
       work = 0.0;
 /*c
@@ -158,7 +158,7 @@ c     sum up the squared differences.
 c*/
       for (i=0; i<n; i++) {  //do 100 i = 1, n
          work = work + (vec0[ i ] - vec1[ i ])*(vec0[ i ] - vec1[ i ]);
-	}  // 100  continue
+    }  // 100  continue
 /*c
 c     take the square root and return the answer.
 c*/
@@ -172,24 +172,24 @@ int     degf;            // degreee/radian flag( 0=rad, 1= deg )
 int     dim;               // vector dimension
 */
 double v_angle(double vec1[], double vec2[], int degf, int dim, double zeroTol) {
-	// Cleaned up by Hamid 11/2006
-	double   mag1, mag2, dprod, cosang, angle;
-	
-	mag1 = v_magn(vec1, dim);
-	mag2 = v_magn(vec2, dim);
-	if (fabs(mag1-0.)<zeroTol || fabs(mag2-0.)<zeroTol) {
-		angle =0.;
-	}
-	else {
-		dprod = v_dot(vec1, vec2, dim);
-		cosang = dprod / (mag1 * mag2);
-		cosang = cosang < -1. ? -1. : cosang;
-		cosang = cosang > +1. ? +1. : cosang;
-		angle = acos(cosang);
-		if (degf == 1)
-			angle *= RAD_TO_DEG;
-	}
-	return angle;
+    // Cleaned up by Hamid 11/2006
+    double   mag1, mag2, dprod, cosang, angle;
+    
+    mag1 = v_magn(vec1, dim);
+    mag2 = v_magn(vec2, dim);
+    if (fabs(mag1-0.)<zeroTol || fabs(mag2-0.)<zeroTol) {
+        angle =0.;
+    }
+    else {
+        dprod = v_dot(vec1, vec2, dim);
+        cosang = dprod / (mag1 * mag2);
+        cosang = cosang < -1. ? -1. : cosang;
+        cosang = cosang > +1. ? +1. : cosang;
+        angle = acos(cosang);
+        if (degf == 1)
+            angle *= RAD_TO_DEG;
+    }
+    return angle;
 }
 
 /* Function to calculate the oriented 2D angle between two
@@ -199,13 +199,13 @@ double v_angle3(double vec1[], double vec2[], int degf, int dim, double zeroTol)
 /*double vec1[], vec2[];  // the input vectors
 int    ideg;            // flag indicating result desired in degrees
                         // ( 0=radians, 1=degrees )*/
-	double angle;
-	angle =v_angle(vec1, vec2, degf, dim, zeroTol);
-	if ( (vec1[0]*vec2[1] - vec1[1]*vec2[0]) < 0. )
-		angle = -angle;
-/*	if (degf == 1)
-		angle *= RAD_TO_DEG;*/
-	return angle;
+    double angle;
+    angle =v_angle(vec1, vec2, degf, dim, zeroTol);
+    if ( (vec1[0]*vec2[1] - vec1[1]*vec2[0]) < 0. )
+        angle = -angle;
+/*  if (degf == 1)
+        angle *= RAD_TO_DEG;*/
+    return angle;
 }
 
 double angle_rad_2d (double p1[], double p2[], double p3[], int degf, double zeroTol) 
@@ -217,10 +217,10 @@ double angle_rad_2d (double p1[], double p2[], double p3[], int degf, double zer
     ANGLE_RAD_2D(X1,Y1,X2,Y2,X3,Y3)
     + ANGLE_RAD_2D(X3,Y3,X2,Y2,X1,Y1) = 2 * PI
 
-	Input, double p1,p2,p3, define the rays
+    Input, double p1,p2,p3, define the rays
     p2->p1 (p1-p2) and p2->p3 (p3-p2) which in turn define the
     angle, counterclockwise from p2->p1
-	degf, 0 = rad 1 = deg
+    degf, 0 = rad 1 = deg
 
     Output, double ANGLE_RAD_2D, the angle swept out by the rays, measured
     in radians.  0 <= ANGLE_DEG_2D < 2 PI.  If either ray has zero length,
@@ -238,17 +238,17 @@ double angle_rad_2d (double p1[], double p2[], double p3[], int degf, double zer
   y = ( x1 - x2 ) * ( y3 - y2 ) - ( y1 - y2 ) * ( x3 - x2 );
 
   if ( fabs(x-0.)<zeroTol && fabs(y-0.)<zeroTol ) {
-	  value = 0.0;
+      value = 0.0;
   }
   else {
-	  value = atan2 ( y, x );
-	  if ( value < 0.0 ) {
-		  value = value + 2.0 * PI;
+      value = atan2 ( y, x );
+      if ( value < 0.0 ) {
+          value = value + 2.0 * PI;
     
-	  }
+      }
   }
   if (degf == 1)
-	  value *= RAD_TO_DEG;
+      value *= RAD_TO_DEG;
   // If value is too close to boundary angles, make sure it is exactly that
   value = fabs(value-90. )<zeroTol ? 90.  : value;
   value = fabs(value-180.)<zeroTol ? 180. : value;

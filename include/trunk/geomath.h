@@ -1,11 +1,11 @@
 /*
-	Filename:	geomath.h
-	Language:	C++
-	Date:		1998/05/25
-	Authors:		Ziji Wu
-			  Hamid Ghadyani 2005-2007
-	Version:	Version: 1.0
-	Description:Declare math / geometric functions
+    Filename:   geomath.h
+    Language:   C++
+    Date:       1998/05/25
+    Authors:        Ziji Wu
+              Hamid Ghadyani 2005-2007
+    Version:    Version: 1.0
+    Description:Declare math / geometric functions
 */
 
 #ifndef __dlmathlib_h
@@ -59,25 +59,25 @@ enum LoopStatus {LoopDead=0, LoopLive=1, LoopActive=2};
 
 // Status of line-crossing-line algorithm
 struct LnLnIntersectionStatus {
-	int intersection; // 0 : no intersection, 1: Intersection, 2: colinear
-	// check crossStatus if intersection is not 0, it's meaningless otherwise.
-	// 1 : intersection point is one of endpoints of first line passed to lnln() function
-	// 2 : intersection point is one of endpoints of second line passed to lnln () function
-	// 3 : two lines intersect at each other's end, i.e. they share one endpoint
-	// 4 : intersection point is none of endpoints of either lines being examined for intersection but it exists!
-//	int crossStatus; 
-	double point[2]; // intersection point coordinates, if 'intersection' is 2 (colinear) it contains the midpoint of
-	             // overlapped part of two elements
+    int intersection; // 0 : no intersection, 1: Intersection, 2: colinear
+    // check crossStatus if intersection is not 0, it's meaningless otherwise.
+    // 1 : intersection point is one of endpoints of first line passed to lnln() function
+    // 2 : intersection point is one of endpoints of second line passed to lnln () function
+    // 3 : two lines intersect at each other's end, i.e. they share one endpoint
+    // 4 : intersection point is none of endpoints of either lines being examined for intersection but it exists!
+//  int crossStatus; 
+    double point[2]; // intersection point coordinates, if 'intersection' is 2 (colinear) it contains the midpoint of
+                 // overlapped part of two elements
 };
 
-/*	calculates the cross product of two vectors of  
-	dimension n (n<=3).  vec1 x vec2 = prod */
+/*  calculates the cross product of two vectors of  
+    dimension n (n<=3).  vec1 x vec2 = prod */
 //void v_cros(double *, double *, int , double *);
 
-/*	calculates the dot product of two vectors of dimension n */
+/*  calculates the dot product of two vectors of dimension n */
 double v_dot(double *, double *, int );
 
-/*	determine if a point lies inside or outside of the given 2D boundary */
+/*  determine if a point lies inside or outside of the given 2D boundary */
 int ddcrsline(double , double , double , double , double , double, double tiny=TinyZero );
 
 /*   Determines the intersection point of two straight lines where */
@@ -168,6 +168,6 @@ int pnpoly(int nvert, double *vertx, double *verty, double testx, double testy);
 
 // Routine to check intersection of a 'ray' and a triangle
 int intersect_ray_triangle_moller(double orig[3], double dir[3],
-							  double vert0[3], double vert1[3], double vert2[3],
-							  double *t, double *u, double *v, double EPSILON=TinyZero);
+                              double vert0[3], double vert1[3], double vert2[3],
+                              double *t, double *u, double *v, double EPSILON=TinyZero);
 #endif
