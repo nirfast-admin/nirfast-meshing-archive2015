@@ -9,6 +9,9 @@
 #include <string>
 #include <vector>
 //#include <cstdlib>
+#include <algorithm>
+#include <functional>
+#include <locale>
 
 #include "CPoint.h"
 
@@ -21,6 +24,22 @@ public:
 	virtual ~CFileOperation();
 
 
+    // trim from both ends
+    static inline std::string &trim(std::string &s) {
+            return ltrim(rtrim(s));
+    }
+
+    // trim from start
+    static inline std::string &ltrim(std::string &s) {
+            s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+            return s;
+    }
+
+    // trim from end
+    static inline std::string &rtrim(std::string &s) {
+            s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+            return s;
+    }
 	static void readSPRHeader(std::string inputFile, short *row, short *column, short *slice, short *dimension, std::string& dataType);
 	static void readACQPHeader(std::string inputFile, short *row, short *column, short *slice, short *dimension, std::string& dataType);
 	static std::string MakeFilename(std::string fileTarg, std::string OldExt, std::string NewExt);

@@ -171,13 +171,14 @@ void CFileOperation::GetLine(std::ifstream &in_file, std::string &s)
 
 //Removes white spaces from beginning and end of string s
 void CFileOperation::CleanString(std::string &s)
-{	
-	while ( s.length()!=0 && isspace( s.at(0) ) ) {
-		s.erase(s.begin());
-	}
-	while ( s.length()!=0 && isspace( s.at( s.length()-1 ) ) ) {
-		s.erase(s.length()-1);
-	}
+{
+    s = trim(s);
+    // while ( s.length()!=0 && isspace( s.at(0) ) ) {
+    //  s.erase(s.begin());
+    // }
+    // while ( s.length()!=0 && isspace( s.at( s.length()-1 ) ) ) {
+    //  s.erase(s.length()-1);
+    // }
 }
 
 // Returns the portion of string s that is separated by characyer ch from rest of s

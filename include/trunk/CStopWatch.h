@@ -3,7 +3,7 @@
 
 #include <time.h>
 
-#if defined(WIN32) || defined(WIN64) || defined (WINDOWS) || defined(windows)
+#if defined(_MSC_VER) || defined(WIN32) || defined(WIN64) || defined (WINDOWS) || defined(windows)
 
 typedef struct {
     double start;

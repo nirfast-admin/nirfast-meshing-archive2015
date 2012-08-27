@@ -2,7 +2,7 @@
 
 #include "CStopWatch.h"
 
-#ifdef WIN32
+#if defined(_MSC_VER) || defined(WIN32) || defined(WIN64) || defined (WINDOWS) || defined(windows)
 
 double CStopWatch::getElapsedTime() {	
     return (timer.stop - timer.start) / 1000. ;
