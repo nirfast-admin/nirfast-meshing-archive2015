@@ -3,3 +3,5 @@ meshlib
 *.bak
 *.manifest
 *.map
+*.ele
+*.node

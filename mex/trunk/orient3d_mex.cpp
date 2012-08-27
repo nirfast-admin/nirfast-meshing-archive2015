@@ -14,7 +14,10 @@
 /* times the signed volume of the tetrahedron defined by the   */
 /* four points.                                                */
 
-// To mex under Linux/OSX platforms:
+// To mex under 
+// Linux:
+// mex -v CXXFLAGS="\$CXXFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp" -DLINUX orient3d_mex.cpp meshlib/geomath.cpp meshlib/vector.cpp meshlib/predicates.cpp -I./meshlib
+// Mac:
 // mex -v CXXFLAGS="\$CXXFLAGS -fopenmp" LDFLAGS="\$LDFLAGS -fopenmp" orient3d_mex.cpp meshlib/geomath.cpp meshlib/vector.cpp meshlib/predicates.cpp -I./meshlib
 // Windows:
 // mex -v COMPFLAGS="$COMPFLAGS /openmp" LINKFLAGS="$LINKFLAGS /openmp" -DWIN32  orient3d_mex.cpp meshlib/geomath.cpp meshlib/vector.cpp meshlib/predicates.cpp -I./meshlib
@@ -44,11 +47,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         mxGetN(prhs[2]) != 3 || mxGetN(prhs[3]) != 3 )
       mexErrMsgTxt("orient3d_mex: need 3D input vertices!\n");
     
-    //~ double mytinyzero = TinyZero;
-    //~ if (nrhs >= 4)
-        //~ mytinyzero = *(mxGetPr(prhs[4]));
-    //~ mexPrintf("mytinyzero: %g\n", mytinyzero);
-
     plhs[0] = mxCreateNumericMatrix(ntets, 1, mxINT8_CLASS, mxREAL);
     char *c = (char *) mxGetData(plhs[0]);
     long i = 0, j = 0;
@@ -72,8 +70,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     shared (ntets, prhs, plhs, c, nt, myeps)
     {
       #ifdef _OPENMP
-      //~ #pragma omp master
-      //~ mexPrintf("Number of threads: %d\n", nt);
+      #pragma omp master
+        mexPrintf("Number of threads: %d\n", nt);
       #endif
 
       #pragma omp for

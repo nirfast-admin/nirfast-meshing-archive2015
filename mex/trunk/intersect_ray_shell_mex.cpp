@@ -290,7 +290,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             mexPrintf("Setting intersection_status!\n");
 		plhs[3] = mxCreateNumericMatrix(nintpnts, 1, mxINT8_CLASS, mxREAL);
 		char  *footmp1 = (char *) mxGetData(plhs[3]);
-		for (ULONG i=0; i<nintpnts; footmp1[i]=intersection_status[i],++i);
+		for (ULONG i=0; i<nintpnts; footmp1[i]=intersection_status[i],++i)
+            ;
 
         if (debug)
             mexPrintf("Setting intersected_facets!\n");
