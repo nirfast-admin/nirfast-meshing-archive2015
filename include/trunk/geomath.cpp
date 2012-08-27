@@ -1116,7 +1116,8 @@ int ray_triangle_coplanar(double rp1[3], double rp2[3], double tp1[3], double tp
 	else if (lnlnst==2)
 		return 500;
 	if (lnlnst!=0) {
-		for (int ii=0; ii<3; rowvector.push_back(p[ii]), ++ii);
+		for (int ii=0; ii<3; rowvector.push_back(p[ii]), ++ii)
+            ;
         tmp.push_back(rowvector);
 		rowvector.clear();
 	}
@@ -1145,7 +1146,8 @@ int ray_triangle_coplanar(double rp1[3], double rp2[3], double tp1[3], double tp
 	else if (lnlnst==2)
 		return 501;
 	if (lnlnst!=0) {
-		for (int ii=0; ii<3; rowvector.push_back(p[ii]), ++ii);
+		for (int ii=0; ii<3; rowvector.push_back(p[ii]), ++ii)
+            ;
         tmp.push_back(rowvector);
 		rowvector.clear();
 	}
@@ -1174,7 +1176,8 @@ int ray_triangle_coplanar(double rp1[3], double rp2[3], double tp1[3], double tp
 	else if (lnlnst==2)
 		return 502;
 	if (lnlnst!=0) {
-		for (int ii=0; ii<3; rowvector.push_back(p[ii]), ++ii);
+		for (int ii=0; ii<3; rowvector.push_back(p[ii]), ++ii)
+            ;
         tmp.push_back(rowvector);
 		rowvector.clear();
 	}
@@ -1286,11 +1289,13 @@ int segseg(double p1[3], double p2[3], double p3[3], double p4[3], double tiny, 
 	if (twoD)
 		p1[2]=p2[2]=p3[2]=p4[2]=0.;
 	
-	for (register int i=0; i<3; a[i]=p1[i], b[i]=p2[i]-p1[i], c[i]=p3[i], d[i]=p4[i]-p3[i], ++i);
+	for (register int i=0; i<3; a[i]=p1[i], b[i]=p2[i]-p1[i], c[i]=p3[i], d[i]=p4[i]-p3[i], ++i)
+        ;
 	if (tiny < 0) {
 		double lab = 0.; double lcd = 0.;
 		double ab[3], cd[3];
-		for (register int i=0; i<3; ab[i]=p2[i]-p1[i], cd[i]=p4[i]-p3[i], ++i);
+		for (register int i=0; i<3; ab[i]=p2[i]-p1[i], cd[i]=p4[i]-p3[i], ++i)
+            ;
         lab = v_magn(ab,3);
         lcd = v_magn(cd,3);
 		tiny = std::min(lab, lcd) / 1e6;

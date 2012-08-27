@@ -8,10 +8,11 @@
 //#include <stdlib.h>
 #include <string>
 #include <vector>
-//#include <cstdlib>
+
 #include <algorithm>
 #include <functional>
 #include <locale>
+#include <cstdlib>
 
 #include "CPoint.h"
 
