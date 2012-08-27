@@ -169,7 +169,7 @@ clear output
 
 tmpath=tempdir;
 warning('off','MATLAB:DELETE:FileNotFound');
-delete([tmpath filesep 'input4delaunay.*'],[tmpath filesep 'junk.txt']);
+delete(fullfile(tmpath,'input4delaunay.*'),fullfile(tmpath,'junk.txt'));
 warning('on','MATLAB:DELETE:FileNotFound');
 
 %% Write NIRFAST-format mesh files

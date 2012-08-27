@@ -145,15 +145,15 @@ P = zeros(nrow,ncol,npln,'int8');
 tmpath=tempdir;
 noPLCp = size(p,1);
 warning('off','MATLAB:DELETE:FileNotFound');
-delete([tmpath filesep 'input4delaunay.*'],[tmpath filesep 'junk.txt']);
+delete(fullfile(tmpath,'input4delaunay.*'),fullfile(tmpath,'junk.txt'));
 warning('on','MATLAB:DELETE:FileNotFound');
 
 % Write input files for delaunaygen
 maxtetvol = sqrt(2)/12*edgesize^3;
-inpolyfn = [tmpath filesep 'input4delaunay'];
-junkfn = [tmpath filesep 'junk.txt'];
+inpolyfn = fullfile(tmpath,'input4delaunay');
+junkfn = fullfile(tmpath,'junk.txt');
 
-writenodes_tetgen([tmpath filesep 'input4delaunay.a.node'],PP);
+writenodes_tetgen(fullfile(tmpath,'input4delaunay.a.node'),PP);
 if isfield(myargs,'regions') && ~isempty(myargs.regions)
     for i=1:size(myargs.regions,1)
         ttags = myargs.regions{i,2};
@@ -177,18 +177,20 @@ fprintf('\n---------> Running Delaunay, please wait...');
 delaunay_cmd = sprintf('! "%s" -pqgjGViA "%s.poly" > "%s"',systemcommand,inpolyfn,junkfn);
 % delaunay_cmd = sprintf('! "%s" -pq1.5gjGVAa "%s.poly" > "%s"',systemcommand,inpolyfn,junkfn);
 eval(delaunay_cmd);
-if ~exist([tmpath filesep 'input4delaunay.1.ele'],'file')
-    warning(' Delaunay Generator failed. Trying again...');
+if ~exist(fullfile(tmpath,'input4delaunay.1.ele'),'file')
+    warning('nirfast_meshing:retry_delaunay',...
+        ' Delaunay Generator failed. Trying again...');
     delaunay_cmd = sprintf('! "%s" -pq1.7gjGVAa%.12f "%s.poly" > "%s"',systemcommand,sqrt(2)*maxtetvol,inpolyfn,junkfn);
     eval(delaunay_cmd);
-    if ~exist([tmpath filesep 'input4delaunay.1.ele'],'file')
+    if ~exist(fullfile(tmpath,'input4delaunay.1.ele'),'file')
         error(' Delaunay Generator failed again. Check your input setting!')
     end
 end
 
 fprintf(' done. <---------\n\n');
 
-[tets,points_from_tetgen,nodemap_fromtetgen]=read_nod_elm([tmpath filesep 'input4delaunay.1.'],1);
+[tets,points_from_tetgen,nodemap_fromtetgen] = ...
+    read_nod_elm(fullfile(tmpath,'input4delaunay.1.'),1);
 
 
 function [PP] = TagBoundary3d(p,t,ds,dx,dy,dz,llc,myargs)
