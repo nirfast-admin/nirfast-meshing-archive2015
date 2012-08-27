@@ -40,6 +40,13 @@ dest[0] = v1[0]-v2[0]; \
 dest[1] = v1[1]-v2[1]; \
 dest[2] = v1[2]-v2[2];
 
+#ifndef umaxof
+#define umaxof(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | \
+                    (0xFULL << ((sizeof(t) * 8ULL) - 4ULL)))
+
+#define smaxof(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | \
+                    (0x7ULL << ((sizeof(t) * 8ULL) - 4ULL)))
+#endif
 // NodeDead should be deleted, 
 // NodeLive is in database and in one loop
 // NodeActive is/will be in database but doesn't belong to any loop
