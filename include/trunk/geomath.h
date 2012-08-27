@@ -89,7 +89,7 @@ double dist_lp(double *, double *, double *, double *);
 double dist_VL(double *, double *, double *, int *, double *);
 
 /* Checks equlaity of two float numbers within tiny tolerance */
-bool IsEqual(double a, double b, double tiny = TinyZero);
+bool IsEqual(double const &a, double const &b, double const &tiny);
 
 /* Checls if a point lies on a line */
 int ptOnLine(double sx, double sy, double ex, double ey, double px, double py);

@@ -189,7 +189,7 @@ int lnln(double a1[3], double b1[3], double c1[3], double d1[3], double p[3], do
 }
 
 // Compares a and b and return 'true' if they are equal with tolerance of 'tiny'
-bool IsEqual(double a, double b, double tiny) {
+bool IsEqual(double const &a, double const &b, double const &tiny) {
 	if (fabs(a-b) < tiny)
 		return true;
 	else if (fabs(a-b) >= tiny)
