@@ -30,6 +30,8 @@ if ismac
     bf = st < 0;
 elseif isunix
     bf = st < 0;
+else
+    bf = st < 0;
 end
 
 e(bf,[1 2]) = e(bf,[2 1]);
