@@ -1,10 +1,11 @@
 function [e p st] = improve_mesh_use_stellar(e, p, opt_params)
 if nargin < 3 || isempty(opt_params)
-    qualmeasure = 0;
-    facetsmooth = 0;
-    usequadrics = 1;
     opt_params = [];
 end
+qualmeasure = 0;
+facetsmooth = 0;
+usequadrics = 1;
+
 eorig = e;
 
 mycf = pwd;
@@ -80,7 +81,7 @@ else
     close(h);
 end
 
-delete([fnprefix '.*'])
+delete([fnprefix '.*'],stellar_config_fn)
 cd(mycf)
 
 
