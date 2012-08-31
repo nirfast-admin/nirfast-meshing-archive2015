@@ -4,7 +4,7 @@ function write_medit_sol_file(infn,sol,type)
 % and n is number of solutions/fields attached to each node/element
 % type specifies if the 'sol' is for nodes or elements
 
-fn = add_extension(infn,'.bb');
+fn = add_extension(remove_extension(infn),'.bb');
 fid = fopen(fn,'wt');
 
 nbmet = size(sol,2);

@@ -1,5 +1,21 @@
 function [e p st] = improve_mesh_use_stellar(e, p, opt_params)
+% Use Stellar to improve mesh quality. Note that this routine will add more
+% nodes/elements to mesh and hence alter it.
+% Therefor no material/region property can be used after this routine is
+% done.
+
+if size(e,2) < 4, error(' Can only handle tetrahedral meshes!'); end
+if size(e,2) > 4 % region/material info?
+    warning('nirfast:meshing:optimize', ...
+        [' Mesh optimization routine will produce a mesh with no material info.\n', ...
+        ' You should reassign material info to the new mesh produce by this method.']);
+    e = e(:,1:4);
+end
+
 if nargin < 3 || isempty(opt_params)
+    qualmeasure = 0;
+    facetsmooth = 0;
+    usequadrics = 1;
     opt_params = [];
 end
 qualmeasure = 0;
@@ -74,19 +90,15 @@ else
     [e p] = read_nod_elm([fnprefix '.1.'],1);
     
     fprintf('\n -- Quality Optimziation --\n');
-    fprintf('\tBefore: # of nodes: %d, # of elements: %d\n',...
+    cprintf([0.1 0.5 1],'\tBefore: # of nodes: %d, # of elements: %d\n',...
         orig_nn, orig_ne);
-    cprintf('Blue','\tAfter: # of nodes: %d, # of elements: %d\n',...
+    cprintf('Blue','\tAfter:  # of nodes: %d, # of elements: %d\n',...
         size(p,1), size(e,1));
     fprintf('\tBefore: %s\n\tAfter : %s\n%s'...
         ,bqual,aqual);
     fprintf('\tOptimization Time: %.2f secs\n',t2);
     % Remove unused nodes
-    ee = e(:,1:4);
-    nodes = unique(ee(:));
-    p = p(nodes,:);
-    [tf ee] = ismember(ee,nodes);
-    e(:,1:4) = ee;
+    [e p] = remove_unused_nodes(e,p);
     close(h);
 end
 
