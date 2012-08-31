@@ -9,7 +9,10 @@ function V = mha_read_volume(info)
 %    imshow(squeeze(V(:,:,round(end/2))),[]);
 %
 % 2: V = mha_read_volume('test.mha');
-
+% If you get errors regarding insufficient heap memory when running this
+% routine, please consult this Mathworks article:
+% http://www.mathworks.com/support/solutions/en/data/1-18I2C/index.html
+% 
 if(~isstruct(info)), info=mha_read_header(info); end
 
 
