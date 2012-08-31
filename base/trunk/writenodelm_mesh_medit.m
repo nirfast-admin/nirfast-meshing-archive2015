@@ -64,8 +64,14 @@ end
 newelm = [newelm eID];
 
 fn = add_extension(infn,'.mesh');
-fid=fopen(fn,'wt');
-fprintf(fid,'MeshVersionFormatted 1\n');
+try
+    fid=fopen(fn,'wt');
+    fprintf(fid,'MeshVersionFormatted 1\n');
+catch err
+    cprintf('Error',' Can''t open the file: %s\n',fn);
+    disp(err)
+    rethrow(err)
+end
 fprintf(fid,'Dimension\n3\nVertices\n%u\n',np);
 
 
@@ -94,7 +100,7 @@ if size(p,2) > 3
     sol = nsol;
 elseif mmflag
     type = 1;
-    sol = elm(:,9:end);
+    sol = elm(:,(nnpe+1):end);
 end
 if type
     write_medit_sol_file(infn,sol,type);

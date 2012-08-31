@@ -6,6 +6,9 @@ qualmeasure = 0;
 facetsmooth = 0;
 usequadrics = 1;
 
+orig_nn = size(p,1);
+orig_ne = size(e,1);
+
 eorig = e;
 
 mycf = pwd;
@@ -67,11 +70,17 @@ else
     [ms me foo mstr] = regexp(result,'worstqual:\s*[\d.+-]+');
     bqual = mstr{1};
     aqual = mstr{2};
-    fprintf('\n -- Quality Optimziation --\n\tBefore: %s\n\tAfter : %s\n%s'...
-        ,bqual,aqual);
-    fprintf('\tTime: %.2f secs\n',t2);
     waitbar(0.96,h,'Reading optimized mesh.');
     [e p] = read_nod_elm([fnprefix '.1.'],1);
+    
+    fprintf('\n -- Quality Optimziation --\n');
+    fprintf('\tBefore: # of nodes: %d, # of elements: %d\n',...
+        orig_nn, orig_ne);
+    cprintf('Blue','\tAfter: # of nodes: %d, # of elements: %d\n',...
+        size(p,1), size(e,1));
+    fprintf('\tBefore: %s\n\tAfter : %s\n%s'...
+        ,bqual,aqual);
+    fprintf('\tOptimization Time: %.2f secs\n',t2);
     % Remove unused nodes
     ee = e(:,1:4);
     nodes = unique(ee(:));
