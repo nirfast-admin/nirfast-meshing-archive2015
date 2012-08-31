@@ -84,8 +84,8 @@ if st~=0
     close(h);
 else
     [ms me foo mstr] = regexp(result,'worstqual:\s*[\d.+-]+');
-    bqual = mstr{1}; bqual = regexp(bqual,'[\d.+-]+');
-    aqual = mstr{2}; aqual = regexp(aqual,'[\d.+-]+');
+    bqual = mstr{1}; [ms me foo bqual] = regexp(bqual,'[\d.+-]+');
+    aqual = mstr{2}; [ms me foo aqual] = regexp(aqual,'[\d.+-]+');
     waitbar(0.96,h,'Reading optimized mesh.');
     [e p] = read_nod_elm([fnprefix '.1.'],1);
     
@@ -94,8 +94,8 @@ else
         orig_nn, orig_ne);
     cprintf('Blue','\tAfter:  # of nodes: %d, # of elements: %d\n',...
         size(p,1), size(e,1));
-    cprintf([1 0.3 0.5],'\tBefore: %s\n\tAfter : %s\n%s'...
-        ,bqual,aqual);
+    cprintf([1 0.3 0.5],'\tBefore:  %.4f\n\tAfter :  %.4f\n'...
+        ,str2double(bqual{1}),str2double(aqual{1}));
     fprintf('\tOptimization Time: %.2f secs\n',t2);
     % Remove unused nodes
     [e p] = remove_unused_nodes(e,p);
