@@ -88,6 +88,8 @@ else
     aqual = mstr{2}; [ms me foo aqual] = regexp(aqual,'[\d.+-]+');
     waitbar(0.96,h,'Reading optimized mesh.');
     [e p] = read_nod_elm([fnprefix '.1.'],1);
+    % Remove unused nodes
+    [e p] = remove_unused_nodes(e,p);
     
     fprintf('\n -- Quality Optimziation --\n');
     cprintf([0.1 0.5 1],'\tBefore: # of nodes: %d, # of elements: %d\n',...
@@ -97,8 +99,7 @@ else
     cprintf([1 0.3 0.5],'\tBefore:  %.4f\n\tAfter :  %.4f\n'...
         ,str2double(bqual{1}),str2double(aqual{1}));
     fprintf('\tOptimization Time: %.2f secs\n',t2);
-    % Remove unused nodes
-    [e p] = remove_unused_nodes(e,p);
+
     close(h);
 end
 
