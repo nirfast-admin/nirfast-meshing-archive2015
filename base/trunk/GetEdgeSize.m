@@ -2,6 +2,7 @@ function [edge_avg edgesizes] = GetEdgeSize(e, p, nnpe, average_only)
 % Assuming e and p define a 3D shell surface, or tetrahedral mesh,
 % this function returns the list of all edge lengths or their average
 % By default this routine returns the average of edges only
+edgesizes = [];
 if nargin < 4 || isempty(average_only)
     average_only = 1;
 end
