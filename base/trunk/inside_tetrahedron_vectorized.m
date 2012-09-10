@@ -25,32 +25,16 @@ end
 
 nn = size(nodes,1);
 bsn = ones(size(tets,1),1) * (nn+1);
-bs = [nodes; P];
-V0 = abs(signed_tetrahedron_vol(tets, nodes(:,1), nodes(:,2), nodes(:,3)));
-% 
-% subtets = tets;
-% subtets(:,1) = nn+1;
-% V1 = abs(signed_tetrahedron_vol(subtets, bs(:,1), bs(:,2), bs(:,3)));
-% 
-% subtets = tets;
-% subtets(:,2) = nn+1;
-% V2 = abs(signed_tetrahedron_vol(subtets, bs(:,1), bs(:,2), bs(:,3)));
-% 
-% subtets = tets;
-% subtets(:,3) = nn+1;
-% V3 = abs(signed_tetrahedron_vol(subtets, bs(:,1), bs(:,2), bs(:,3)));
-% 
-% subtets = tets;
-% subtets(:,4) = nn+1;
-% V4 = abs(signed_tetrahedron_vol(subtets, bs(:,1), bs(:,2), bs(:,3)));
+nodes(end+1,:) = P;
 
+V0 = abs(signed_tetrahedron_vol(tets, nodes(:,1), nodes(:,2), nodes(:,3)));
 totv = ...
     abs(signed_tetrahedron_vol([bsn tets(:,2) tets(:,3) tets(:,4)],...
-    bs(:,1), bs(:,2), bs(:,3))) + ...
+    nodes(:,1), nodes(:,2), nodes(:,3))) + ...
     abs(signed_tetrahedron_vol([tets(:,1) bsn tets(:,3) tets(:,4)],...
-    bs(:,1), bs(:,2), bs(:,3))) + ...
+    nodes(:,1), nodes(:,2), nodes(:,3))) + ...
     abs(signed_tetrahedron_vol([tets(:,1) tets(:,2) bsn tets(:,4)],...
-    bs(:,1), bs(:,2), bs(:,3))) + ...
+    nodes(:,1), nodes(:,2), nodes(:,3))) + ...
     abs(signed_tetrahedron_vol([tets(:,1) tets(:,2) tets(:,3) bsn],...
-    bs(:,1), bs(:,2), bs(:,3)));
+    nodes(:,1), nodes(:,2), nodes(:,3)));
 st = (totv - V0) ./ V0 < 1e-6;
