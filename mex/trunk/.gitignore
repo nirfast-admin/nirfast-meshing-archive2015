@@ -5,3 +5,4 @@ meshlib
 *.map
 *.ele
 *.node
+*.lnk
