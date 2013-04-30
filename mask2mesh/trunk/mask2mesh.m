@@ -4,6 +4,7 @@ function [mesh_p mesh_e ext_bdy_nodes regions] = ...
 % Creates a 2D triangular mesh using the mask info defined in I
 % I : input mask (either filename or a grascale image matrix
 % pixel_dim : size of each pixel in mm, cm, inches ...
+%             has two values, for x and y
 % edge_size : size of exterior boundary edges (that contains the whole
 % mask)
 % tri_area : area of each mesh triangle, this number specifies the maximum
@@ -37,7 +38,7 @@ function [mesh_p mesh_e ext_bdy_nodes regions] = ...
 
 %% Based on the test image sent by Josiah, pixel dimension is 0.1923
 if nargin==1 || nargin==0
-    pixel_dim = 0.1923;
+    pixel_dim = [0.1923 0.1923];
     edge_size = 3;
     tri_area = 60;
 elseif nargin~=4
@@ -45,6 +46,10 @@ elseif nargin~=4
                          'mask2mesh(I,pixel_dim,edge_size,tri_area)\n\n']);
     errordlg(' mask2mesh needs 4 input arguments','Meshing Error');
     error(' mask2mesh needs 4 input arguments');
+end
+
+if size(pixel_dim,2)==1
+    pixel_dim = [pixel_dim pixel_dim];
 end
 
 %% Read in image from file or matrix
@@ -70,7 +75,7 @@ if ndims(a)==3
     a=rgb2gray(a);
 end
 
-edge_size = edge_size/pixel_dim;
+edge_size = edge_size/pixel_dim(1);
 mask=flipdim(a,1);
 
 % Create a 2D boundary for the exterior of the mask
@@ -93,7 +98,7 @@ if exist([foofn '.1.node'],'file')
 end
 % Run the mesh generator
 eval(['! "' syscommand '" -pqAa' ...
-    num2str(tri_area/pixel_dim) ' "' foofn '.poly" > ' ...
+    num2str(tri_area/pixel_dim(1)) ' "' foofn '.poly" > ' ...
     tempdir filesep 'junk.txt']);
 [mesh_e,mesh_p]=read_nod_elm([foofn '.1.'],1);
 delete([foofn '.1.ele']);  delete([foofn '.1.node']);
@@ -107,15 +112,16 @@ ext_bdy_nodes = unique([mesh_edges(:,1); mesh_edges(:,2)]);
 mesh.nodes = mesh_p;
 mesh.elements = mesh_e(:,1:3);
 mesh.region = GetNodeRegions(mesh,mask);
-mesh.nodes = mesh.nodes * pixel_dim;
+mesh.nodes(:,1) = mesh.nodes(:,1) * pixel_dim(1);
+mesh.nodes(:,2) = mesh.nodes(:,2) * pixel_dim(2);
 
 mesh_p = mesh.nodes;
 mesh_e = mesh_e(:,1:3);
 regions = mesh.region;
 % Plot the mesh
-figure;
-trisurf(mesh.elements,mesh.nodes(:,1),mesh.nodes(:,2),double(mesh.region))
-colormap(cool); view(2); shading interp;
+% figure;
+% trisurf(mesh.elements,mesh.nodes(:,1),mesh.nodes(:,2),double(mesh.region))
+% colormap(cool); view(2); shading interp;
 
 
 
