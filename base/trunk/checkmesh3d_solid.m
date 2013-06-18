@@ -74,13 +74,13 @@ if type~=0
 end
 nvoids=sum(qualflag);
 
-if nvoids~=0
-    voidfn = [tempdir 'voidelements.txt'];
-    fprintf(' There are %d elements with undesirable quality.\n', nvoids);
-    fprintf(' Check %s.\n',voidfn);
-    [tf idx] = ismember(true,qualflag);
-    dlmwrite(voidfn,[idx e(qualflag,:)],'delimiter',' ','newline',newlinech);
-end
+% if nvoids~=0
+%     voidfn = [tempdir 'voidelements.txt'];
+%     fprintf(' There are %d elements with undesirable quality.\n', nvoids);
+%     fprintf(' Check %s.\n',voidfn);
+%     [tf idx] = ismember(true,qualflag);
+%     dlmwrite(voidfn,[idx e(qualflag,:)],'delimiter',' ','newline',newlinech);
+% end
 
 [st2 badtets bfaces] = check_tetrahedron_faces(e);
 if st2~=0
