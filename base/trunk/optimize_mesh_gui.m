@@ -69,8 +69,16 @@ if(nargin > 3)
           set(hObject, 'Name', varargin{index+1});
          case 'string'
           set(handles.q_text, 'String', varargin{index+1});
+         case 'flag'
+          myflag = varargin{index+1};
         end
     end
+end
+
+if myflag
+    set(handles.text4,'String','Optimization is highly recommended for your mesh due to very poor quality elements!');
+else
+    set(handles.text4,'String','');
 end
 
 % Determine the position of the dialog - centered on the callback figure
