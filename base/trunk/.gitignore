@@ -2,3 +2,4 @@ rotate2.m
 *.m~
 *.asv
 .stellar_config
+.DS_Store
