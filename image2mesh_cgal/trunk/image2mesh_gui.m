@@ -938,7 +938,7 @@ if strcmp(sdfname(end-3:end),'.csv')
     handles.sdcoords = [s.data(:,2) s.data(:,4) s.data(:,4)];
 elseif strcmp(sdfname(end-4:end),'.fcsv') % Fiducials list from 3DSlicer
     fid=fopen(get(handles.sdfilename,'String'),'rt');
-    s=textscan(fid,'%s %f %f %f %n %n %n %n %n %n %n %s','Delimiter',',','MultipleDelimsAsOne',1,'CommentStyle','#');
+    s=textscan(fid,'%s %f %f %f %n %n %n %n %n %n %n %s %s','Delimiter',',','MultipleDelimsAsOne',1,'CommentStyle','#');
     handles.sdcoords = [s{2} s{3} s{4}];
 else
     fid=fopen(get(handles.sdfilename,'String'),'rt');
